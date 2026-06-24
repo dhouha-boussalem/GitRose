@@ -1,0 +1,79 @@
+:root {
+  /* === Rose palette === */
+  --rose-50:  #fff0f6;
+  --rose-100: #ffd6e8;
+  --rose-200: #ffadd2;
+  --rose-300: #ff85bc;
+  --rose-400: #f759a3;
+  --rose-500: #eb2f8a;
+  --rose-600: #c4177a;
+  --rose-700: #9b0c63;
+
+  /* === Dark background === */
+  --bg-deepest:  #0f0610;
+  --bg-deep:     #1a0a14;
+  --bg-surface:  #261320;
+  --bg-elevated: #33192b;
+  --bg-hover:    #3d1f34;
+
+  /* === Text === */
+  --text-primary:   #f8e8f2;
+  --text-secondary: #c49ab5;
+  --text-muted:     #7a5069;
+  --text-accent:    var(--rose-300);
+
+  /* === Borders === */
+  --border-subtle: #3d1f34;
+  --border-medium: #5c2e4e;
+  --border-accent: var(--rose-500);
+
+  /* === Status colors === */
+  --color-added:    #52d9a0;
+  --color-modified: #f7c948;
+  --color-deleted:  #f76059;
+  --color-untracked:#9b8af7;
+
+  /* === Typography === */
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* === Spacing === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* === Shadows === */
+  --shadow-rose: 0 0 20px rgba(235, 47, 138, 0.15);
+  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-deepest);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow: hidden;
+  user-select: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--rose-600);
+}

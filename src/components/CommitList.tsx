@@ -1,0 +1,86 @@
+import type { Commit } from '../types/git';
+
+interface CommitListProps {
+  commits: Commit[];
+  selectedHash: string | null;
+  onSelect: (commit: Commit) => void;
+}
+
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  const hours = Math.floor(diff / 3_600_000);
+  const days = Math.floor(diff / 86_400_000);
+
+  if (hours < 1) return 'Il y a moins d\'1h';
+  if (hours < 24) return `Il y a ${hours}h`;
+  if (days < 7) return `Il y a ${days}j`;
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function getInitials(name: string): string {
+  return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+}
+
+function hashToColor(str: string): string {
+  const colors = ['#f759a3', '#eb2f8a', '#c4177a', '#ff85bc', '#9b0c63'];
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
+}
+
+function parseRefs(refs: string) {
+  if (!refs) return [];
+  return refs.split(', ').filter(Boolean).map((r) => r.trim());
+}
+
+export function CommitList({ commits, selectedHash, onSelect }: CommitListProps) {
+  if (commits.length === 0) {
+    return (
+      <div className="commit-empty">
+        <span>Aucun commit trouvé</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="commit-list">
+      {commits.map((commit) => {
+        const refs = parseRefs(commit.refs);
+        return (
+          <div
+            key={commit.hash}
+            className={`commit-row ${selectedHash === commit.hash ? 'selected' : ''}`}
+            onClick={() => onSelect(commit)}
+          >
+            <div
+              className="commit-avatar"
+              style={{ backgroundColor: hashToColor(commit.email) }}
+            >
+              {getInitials(commit.author)}
+            </div>
+            <div className="commit-body">
+              <div className="commit-top">
+                <span className="commit-message">{commit.message}</span>
+                <span className="commit-date">{formatDate(commit.date)}</span>
+              </div>
+              <div className="commit-bottom">
+                <span className="commit-author">{commit.author}</span>
+                <code className="commit-hash">{commit.shortHash}</code>
+                {refs.map((ref) => (
+                  <span
+                    key={ref}
+                    className={`commit-ref ${ref.includes('HEAD') ? 'ref-head' : ref.includes('origin') ? 'ref-remote' : 'ref-local'}`}
+                  >
+                    {ref.replace('HEAD -> ', '').replace('origin/', '')}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
