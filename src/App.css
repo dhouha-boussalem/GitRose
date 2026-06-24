@@ -257,3 +257,253 @@
 .loading { display: flex; align-items: center; justify-content: center; gap: 10px; height: 100%; color: var(--text-secondary); }
 .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border-medium); border-top-color: var(--rose-500); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* === Action panel === */
+
+.action-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.action-sync-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.action-sync-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 0;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.action-sync-btn:hover:not(:disabled) {
+  border-color: var(--rose-500);
+  background: var(--bg-elevated);
+}
+
+.action-sync-btn:active:not(:disabled) { transform: scale(0.97); }
+.action-sync-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.action-sync-btn.pull:hover:not(:disabled) { border-color: var(--color-untracked); color: var(--color-untracked); }
+.action-sync-btn.push:hover:not(:disabled) { border-color: var(--rose-400); color: var(--rose-300); }
+.action-sync-btn.loading { border-color: var(--rose-500); }
+
+.action-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 8px 16px 0;
+  padding: 10px 12px;
+  background: rgba(247, 96, 89, 0.12);
+  border: 1px solid rgba(247, 96, 89, 0.3);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  color: var(--color-deleted);
+  line-height: 1.4;
+}
+
+.action-error-icon { flex-shrink: 0; font-size: 14px; }
+
+.action-error-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--color-deleted);
+  cursor: pointer;
+  font-size: 13px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.action-error-dismiss:hover { opacity: 1; }
+
+.action-section {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 60px;
+  max-height: 35%;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.action-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 6px;
+  position: sticky;
+  top: 0;
+  background: var(--bg-deepest);
+  z-index: 1;
+}
+
+.action-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.action-link-btn {
+  background: none;
+  border: none;
+  color: var(--rose-400);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+.action-link-btn:hover { color: var(--rose-300); }
+.action-link-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.action-empty {
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.action-file-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 16px;
+  transition: background 0.1s;
+}
+
+.action-file-row:hover { background: var(--bg-surface); }
+
+.action-file-name {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.action-file-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.action-file-btn.stage:hover:not(:disabled) {
+  background: rgba(82, 217, 160, 0.15);
+  border-color: var(--color-added);
+  color: var(--color-added);
+}
+
+.action-file-btn.unstage:hover:not(:disabled) {
+  background: rgba(247, 201, 72, 0.15);
+  border-color: var(--color-modified);
+  color: var(--color-modified);
+}
+
+.action-file-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* === Commit zone === */
+
+.action-commit-zone {
+  padding: 12px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.action-commit-msg {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s;
+  line-height: 1.5;
+}
+
+.action-commit-msg:focus { border-color: var(--rose-500); }
+.action-commit-msg::placeholder { color: var(--text-muted); }
+
+.action-commit-btn {
+  width: 100%;
+  padding: 9px;
+  background: linear-gradient(135deg, var(--rose-500), var(--rose-700));
+  border: none;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: var(--shadow-rose);
+}
+
+.action-commit-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: 0 0 20px rgba(235, 47, 138, 0.4);
+}
+
+.action-commit-btn:active:not(:disabled) { transform: scale(0.98); }
+
+.action-commit-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.action-commit-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* === Spinner générique === */
+
+.btn-spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}

@@ -38,6 +38,12 @@ declare global {
       getBranches: (repoPath: string) => Promise<Branch[]>;
       getStatus: (repoPath: string) => Promise<RepoStatus>;
       getDiff: (repoPath: string, filePath: string) => Promise<string>;
+      stageFile: (repoPath: string, filePath: string) => Promise<void>;
+      unstageFile: (repoPath: string, filePath: string) => Promise<void>;
+      stageAll: (repoPath: string) => Promise<void>;
+      commit: (repoPath: string, message: string) => Promise<void>;
+      push: (repoPath: string) => Promise<void>;
+      pull: (repoPath: string) => Promise<void>;
     };
   }
 }

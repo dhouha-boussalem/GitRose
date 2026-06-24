@@ -96,4 +96,28 @@ export class GitService {
     const git = this.getGit(repoPath);
     return git.diff([filePath]);
   }
+
+  static async stageFile(repoPath: string, filePath: string): Promise<void> {
+    await this.getGit(repoPath).add(filePath);
+  }
+
+  static async unstageFile(repoPath: string, filePath: string): Promise<void> {
+    await this.getGit(repoPath).reset(['HEAD', '--', filePath]);
+  }
+
+  static async stageAll(repoPath: string): Promise<void> {
+    await this.getGit(repoPath).add('.');
+  }
+
+  static async commit(repoPath: string, message: string): Promise<void> {
+    await this.getGit(repoPath).commit(message);
+  }
+
+  static async push(repoPath: string): Promise<void> {
+    await this.getGit(repoPath).push();
+  }
+
+  static async pull(repoPath: string): Promise<void> {
+    await this.getGit(repoPath).pull();
+  }
 }

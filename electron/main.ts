@@ -66,4 +66,28 @@ function registerGitHandlers() {
   ipcMain.handle('git:get-diff', async (_event, repoPath: string, filePath: string) => {
     return GitService.getDiff(repoPath, filePath);
   });
+
+  ipcMain.handle('git:stage-file', async (_event, repoPath: string, filePath: string) => {
+    return GitService.stageFile(repoPath, filePath);
+  });
+
+  ipcMain.handle('git:unstage-file', async (_event, repoPath: string, filePath: string) => {
+    return GitService.unstageFile(repoPath, filePath);
+  });
+
+  ipcMain.handle('git:stage-all', async (_event, repoPath: string) => {
+    return GitService.stageAll(repoPath);
+  });
+
+  ipcMain.handle('git:commit', async (_event, repoPath: string, message: string) => {
+    return GitService.commit(repoPath, message);
+  });
+
+  ipcMain.handle('git:push', async (_event, repoPath: string) => {
+    return GitService.push(repoPath);
+  });
+
+  ipcMain.handle('git:pull', async (_event, repoPath: string) => {
+    return GitService.pull(repoPath);
+  });
 }

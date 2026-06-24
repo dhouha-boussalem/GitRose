@@ -3,7 +3,7 @@ import type { Commit, Branch, RepoStatus } from './types/git';
 import { Sidebar } from './components/Sidebar';
 import { Toolbar } from './components/Toolbar';
 import { CommitList } from './components/CommitList';
-import { StatusPanel } from './components/StatusPanel';
+import { ActionPanel } from './components/ActionPanel';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import './styles/theme.css';
 import './App.css';
@@ -17,6 +17,19 @@ export default function App() {
   const [activeBranch, setActiveBranch] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<'commits' | 'status'>('commits');
   const [loading, setLoading] = useState(false);
+
+  const refreshStatus = useCallback(async () => {
+    if (!repoPath) return;
+    const [c, b, s] = await Promise.all([
+      window.gitRose.getCommits(repoPath),
+      window.gitRose.getBranches(repoPath),
+      window.gitRose.getStatus(repoPath),
+    ]);
+    setCommits(c);
+    setBranches(b);
+    setStatus(s);
+    setActiveBranch(s.current);
+  }, [repoPath]);
 
   const loadRepo = useCallback(async (path: string) => {
     setLoading(true);
@@ -83,7 +96,11 @@ export default function App() {
               onSelect={setSelectedCommit}
             />
           ) : (
-            <StatusPanel status={status} />
+            <ActionPanel
+              repoPath={repoPath}
+              status={status}
+              onRefresh={refreshStatus}
+            />
           )}
         </main>
       </div>
