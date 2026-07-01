@@ -24,7 +24,7 @@ export function Toolbar({ repoPath, status, onOpenRepo, activeView, onViewChange
           ) : (
             <>
               <span className="toolbar-repo-icon">+</span>
-              <span>Ouvrir un dépôt</span>
+              <span>Open repository</span>
             </>
           )}
         </button>
@@ -36,13 +36,13 @@ export function Toolbar({ repoPath, status, onOpenRepo, activeView, onViewChange
             className={`toolbar-nav-btn ${activeView === 'commits' ? 'active' : ''}`}
             onClick={() => onViewChange('commits')}
           >
-            Historique
+            History
           </button>
           <button
             className={`toolbar-nav-btn ${activeView === 'status' ? 'active' : ''}`}
             onClick={() => onViewChange('status')}
           >
-            Modifications
+            Changes
             {changes > 0 && <span className="toolbar-badge">{changes}</span>}
           </button>
         </nav>

@@ -8,11 +8,11 @@ export function WelcomeScreen({ onOpenRepo }: WelcomeScreenProps) {
       <div className="welcome-inner">
         <div className="welcome-logo">🌹</div>
         <h1 className="welcome-title">GitRose</h1>
-        <p className="welcome-subtitle">Un client git avec du caractère</p>
+        <p className="welcome-subtitle">A git client with personality</p>
         <button className="welcome-cta" onClick={onOpenRepo}>
-          Ouvrir un dépôt
+          Open a repository
         </button>
-        <p className="welcome-hint">ou glisse un dossier ici</p>
+        <p className="welcome-hint">or drag a folder here</p>
       </div>
     </div>
   );

@@ -102,15 +102,15 @@ export function ActionPanel({ repoPath, status, onRefresh }: ActionPanelProps) {
         </div>
       )}
 
-      {/* Fichiers non indexés */}
+      {/* Unstaged files */}
       <div className="action-section">
         <div className="action-section-header">
           <span className="action-section-title">
-            Modifications ({(status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)})
+            Changes ({(status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)})
           </span>
           {((status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)) > 0 && (
             <button className="action-link-btn" onClick={handleStageAll} disabled={isLoading}>
-              Tout indexer
+              Stage all
             </button>
           )}
         </div>
@@ -134,15 +134,15 @@ export function ActionPanel({ repoPath, status, onRefresh }: ActionPanelProps) {
           />
         ))}
         {(status?.unstaged?.length ?? 0) === 0 && (status?.untracked?.length ?? 0) === 0 && (
-          <div className="action-empty">Aucune modification</div>
+          <div className="action-empty">No changes</div>
         )}
       </div>
 
-      {/* Fichiers indexés */}
+      {/* Staged files */}
       <div className="action-section">
         <div className="action-section-header">
           <span className="action-section-title">
-            Indexés ({status?.staged?.length ?? 0})
+            Staged ({status?.staged?.length ?? 0})
           </span>
         </div>
 
@@ -156,15 +156,15 @@ export function ActionPanel({ repoPath, status, onRefresh }: ActionPanelProps) {
           />
         ))}
         {(status?.staged?.length ?? 0) === 0 && (
-          <div className="action-empty">Aucun fichier indexé</div>
+          <div className="action-empty">No staged files</div>
         )}
       </div>
 
-      {/* Zone de commit */}
+      {/* Commit zone */}
       <div className="action-commit-zone">
         <textarea
           className="action-commit-msg"
-          placeholder="Message de commit…"
+          placeholder="Commit message…"
           value={commitMsg}
           onChange={(e) => setCommitMsg(e.target.value)}
           onKeyDown={(e) => {
@@ -178,9 +178,9 @@ export function ActionPanel({ repoPath, status, onRefresh }: ActionPanelProps) {
           disabled={!canCommit || isLoading}
         >
           {isLoading ? <span className="btn-spinner" /> : null}
-          Commiter
+          Commit
         </button>
-        <div className="action-commit-hint">Ctrl+Entrée pour commiter</div>
+        <div className="action-commit-hint">Ctrl+Enter to commit</div>
       </div>
     </div>
   );
@@ -221,7 +221,7 @@ function FileRow({
         className={`action-file-btn ${action}`}
         onClick={onAction}
         disabled={disabled}
-        title={action === 'stage' ? 'Indexer' : 'Désindexer'}
+        title={action === 'stage' ? 'Stage' : 'Unstage'}
       >
         {action === 'stage' ? '+' : '−'}
       </button>
