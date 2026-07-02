@@ -7,9 +7,9 @@ interface CommitGraphProps {
 }
 
 const ROW_HEIGHT = 52;
-const LANE_WIDTH = 16;
-const DOT_RADIUS = 5;
-const PADDING = 8;
+const LANE_WIDTH = 12;
+const DOT_RADIUS = 4;
+const PADDING = 6;
 
 function laneX(lane: number): number {
   return PADDING + lane * LANE_WIDTH;

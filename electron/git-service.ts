@@ -245,7 +245,13 @@ function buildGraph(commits: Commit[]): GraphCommit[] {
 
       // Additional parents (merge commits) get new or existing lanes
       for (let p = 1; p < parents.length; p++) {
+        const pidx = commits.findIndex((c, j) => j > i && c.hash === parents[p]);
         const existingLane = findLane(parents[p]);
+        if (pidx === -1 && existingLane === -1) {
+          // Parent is outside the visible window — draw a short stub edge downward, don't hold a lane
+          edges.push({ fromLane: lane, toLane: lane, toIndex: i + 1 });
+          continue;
+        }
         let targetLane: number;
         if (existingLane !== -1) {
           targetLane = existingLane;
@@ -253,7 +259,6 @@ function buildGraph(commits: Commit[]): GraphCommit[] {
           targetLane = freeLane();
           lanes[targetLane] = parents[p];
         }
-        const pidx = commits.findIndex((c, j) => j > i && c.hash === parents[p]);
         edges.push({ fromLane: lane, toLane: targetLane, toIndex: pidx === -1 ? i + 1 : pidx });
       }
     }
