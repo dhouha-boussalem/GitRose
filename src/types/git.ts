@@ -44,6 +44,7 @@ declare global {
       commit: (repoPath: string, message: string) => Promise<void>;
       push: (repoPath: string) => Promise<void>;
       pull: (repoPath: string) => Promise<void>;
+      checkout: (repoPath: string, branch: string) => Promise<void>;
     };
   }
 }

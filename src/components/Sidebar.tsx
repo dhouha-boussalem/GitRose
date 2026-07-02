@@ -1,14 +1,22 @@
+import { useState } from 'react';
 import type { Branch } from '../types/git';
 
 interface SidebarProps {
   branches: Branch[];
-  activeBranch: string | null;
-  onBranchSelect: (name: string) => void;
+  onCheckout: (name: string) => Promise<void>;
 }
 
-export function Sidebar({ branches, activeBranch, onBranchSelect }: SidebarProps) {
+export function Sidebar({ branches, onCheckout }: SidebarProps) {
   const local = branches.filter((b) => !b.isRemote);
   const remote = branches.filter((b) => b.isRemote);
+  const [switching, setSwitching] = useState<string | null>(null);
+
+  async function handleCheckout(name: string, isCurrent: boolean) {
+    if (isCurrent || switching) return;
+    setSwitching(name);
+    await onCheckout(name);
+    setSwitching(null);
+  }
 
   return (
     <aside className="sidebar">
@@ -24,10 +32,14 @@ export function Sidebar({ branches, activeBranch, onBranchSelect }: SidebarProps
         {local.map((branch) => (
           <button
             key={branch.name}
-            className={`branch-item ${branch.current || activeBranch === branch.name ? 'active' : ''}`}
-            onClick={() => onBranchSelect(branch.name)}
+            className={`branch-item ${branch.current ? 'active' : ''} ${switching === branch.name ? 'switching' : ''}`}
+            onClick={() => handleCheckout(branch.name, branch.current)}
+            disabled={!!switching}
+            title={branch.current ? 'Current branch' : `Switch to ${branch.name}`}
           >
-            <span className="branch-icon">{branch.current ? '◆' : '◇'}</span>
+            <span className="branch-icon">
+              {switching === branch.name ? <span className="branch-spinner" /> : branch.current ? '◆' : '◇'}
+            </span>
             <span className="branch-name">{branch.name}</span>
           </button>
         ))}
@@ -39,8 +51,8 @@ export function Sidebar({ branches, activeBranch, onBranchSelect }: SidebarProps
           {remote.map((branch) => (
             <button
               key={branch.name}
-              className={`branch-item remote ${activeBranch === branch.name ? 'active' : ''}`}
-              onClick={() => onBranchSelect(branch.name)}
+              className="branch-item remote"
+              disabled
             >
               <span className="branch-icon">↗</span>
               <span className="branch-name">{branch.name}</span>

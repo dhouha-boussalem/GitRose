@@ -90,4 +90,8 @@ function registerGitHandlers() {
   ipcMain.handle('git:pull', async (_event, repoPath: string) => {
     return GitService.pull(repoPath);
   });
+
+  ipcMain.handle('git:checkout', async (_event, repoPath: string, branch: string) => {
+    return GitService.checkout(repoPath, branch);
+  });
 }

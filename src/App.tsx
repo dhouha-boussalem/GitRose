@@ -14,7 +14,6 @@ export default function App() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [status, setStatus] = useState<RepoStatus | null>(null);
   const [selectedCommit, setSelectedCommit] = useState<Commit | null>(null);
-  const [activeBranch, setActiveBranch] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<'commits' | 'status'>('commits');
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +27,6 @@ export default function App() {
     setCommits(c);
     setBranches(b);
     setStatus(s);
-    setActiveBranch(s.current);
   }, [repoPath]);
 
   const loadRepo = useCallback(async (path: string) => {
@@ -42,7 +40,6 @@ export default function App() {
       setCommits(c);
       setBranches(b);
       setStatus(s);
-      setActiveBranch(s.current);
       setRepoPath(path);
     } catch (err) {
       console.error('Erreur chargement repo:', err);
@@ -80,8 +77,10 @@ export default function App() {
       <div className="app-body">
         <Sidebar
           branches={branches}
-          activeBranch={activeBranch}
-          onBranchSelect={setActiveBranch}
+          onCheckout={async (branch) => {
+            await window.gitRose.checkout(repoPath, branch);
+            await refreshStatus();
+          }}
         />
         <main className="main-content">
           {loading ? (

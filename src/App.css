@@ -507,3 +507,25 @@
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
 }
+
+.branch-spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--border-medium);
+  border-top-color: var(--rose-400);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.branch-item.switching {
+  opacity: 0.7;
+}
+
+.branch-item:disabled {
+  cursor: default;
+}
+
+.branch-item.remote:disabled {
+  opacity: 0.6;
+}

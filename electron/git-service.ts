@@ -137,4 +137,8 @@ export class GitService {
   static async pull(repoPath: string): Promise<void> {
     await this.getGit(repoPath).pull();
   }
+
+  static async checkout(repoPath: string, branch: string): Promise<void> {
+    await this.getGit(repoPath).checkout(branch);
+  }
 }
