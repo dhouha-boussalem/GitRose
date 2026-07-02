@@ -55,6 +55,10 @@ function registerGitHandlers() {
     return GitService.getCommits(repoPath);
   });
 
+  ipcMain.handle('git:get-graph', async (_event, repoPath: string) => {
+    return GitService.getGraphCommits(repoPath);
+  });
+
   ipcMain.handle('git:get-branches', async (_event, repoPath: string) => {
     return GitService.getBranches(repoPath);
   });

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Commit, Branch, RepoStatus } from './types/git';
+import type { Commit, Branch, RepoStatus, GraphCommit } from './types/git';
 import { Sidebar } from './components/Sidebar';
 import { Toolbar } from './components/Toolbar';
-import { CommitList } from './components/CommitList';
+import { CommitGraph } from './components/CommitGraph';
 import { ActionPanel } from './components/ActionPanel';
 import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
@@ -11,10 +11,10 @@ import './App.css';
 
 export default function App() {
   const [repoPath, setRepoPath] = useState<string | null>(null);
-  const [commits, setCommits] = useState<Commit[]>([]);
+  const [commits, setCommits] = useState<GraphCommit[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [status, setStatus] = useState<RepoStatus | null>(null);
-  const [selectedCommit, setSelectedCommit] = useState<Commit | null>(null);
+  const [selectedCommit, setSelectedCommit] = useState<GraphCommit | null>(null);
   const [activeView, setActiveView] = useState<'commits' | 'status'>('commits');
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState('');
@@ -23,7 +23,7 @@ export default function App() {
   const refreshStatus = useCallback(async () => {
     if (!repoPath) return;
     const [c, b, s] = await Promise.all([
-      window.gitRose.getCommits(repoPath),
+      window.gitRose.getGraph(repoPath),
       window.gitRose.getBranches(repoPath),
       window.gitRose.getStatus(repoPath),
     ]);
@@ -36,7 +36,7 @@ export default function App() {
     setLoading(true);
     try {
       const [c, b, s] = await Promise.all([
-        window.gitRose.getCommits(path),
+        window.gitRose.getGraph(path),
         window.gitRose.getBranches(path),
         window.gitRose.getStatus(path),
       ]);
@@ -94,7 +94,7 @@ export default function App() {
               Loading…
             </div>
           ) : activeView === 'commits' ? (
-            <CommitList
+            <CommitGraph
               commits={commits}
               selectedHash={selectedCommit?.hash ?? null}
               onSelect={setSelectedCommit}
