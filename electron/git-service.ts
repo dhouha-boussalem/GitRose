@@ -39,10 +39,7 @@ export class GitService {
 
   static async getCommits(repoPath: string, maxCount = 200): Promise<Commit[]> {
     const git = this.getGit(repoPath);
-    const log: LogResult = await git.log({
-      maxCount,
-      '--format': '%H|%h|%s|%an|%ae|%ai|%D',
-    });
+    const log: LogResult = await git.log({ maxCount });
 
     return log.all.map((entry) => ({
       hash: entry.hash,
