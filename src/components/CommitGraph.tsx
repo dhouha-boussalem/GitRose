@@ -9,10 +9,10 @@ interface CommitGraphProps {
 const ROW_HEIGHT = 52;
 const LANE_WIDTH = 16;
 const DOT_RADIUS = 5;
-const PADDING = 8;
+const PADDING_LEFT = 8;
 
 function laneX(lane: number): number {
-  return PADDING + lane * LANE_WIDTH;
+  return PADDING_LEFT + lane * LANE_WIDTH;
 }
 
 function rowY(index: number): number {
@@ -20,15 +20,15 @@ function rowY(index: number): number {
 }
 
 export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProps) {
-  if (commits.length === 0) return null;
+  if (commits.length === 0) {
+    return <div className="commit-empty"><span>No commits found</span></div>;
+  }
 
   const maxLanes = Math.max(...commits.map((c) => c.lanes), 1);
-  const svgWidth = PADDING * 2 + maxLanes * LANE_WIDTH;
+  const svgWidth = PADDING_LEFT * 2 + maxLanes * LANE_WIDTH;
   const svgHeight = commits.length * ROW_HEIGHT;
 
-  // Build edge paths
   const edgePaths: { d: string; color: string; key: string }[] = [];
-
   for (let i = 0; i < commits.length; i++) {
     const commit = commits[i];
     for (const edge of commit.edges) {
@@ -36,39 +36,27 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
       const y1 = rowY(i);
       const x2 = laneX(edge.toLane);
       const y2 = rowY(edge.toIndex);
-
       let d: string;
       if (x1 === x2) {
         d = `M ${x1} ${y1} L ${x2} ${y2}`;
       } else {
-        const midY = (y1 + y2) / 2;
-        d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+        const cp = y1 + ROW_HEIGHT * 0.6;
+        d = `M ${x1} ${y1} C ${x1} ${cp}, ${x2} ${cp}, ${x2} ${y2}`;
       }
-
-      edgePaths.push({
-        d,
-        color: commit.color,
-        key: `${i}-${edge.fromLane}-${edge.toLane}-${edge.toIndex}`,
-      });
+      edgePaths.push({ d, color: commit.color, key: `${i}-${edge.fromLane}-${edge.toLane}-${edge.toIndex}` });
     }
   }
 
   return (
-    <div className="commit-graph-container" style={{ display: 'flex' }}>
+    <div className="commit-list" style={{ position: 'relative' }}>
+      {/* SVG graph overlay — absolutely positioned, full height */}
       <svg
         width={svgWidth}
         height={svgHeight}
-        style={{ flexShrink: 0, display: 'block' }}
+        style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', flexShrink: 0 }}
       >
         {edgePaths.map((ep) => (
-          <path
-            key={ep.key}
-            d={ep.d}
-            stroke={ep.color}
-            strokeWidth={2}
-            fill="none"
-            opacity={0.7}
-          />
+          <path key={ep.key} d={ep.d} stroke={ep.color} strokeWidth={2} fill="none" opacity={0.75} />
         ))}
         {commits.map((commit, i) => (
           <circle
@@ -82,14 +70,16 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
           />
         ))}
       </svg>
-      <div style={{ flex: 1, minWidth: 0 }}>
+
+      {/* Commit rows, offset by SVG width */}
+      <div style={{ marginLeft: svgWidth }}>
         {commits.map((commit) => {
           const refs = commit.refs ? commit.refs.split(', ').filter(Boolean) : [];
           return (
             <div
               key={commit.hash}
               className={`commit-row ${selectedHash === commit.hash ? 'selected' : ''}`}
-              style={{ height: ROW_HEIGHT }}
+              style={{ height: ROW_HEIGHT, boxSizing: 'border-box' }}
               onClick={() => onSelect(commit)}
             >
               <div
