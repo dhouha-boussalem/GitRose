@@ -4,7 +4,9 @@ import type { Branch } from '../types/git';
 interface SidebarProps {
   branches: Branch[];
   userName: string;
+  focusedBranch: string | null;
   onCheckout: (name: string) => Promise<void>;
+  onFocus: (branch: string | null) => void;
 }
 
 function GirlAvatar() {
@@ -32,7 +34,7 @@ function getInitials(name: string): string {
   return name.split(/\s+/).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 }
 
-export function Sidebar({ branches, userName, onCheckout }: SidebarProps) {
+export function Sidebar({ branches, userName, focusedBranch, onCheckout, onFocus }: SidebarProps) {
   const local = branches.filter((b) => !b.isRemote);
   const remote = branches.filter((b) => b.isRemote);
   const [switching, setSwitching] = useState<string | null>(null);
@@ -42,6 +44,10 @@ export function Sidebar({ branches, userName, onCheckout }: SidebarProps) {
     setSwitching(name);
     await onCheckout(name);
     setSwitching(null);
+  }
+
+  function handleFocus(name: string) {
+    onFocus(focusedBranch === name ? null : name);
   }
 
   return (
@@ -58,11 +64,11 @@ export function Sidebar({ branches, userName, onCheckout }: SidebarProps) {
         {local.map((branch) => (
           <button
             key={branch.name}
-            className={`branch-item ${branch.current ? 'active' : ''} ${switching === branch.name ? 'switching' : ''}`}
+            className={`branch-item ${branch.current ? 'active' : ''} ${switching === branch.name ? 'switching' : ''} ${focusedBranch === branch.name ? 'focused' : ''}`}
+            onClick={() => handleFocus(branch.name)}
             onDoubleClick={() => handleCheckout(branch.name, branch.current)}
-            onClick={() => {}}
             disabled={!!switching}
-            title={branch.current ? 'Current branch' : `Double-click to switch to ${branch.name}`}
+            title={`Click to view history · Double-click to switch`}
           >
             <span className="branch-icon">
               {switching === branch.name ? <span className="branch-spinner" /> : branch.current ? '◆' : '◇'}

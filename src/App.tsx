@@ -19,11 +19,12 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState('');
   const [selectedFile, setSelectedFile] = useState<{ path: string; staged: boolean } | null>(null);
+  const [focusedBranch, setFocusedBranch] = useState<string | null>(null);
 
   const refreshStatus = useCallback(async () => {
     if (!repoPath) return;
     const [c, b, s] = await Promise.all([
-      window.gitRose.getGraph(repoPath),
+      window.gitRose.getGraph(repoPath, focusedBranch ?? undefined),
       window.gitRose.getBranches(repoPath),
       window.gitRose.getStatus(repoPath),
     ]);
@@ -36,7 +37,7 @@ export default function App() {
     setLoading(true);
     try {
       const [c, b, s] = await Promise.all([
-        window.gitRose.getGraph(path),
+        window.gitRose.getGraph(path, undefined),
         window.gitRose.getBranches(path),
         window.gitRose.getStatus(path),
       ]);
@@ -56,6 +57,14 @@ export default function App() {
     const path = await window.gitRose.openRepo();
     if (path) loadRepo(path);
   }, [loadRepo]);
+
+  const handleFocusBranch = useCallback(async (branch: string | null) => {
+    if (!repoPath) return;
+    setFocusedBranch(branch);
+    setSelectedCommit(null);
+    const c = await window.gitRose.getGraph(repoPath, branch ?? undefined);
+    setCommits(c);
+  }, [repoPath]);
 
   useEffect(() => {
     if (!repoPath) return;
@@ -82,10 +91,12 @@ export default function App() {
         <Sidebar
           branches={branches}
           userName={userName}
+          focusedBranch={focusedBranch}
           onCheckout={async (branch) => {
             await window.gitRose.checkout(repoPath, branch);
             await refreshStatus();
           }}
+          onFocus={handleFocusBranch}
         />
         <main className="main-content">
           {loading ? (
@@ -94,11 +105,22 @@ export default function App() {
               Loading…
             </div>
           ) : activeView === 'commits' ? (
-            <CommitGraph
-              commits={commits}
-              selectedHash={selectedCommit?.hash ?? null}
-              onSelect={setSelectedCommit}
-            />
+            <>
+              {focusedBranch && (
+                <div className="branch-focus-banner">
+                  <span className="branch-focus-icon">◆</span>
+                  <span className="branch-focus-name">{focusedBranch}</span>
+                  <button className="branch-focus-clear" onClick={() => handleFocusBranch(null)} title="Show all branches">
+                    ✕ All branches
+                  </button>
+                </div>
+              )}
+              <CommitGraph
+                commits={commits}
+                selectedHash={selectedCommit?.hash ?? null}
+                onSelect={setSelectedCommit}
+              />
+            </>
           ) : (
             <div className="changes-layout">
               <ActionPanel

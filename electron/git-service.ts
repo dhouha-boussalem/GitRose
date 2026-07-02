@@ -45,12 +45,12 @@ export class GitService {
     return simpleGit(repoPath);
   }
 
-  static async getCommits(repoPath: string, maxCount = 200): Promise<Commit[]> {
+  static async getCommits(repoPath: string, maxCount = 200, ref?: string): Promise<Commit[]> {
     const git = this.getGit(repoPath);
-    const log: LogResult = await git.log({ maxCount });
+    const logArgs = ref ? [ref] : [];
+    const log: LogResult = await git.log([...logArgs, `--max-count=${maxCount}`] as any);
 
-    // Get parent hashes separately
-    const parentMap = await this.getParentMap(repoPath, maxCount);
+    const parentMap = await this.getParentMap(repoPath, maxCount, ref);
 
     return log.all.map((entry) => ({
       hash: entry.hash,
@@ -64,9 +64,11 @@ export class GitService {
     }));
   }
 
-  private static async getParentMap(repoPath: string, maxCount: number): Promise<Map<string, string[]>> {
+  private static async getParentMap(repoPath: string, maxCount: number, ref?: string): Promise<Map<string, string[]>> {
     const git = this.getGit(repoPath);
-    const raw = await git.raw(['log', `--max-count=${maxCount}`, '--format=%H %P']);
+    const args = ['log', `--max-count=${maxCount}`, '--format=%H %P'];
+    if (ref) args.push(ref);
+    const raw = await git.raw(args);
     const map = new Map<string, string[]>();
     for (const line of raw.trim().split('\n')) {
       const parts = line.trim().split(' ').filter(Boolean);
@@ -77,8 +79,8 @@ export class GitService {
     return map;
   }
 
-  static async getGraphCommits(repoPath: string, maxCount = 200): Promise<GraphCommit[]> {
-    const commits = await this.getCommits(repoPath, maxCount);
+  static async getGraphCommits(repoPath: string, maxCount = 200, ref?: string): Promise<GraphCommit[]> {
+    const commits = await this.getCommits(repoPath, maxCount, ref);
     return buildGraph(commits);
   }
 

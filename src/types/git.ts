@@ -43,7 +43,7 @@ declare global {
     gitRose: {
       openRepo: () => Promise<string | null>;
       getCommits: (repoPath: string) => Promise<Commit[]>;
-      getGraph: (repoPath: string) => Promise<GraphCommit[]>;
+      getGraph: (repoPath: string, ref?: string) => Promise<GraphCommit[]>;
       getBranches: (repoPath: string) => Promise<Branch[]>;
       getStatus: (repoPath: string) => Promise<RepoStatus>;
       getDiff: (repoPath: string, filePath: string, staged: boolean) => Promise<string>;

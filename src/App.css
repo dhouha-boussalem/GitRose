@@ -530,6 +530,53 @@
   opacity: 0.6;
 }
 
+.branch-item.focused {
+  background: rgba(235, 47, 138, 0.12);
+  color: var(--rose-300);
+  border-left: 2px solid var(--rose-500);
+}
+
+/* === Branch focus banner === */
+
+.branch-focus-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: rgba(235, 47, 138, 0.08);
+  border-bottom: 1px solid rgba(235, 47, 138, 0.2);
+  flex-shrink: 0;
+}
+
+.branch-focus-icon {
+  font-size: 10px;
+  color: var(--rose-500);
+}
+
+.branch-focus-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rose-400);
+  font-family: var(--font-mono);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.branch-focus-clear {
+  background: none;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 2px 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+.branch-focus-clear:hover { color: var(--text-primary); border-color: var(--rose-500); }
+
 .branch-you {
   margin-left: auto;
   flex-shrink: 0;
