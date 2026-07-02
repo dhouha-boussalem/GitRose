@@ -7,6 +7,27 @@ interface SidebarProps {
   onCheckout: (name: string) => Promise<void>;
 }
 
+function GirlAvatar() {
+  return (
+    <svg viewBox="0 0 20 20" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Hair */}
+      <ellipse cx="10" cy="7.5" rx="5" ry="5.5" fill="#ffadd2" />
+      <path d="M5 8 Q4 14 5.5 16 Q7 13 10 13 Q13 13 14.5 16 Q16 14 15 8" fill="#ffadd2" />
+      {/* Face */}
+      <ellipse cx="10" cy="8.5" rx="3.5" ry="4" fill="#ffe4f0" />
+      {/* Bangs */}
+      <path d="M5.5 7 Q7 5 10 5 Q13 5 14.5 7 Q13 6.5 10 6.5 Q7 6.5 5.5 7Z" fill="#eb2f8a" />
+      {/* Eyes */}
+      <circle cx="8.3" cy="8.5" r="0.6" fill="#1a0a14" />
+      <circle cx="11.7" cy="8.5" r="0.6" fill="#1a0a14" />
+      {/* Smile */}
+      <path d="M8.5 10.5 Q10 11.5 11.5 10.5" stroke="#c4177a" strokeWidth="0.6" strokeLinecap="round" fill="none" />
+      {/* Shoulders */}
+      <path d="M4 19 Q5 16 10 15.5 Q15 16 16 19" fill="#eb2f8a" />
+    </svg>
+  );
+}
+
 function getInitials(name: string): string {
   return name.split(/\s+/).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 }
@@ -49,7 +70,7 @@ export function Sidebar({ branches, userName, onCheckout }: SidebarProps) {
             <span className="branch-name">{branch.name}</span>
             {branch.current && (
               <span className="branch-you" title={userName || 'You'}>
-                {userName ? getInitials(userName) : '♥'}
+                {userName ? getInitials(userName) : <GirlAvatar />}
               </span>
             )}
           </button>
