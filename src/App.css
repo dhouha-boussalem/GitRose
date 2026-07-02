@@ -155,7 +155,7 @@
 .branch-item.active { color: var(--rose-300); background: rgba(235,47,138,0.1); }
 .branch-item.remote { opacity: 0.75; }
 .branch-icon { font-size: 10px; width: 14px; flex-shrink: 0; color: var(--rose-500); }
-.branch-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.branch-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* === Main content === */
 

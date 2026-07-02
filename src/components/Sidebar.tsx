@@ -49,7 +49,7 @@ export function Sidebar({ branches, userName, onCheckout }: SidebarProps) {
             <span className="branch-name">{branch.name}</span>
             {branch.current && (
               <span className="branch-you" title={userName || 'You'}>
-                {getInitials(userName || 'Me')}
+                {userName ? getInitials(userName) : '♥'}
               </span>
             )}
           </button>
