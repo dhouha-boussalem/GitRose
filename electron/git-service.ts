@@ -99,7 +99,24 @@ export class GitService {
 
   static async getDiff(repoPath: string, filePath: string, staged = false): Promise<string> {
     const git = this.getGit(repoPath);
-    return staged ? git.diff(['--cached', '--', filePath]) : git.diff(['--', filePath]);
+    const diff = staged
+      ? await git.diff(['--cached', '--', filePath])
+      : await git.diff(['--', filePath]);
+
+    if (diff) return diff;
+
+    // Untracked or new file — read raw content and fake a diff
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const fullPath = path.join(repoPath, filePath);
+    try {
+      const content = await fs.readFile(fullPath, 'utf-8');
+      const lines = content.split('\n');
+      const header = `--- /dev/null\n+++ b/${filePath}\n@@ -0,0 +1,${lines.length} @@\n`;
+      return header + lines.map((l) => '+' + l).join('\n');
+    } catch {
+      return '';
+    }
   }
 
   static async stageFile(repoPath: string, filePath: string): Promise<void> {
