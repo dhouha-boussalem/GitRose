@@ -5,7 +5,7 @@ contextBridge.exposeInMainWorld('gitRose', {
   getCommits: (repoPath: string) => ipcRenderer.invoke('git:get-commits', repoPath),
   getBranches: (repoPath: string) => ipcRenderer.invoke('git:get-branches', repoPath),
   getStatus: (repoPath: string) => ipcRenderer.invoke('git:get-status', repoPath),
-  getDiff: (repoPath: string, filePath: string) => ipcRenderer.invoke('git:get-diff', repoPath, filePath),
+  getDiff: (repoPath: string, filePath: string, staged: boolean) => ipcRenderer.invoke('git:get-diff', repoPath, filePath, staged),
   stageFile: (repoPath: string, filePath: string) => ipcRenderer.invoke('git:stage-file', repoPath, filePath),
   unstageFile: (repoPath: string, filePath: string) => ipcRenderer.invoke('git:unstage-file', repoPath, filePath),
   stageAll: (repoPath: string) => ipcRenderer.invoke('git:stage-all', repoPath),

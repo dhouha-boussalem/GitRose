@@ -4,6 +4,7 @@ import { Sidebar } from './components/Sidebar';
 import { Toolbar } from './components/Toolbar';
 import { CommitList } from './components/CommitList';
 import { ActionPanel } from './components/ActionPanel';
+import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import './styles/theme.css';
 import './App.css';
@@ -17,6 +18,7 @@ export default function App() {
   const [activeView, setActiveView] = useState<'commits' | 'status'>('commits');
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState('');
+  const [selectedFile, setSelectedFile] = useState<{ path: string; staged: boolean } | null>(null);
 
   const refreshStatus = useCallback(async () => {
     if (!repoPath) return;
@@ -98,11 +100,20 @@ export default function App() {
               onSelect={setSelectedCommit}
             />
           ) : (
-            <ActionPanel
-              repoPath={repoPath}
-              status={status}
-              onRefresh={refreshStatus}
-            />
+            <div className="changes-layout">
+              <ActionPanel
+                repoPath={repoPath}
+                status={status}
+                onRefresh={() => { refreshStatus(); setSelectedFile(null); }}
+                onFileSelect={(path, staged) => setSelectedFile({ path, staged })}
+                selectedFile={selectedFile?.path ?? null}
+              />
+              <DiffViewer
+                repoPath={repoPath}
+                filePath={selectedFile?.path ?? null}
+                staged={selectedFile?.staged ?? false}
+              />
+            </div>
           )}
         </main>
       </div>

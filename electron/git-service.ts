@@ -97,9 +97,9 @@ export class GitService {
     };
   }
 
-  static async getDiff(repoPath: string, filePath: string): Promise<string> {
+  static async getDiff(repoPath: string, filePath: string, staged = false): Promise<string> {
     const git = this.getGit(repoPath);
-    return git.diff([filePath]);
+    return staged ? git.diff(['--cached', '--', filePath]) : git.diff(['--', filePath]);
   }
 
   static async stageFile(repoPath: string, filePath: string): Promise<void> {
