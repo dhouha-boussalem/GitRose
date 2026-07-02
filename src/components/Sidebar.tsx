@@ -33,7 +33,8 @@ export function Sidebar({ branches, onCheckout }: SidebarProps) {
           <button
             key={branch.name}
             className={`branch-item ${branch.current ? 'active' : ''} ${switching === branch.name ? 'switching' : ''}`}
-            onClick={() => handleCheckout(branch.name, branch.current)}
+            onDoubleClick={() => handleCheckout(branch.name, branch.current)}
+            onClick={() => {}}
             disabled={!!switching}
             title={branch.current ? 'Current branch' : `Switch to ${branch.name}`}
           >
