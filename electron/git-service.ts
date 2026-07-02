@@ -71,10 +71,15 @@ export class GitService {
     const git = this.getGit(repoPath);
     const status: StatusResult = await git.status();
 
+    const createdSet = new Set(status.created);
+    const deletedStagedSet = new Set(status.deleted.filter((f) => status.staged.includes(f)));
+
     const staged: FileStatus[] = [
       ...status.created.map((f) => ({ path: f, status: 'created', staged: true })),
-      ...status.staged.map((f) => ({ path: f, status: 'modified', staged: true })),
-      ...status.deleted.filter((f) => status.staged.includes(f)).map((f) => ({ path: f, status: 'deleted', staged: true })),
+      ...status.staged
+        .filter((f) => !createdSet.has(f) && !deletedStagedSet.has(f))
+        .map((f) => ({ path: f, status: 'modified', staged: true })),
+      ...[...deletedStagedSet].map((f) => ({ path: f, status: 'deleted', staged: true })),
     ];
 
     const unstaged: FileStatus[] = [
