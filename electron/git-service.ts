@@ -119,7 +119,19 @@ export class GitService {
   }
 
   static async push(repoPath: string): Promise<void> {
-    await this.getGit(repoPath).push();
+    const git = this.getGit(repoPath);
+    const status = await git.status();
+    const branch = status.current;
+    if (!branch) throw new Error('Not on a branch');
+
+    const tracking = await git.revparse(['--abbrev-ref', '--symbolic-full-name', '@{u}'])
+      .catch(() => null);
+
+    if (tracking) {
+      await git.push();
+    } else {
+      await git.push(['--set-upstream', 'origin', branch]);
+    }
   }
 
   static async pull(repoPath: string): Promise<void> {
