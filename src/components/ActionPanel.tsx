@@ -5,11 +5,13 @@ interface ActionPanelProps {
   repoPath: string;
   status: RepoStatus | null;
   onRefresh: () => void;
+  onFileSelect: (path: string, staged: boolean) => void;
+  selectedFile: string | null;
 }
 
 type OpState = 'idle' | 'loading' | 'error';
 
-export function ActionPanel({ repoPath, status, onRefresh }: ActionPanelProps) {
+export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selectedFile }: ActionPanelProps) {
   const [commitMsg, setCommitMsg] = useState('');
   const [opState, setOpState] = useState<OpState>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -121,6 +123,8 @@ export function ActionPanel({ repoPath, status, onRefresh }: ActionPanelProps) {
             file={f}
             action="stage"
             onAction={() => handleStage(f)}
+            onSelect={() => onFileSelect(f.path, false)}
+            selected={selectedFile === f.path}
             disabled={isLoading}
           />
         ))}
@@ -130,6 +134,8 @@ export function ActionPanel({ repoPath, status, onRefresh }: ActionPanelProps) {
             file={{ path, status: 'untracked', staged: false }}
             action="stage"
             onAction={() => handleStage({ path, status: 'untracked', staged: false })}
+            onSelect={() => onFileSelect(path, false)}
+            selected={selectedFile === path}
             disabled={isLoading}
           />
         ))}
@@ -152,6 +158,8 @@ export function ActionPanel({ repoPath, status, onRefresh }: ActionPanelProps) {
             file={f}
             action="unstage"
             onAction={() => handleUnstage(f)}
+            onSelect={() => onFileSelect(f.path, true)}
+            selected={selectedFile === f.path}
             disabled={isLoading}
           />
         ))}
@@ -201,25 +209,27 @@ const statusClass: Record<string, string> = {
 };
 
 function FileRow({
-  file,
-  action,
-  onAction,
-  disabled,
+  file, action, onAction, onSelect, selected, disabled,
 }: {
   file: FileStatus;
   action: 'stage' | 'unstage';
   onAction: () => void;
+  onSelect: () => void;
+  selected: boolean;
   disabled: boolean;
 }) {
   return (
-    <div className="action-file-row">
+    <div
+      className={`action-file-row ${selected ? 'selected' : ''}`}
+      onClick={onSelect}
+    >
       <span className={`status-badge ${statusClass[file.status] ?? 'modified'}`}>
         {statusIcon[file.status] ?? '~'}
       </span>
       <span className="action-file-name">{file.path}</span>
       <button
         className={`action-file-btn ${action}`}
-        onClick={onAction}
+        onClick={(e) => { e.stopPropagation(); onAction(); }}
         disabled={disabled}
         title={action === 'stage' ? 'Stage' : 'Unstage'}
       >

@@ -63,8 +63,8 @@ function registerGitHandlers() {
     return GitService.getStatus(repoPath);
   });
 
-  ipcMain.handle('git:get-diff', async (_event, repoPath: string, filePath: string) => {
-    return GitService.getDiff(repoPath, filePath);
+  ipcMain.handle('git:get-diff', async (_event, repoPath: string, filePath: string, staged: boolean) => {
+    return GitService.getDiff(repoPath, filePath, staged);
   });
 
   ipcMain.handle('git:stage-file', async (_event, repoPath: string, filePath: string) => {
@@ -89,5 +89,13 @@ function registerGitHandlers() {
 
   ipcMain.handle('git:pull', async (_event, repoPath: string) => {
     return GitService.pull(repoPath);
+  });
+
+  ipcMain.handle('git:checkout', async (_event, repoPath: string, branch: string) => {
+    return GitService.checkout(repoPath, branch);
+  });
+
+  ipcMain.handle('git:get-user', async (_event, repoPath: string) => {
+    return GitService.getUser(repoPath);
   });
 }

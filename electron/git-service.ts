@@ -39,10 +39,7 @@ export class GitService {
 
   static async getCommits(repoPath: string, maxCount = 200): Promise<Commit[]> {
     const git = this.getGit(repoPath);
-    const log: LogResult = await git.log({
-      maxCount,
-      '--format': '%H|%h|%s|%an|%ae|%ai|%D',
-    });
+    const log: LogResult = await git.log({ maxCount });
 
     return log.all.map((entry) => ({
       hash: entry.hash,
@@ -71,10 +68,15 @@ export class GitService {
     const git = this.getGit(repoPath);
     const status: StatusResult = await git.status();
 
+    const createdSet = new Set(status.created);
+    const deletedStagedSet = new Set(status.deleted.filter((f) => status.staged.includes(f)));
+
     const staged: FileStatus[] = [
       ...status.created.map((f) => ({ path: f, status: 'created', staged: true })),
-      ...status.staged.map((f) => ({ path: f, status: 'modified', staged: true })),
-      ...status.deleted.filter((f) => status.staged.includes(f)).map((f) => ({ path: f, status: 'deleted', staged: true })),
+      ...status.staged
+        .filter((f) => !createdSet.has(f) && !deletedStagedSet.has(f))
+        .map((f) => ({ path: f, status: 'modified', staged: true })),
+      ...[...deletedStagedSet].map((f) => ({ path: f, status: 'deleted', staged: true })),
     ];
 
     const unstaged: FileStatus[] = [
@@ -92,9 +94,26 @@ export class GitService {
     };
   }
 
-  static async getDiff(repoPath: string, filePath: string): Promise<string> {
+  static async getDiff(repoPath: string, filePath: string, staged = false): Promise<string> {
     const git = this.getGit(repoPath);
-    return git.diff([filePath]);
+    const diff = staged
+      ? await git.diff(['--cached', '--', filePath])
+      : await git.diff(['--', filePath]);
+
+    if (diff) return diff;
+
+    // Untracked or new file — read raw content and fake a diff
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const fullPath = path.join(repoPath, filePath);
+    try {
+      const content = await fs.readFile(fullPath, 'utf-8');
+      const lines = content.split('\n');
+      const header = `--- /dev/null\n+++ b/${filePath}\n@@ -0,0 +1,${lines.length} @@\n`;
+      return header + lines.map((l) => '+' + l).join('\n');
+    } catch {
+      return '';
+    }
   }
 
   static async stageFile(repoPath: string, filePath: string): Promise<void> {
@@ -114,10 +133,33 @@ export class GitService {
   }
 
   static async push(repoPath: string): Promise<void> {
-    await this.getGit(repoPath).push();
+    const git = this.getGit(repoPath);
+    const status = await git.status();
+    const branch = status.current;
+    if (!branch) throw new Error('Not on a branch');
+
+    const tracking = await git.revparse(['--abbrev-ref', '--symbolic-full-name', '@{u}'])
+      .catch(() => null);
+
+    if (tracking) {
+      await git.push();
+    } else {
+      await git.push(['--set-upstream', 'origin', branch]);
+    }
   }
 
   static async pull(repoPath: string): Promise<void> {
     await this.getGit(repoPath).pull();
+  }
+
+  static async checkout(repoPath: string, branch: string): Promise<void> {
+    await this.getGit(repoPath).checkout(branch);
+  }
+
+  static async getUser(repoPath: string): Promise<{ name: string; email: string }> {
+    const git = this.getGit(repoPath);
+    const name = await git.raw(['config', 'user.name']).then((s) => s.trim()).catch(() => '');
+    const email = await git.raw(['config', 'user.email']).then((s) => s.trim()).catch(() => '');
+    return { name, email };
   }
 }

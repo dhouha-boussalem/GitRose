@@ -4,6 +4,7 @@ import { Sidebar } from './components/Sidebar';
 import { Toolbar } from './components/Toolbar';
 import { CommitList } from './components/CommitList';
 import { ActionPanel } from './components/ActionPanel';
+import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import './styles/theme.css';
 import './App.css';
@@ -14,9 +15,10 @@ export default function App() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [status, setStatus] = useState<RepoStatus | null>(null);
   const [selectedCommit, setSelectedCommit] = useState<Commit | null>(null);
-  const [activeBranch, setActiveBranch] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<'commits' | 'status'>('commits');
   const [loading, setLoading] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [selectedFile, setSelectedFile] = useState<{ path: string; staged: boolean } | null>(null);
 
   const refreshStatus = useCallback(async () => {
     if (!repoPath) return;
@@ -28,7 +30,6 @@ export default function App() {
     setCommits(c);
     setBranches(b);
     setStatus(s);
-    setActiveBranch(s.current);
   }, [repoPath]);
 
   const loadRepo = useCallback(async (path: string) => {
@@ -42,8 +43,8 @@ export default function App() {
       setCommits(c);
       setBranches(b);
       setStatus(s);
-      setActiveBranch(s.current);
       setRepoPath(path);
+      window.gitRose.getUser(path).then((u) => setUserName(u.name)).catch(() => {});
     } catch (err) {
       console.error('Erreur chargement repo:', err);
     } finally {
@@ -80,8 +81,11 @@ export default function App() {
       <div className="app-body">
         <Sidebar
           branches={branches}
-          activeBranch={activeBranch}
-          onBranchSelect={setActiveBranch}
+          userName={userName}
+          onCheckout={async (branch) => {
+            await window.gitRose.checkout(repoPath, branch);
+            await refreshStatus();
+          }}
         />
         <main className="main-content">
           {loading ? (
@@ -96,11 +100,20 @@ export default function App() {
               onSelect={setSelectedCommit}
             />
           ) : (
-            <ActionPanel
-              repoPath={repoPath}
-              status={status}
-              onRefresh={refreshStatus}
-            />
+            <div className="changes-layout">
+              <ActionPanel
+                repoPath={repoPath}
+                status={status}
+                onRefresh={() => { refreshStatus(); setSelectedFile(null); }}
+                onFileSelect={(path, staged) => setSelectedFile({ path, staged })}
+                selectedFile={selectedFile?.path ?? null}
+              />
+              <DiffViewer
+                repoPath={repoPath}
+                filePath={selectedFile?.path ?? null}
+                staged={selectedFile?.staged ?? false}
+              />
+            </div>
           )}
         </main>
       </div>
