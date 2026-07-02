@@ -13,10 +13,10 @@ function formatDate(dateStr: string): string {
   const hours = Math.floor(diff / 3_600_000);
   const days = Math.floor(diff / 86_400_000);
 
-  if (hours < 1) return 'Il y a moins d\'1h';
-  if (hours < 24) return `Il y a ${hours}h`;
-  if (days < 7) return `Il y a ${days}j`;
-  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  if (hours < 1) return 'Just now';
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function getInitials(name: string): string {
@@ -39,7 +39,7 @@ export function CommitList({ commits, selectedHash, onSelect }: CommitListProps)
   if (commits.length === 0) {
     return (
       <div className="commit-empty">
-        <span>Aucun commit trouvé</span>
+        <span>No commits found</span>
       </div>
     );
   }

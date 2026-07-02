@@ -87,7 +87,7 @@ export default function App() {
           {loading ? (
             <div className="loading">
               <span className="loading-spinner" />
-              Chargement…
+              Loading…
             </div>
           ) : activeView === 'commits' ? (
             <CommitList

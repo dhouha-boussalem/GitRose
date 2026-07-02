@@ -20,7 +20,7 @@ export function Sidebar({ branches, activeBranch, onBranchSelect }: SidebarProps
       </div>
 
       <div className="sidebar-section">
-        <div className="sidebar-label">LOCAL</div>
+        <div className="sidebar-label">LOCAL BRANCHES</div>
         {local.map((branch) => (
           <button
             key={branch.name}
@@ -35,7 +35,7 @@ export function Sidebar({ branches, activeBranch, onBranchSelect }: SidebarProps
 
       {remote.length > 0 && (
         <div className="sidebar-section">
-          <div className="sidebar-label">REMOTE</div>
+          <div className="sidebar-label">REMOTE BRANCHES</div>
           {remote.map((branch) => (
             <button
               key={branch.name}
