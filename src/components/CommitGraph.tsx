@@ -9,10 +9,10 @@ interface CommitGraphProps {
 const ROW_HEIGHT = 52;
 const LANE_WIDTH = 16;
 const DOT_RADIUS = 5;
-const PADDING_LEFT = 8;
+const PADDING = 8;
 
 function laneX(lane: number): number {
-  return PADDING_LEFT + lane * LANE_WIDTH;
+  return PADDING + lane * LANE_WIDTH;
 }
 
 function rowY(index: number): number {
@@ -25,7 +25,7 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
   }
 
   const maxLanes = Math.max(...commits.map((c) => c.lanes), 1);
-  const svgWidth = PADDING_LEFT * 2 + maxLanes * LANE_WIDTH;
+  const svgWidth = PADDING * 2 + maxLanes * LANE_WIDTH;
   const svgHeight = commits.length * ROW_HEIGHT;
 
   const edgePaths: { d: string; color: string; key: string }[] = [];
@@ -48,67 +48,70 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
   }
 
   return (
-    <div className="commit-list" style={{ position: 'relative' }}>
-      {/* SVG graph overlay — absolutely positioned, full height */}
-      <svg
-        width={svgWidth}
-        height={svgHeight}
-        style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', flexShrink: 0 }}
-      >
-        {edgePaths.map((ep) => (
-          <path key={ep.key} d={ep.d} stroke={ep.color} strokeWidth={2} fill="none" opacity={0.75} />
-        ))}
-        {commits.map((commit, i) => (
-          <circle
-            key={commit.hash}
-            cx={laneX(commit.lane)}
-            cy={rowY(i)}
-            r={DOT_RADIUS}
-            fill={commit.color}
-            stroke="var(--bg-surface)"
-            strokeWidth={1.5}
-          />
-        ))}
-      </svg>
-
-      {/* Commit rows, offset by SVG width */}
-      <div style={{ marginLeft: svgWidth }}>
-        {commits.map((commit) => {
-          const refs = commit.refs ? commit.refs.split(', ').filter(Boolean) : [];
-          return (
-            <div
+    // .commit-list = flex:1; overflow-y:auto — the single scroll container
+    <div className="commit-list">
+      {/* inner flex row: SVG column left, commit rows right — both scroll together */}
+      <div style={{ display: 'flex' }}>
+        <svg
+          width={svgWidth}
+          height={svgHeight}
+          style={{ display: 'block', flexShrink: 0 }}
+        >
+          {edgePaths.map((ep) => (
+            <path key={ep.key} d={ep.d} stroke={ep.color} strokeWidth={2} fill="none" opacity={0.75} />
+          ))}
+          {commits.map((commit, i) => (
+            <circle
               key={commit.hash}
-              className={`commit-row ${selectedHash === commit.hash ? 'selected' : ''}`}
-              style={{ height: ROW_HEIGHT, boxSizing: 'border-box' }}
-              onClick={() => onSelect(commit)}
-            >
+              cx={laneX(commit.lane)}
+              cy={rowY(i)}
+              r={DOT_RADIUS}
+              fill={commit.color}
+              stroke="var(--bg-surface)"
+              strokeWidth={1.5}
+            />
+          ))}
+        </svg>
+
+        {/* commit rows column */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {commits.map((commit) => {
+            const refs = commit.refs ? commit.refs.split(', ').filter(Boolean) : [];
+            return (
               <div
-                className="commit-avatar"
-                style={{ backgroundColor: hashToColor(commit.email) }}
+                key={commit.hash}
+                className={`commit-row ${selectedHash === commit.hash ? 'selected' : ''}`}
+                style={{ height: ROW_HEIGHT, boxSizing: 'border-box' }}
+                onClick={() => onSelect(commit)}
               >
-                {getInitials(commit.author)}
-              </div>
-              <div className="commit-body">
-                <div className="commit-top">
-                  <span className="commit-message">{commit.message}</span>
-                  <span className="commit-date">{formatDate(commit.date)}</span>
+                <div
+                  className="commit-avatar"
+                  style={{ backgroundColor: hashToColor(commit.email) }}
+                >
+                  {getInitials(commit.author)}
                 </div>
-                <div className="commit-bottom">
-                  <span className="commit-author">{commit.author}</span>
-                  <code className="commit-hash">{commit.shortHash}</code>
-                  {refs.map((ref) => (
-                    <span
-                      key={ref}
-                      className={`commit-ref ${ref.includes('HEAD') ? 'ref-head' : ref.includes('origin') ? 'ref-remote' : 'ref-local'}`}
-                    >
-                      {ref.replace('HEAD -> ', '').replace('origin/', '')}
-                    </span>
-                  ))}
+                <div className="commit-body">
+                  <div className="commit-top">
+                    <span className="commit-message">{commit.message}</span>
+                    <span className="commit-date">{formatDate(commit.date)}</span>
+                  </div>
+                  <div className="commit-bottom">
+                    <span className="commit-author">{commit.author}</span>
+                    <code className="commit-hash">{commit.shortHash}</code>
+                    {refs.map((ref) => (
+                      <span
+                        key={ref}
+                        className={`commit-ref ${ref.includes('HEAD') ? 'ref-head' : ref.includes('origin') ? 'ref-remote' : 'ref-local'}`}
+                      >
+                        {ref.replace('HEAD -> ', '').replace('origin/', '')}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
