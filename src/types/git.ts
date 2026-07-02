@@ -45,6 +45,7 @@ declare global {
       push: (repoPath: string) => Promise<void>;
       pull: (repoPath: string) => Promise<void>;
       checkout: (repoPath: string, branch: string) => Promise<void>;
+      getUser: (repoPath: string) => Promise<{ name: string; email: string }>;
     };
   }
 }

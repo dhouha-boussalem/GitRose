@@ -141,4 +141,11 @@ export class GitService {
   static async checkout(repoPath: string, branch: string): Promise<void> {
     await this.getGit(repoPath).checkout(branch);
   }
+
+  static async getUser(repoPath: string): Promise<{ name: string; email: string }> {
+    const git = this.getGit(repoPath);
+    const name = await git.raw(['config', 'user.name']).then((s) => s.trim()).catch(() => '');
+    const email = await git.raw(['config', 'user.email']).then((s) => s.trim()).catch(() => '');
+    return { name, email };
+  }
 }

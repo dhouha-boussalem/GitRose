@@ -3,10 +3,15 @@ import type { Branch } from '../types/git';
 
 interface SidebarProps {
   branches: Branch[];
+  userName: string;
   onCheckout: (name: string) => Promise<void>;
 }
 
-export function Sidebar({ branches, onCheckout }: SidebarProps) {
+function getInitials(name: string): string {
+  return name.split(/\s+/).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
+}
+
+export function Sidebar({ branches, userName, onCheckout }: SidebarProps) {
   const local = branches.filter((b) => !b.isRemote);
   const remote = branches.filter((b) => b.isRemote);
   const [switching, setSwitching] = useState<string | null>(null);
@@ -36,12 +41,17 @@ export function Sidebar({ branches, onCheckout }: SidebarProps) {
             onDoubleClick={() => handleCheckout(branch.name, branch.current)}
             onClick={() => {}}
             disabled={!!switching}
-            title={branch.current ? 'Current branch' : `Switch to ${branch.name}`}
+            title={branch.current ? 'Current branch' : `Double-click to switch to ${branch.name}`}
           >
             <span className="branch-icon">
               {switching === branch.name ? <span className="branch-spinner" /> : branch.current ? '◆' : '◇'}
             </span>
             <span className="branch-name">{branch.name}</span>
+            {branch.current && (
+              <span className="branch-you" title={userName || 'You'}>
+                {getInitials(userName || 'Me')}
+              </span>
+            )}
           </button>
         ))}
       </div>

@@ -16,6 +16,7 @@ export default function App() {
   const [selectedCommit, setSelectedCommit] = useState<Commit | null>(null);
   const [activeView, setActiveView] = useState<'commits' | 'status'>('commits');
   const [loading, setLoading] = useState(false);
+  const [userName, setUserName] = useState('');
 
   const refreshStatus = useCallback(async () => {
     if (!repoPath) return;
@@ -41,6 +42,7 @@ export default function App() {
       setBranches(b);
       setStatus(s);
       setRepoPath(path);
+      window.gitRose.getUser(path).then((u) => setUserName(u.name)).catch(() => {});
     } catch (err) {
       console.error('Erreur chargement repo:', err);
     } finally {
@@ -77,6 +79,7 @@ export default function App() {
       <div className="app-body">
         <Sidebar
           branches={branches}
+          userName={userName}
           onCheckout={async (branch) => {
             await window.gitRose.checkout(repoPath, branch);
             await refreshStatus();

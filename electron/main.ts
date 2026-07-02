@@ -94,4 +94,8 @@ function registerGitHandlers() {
   ipcMain.handle('git:checkout', async (_event, repoPath: string, branch: string) => {
     return GitService.checkout(repoPath, branch);
   });
+
+  ipcMain.handle('git:get-user', async (_event, repoPath: string) => {
+    return GitService.getUser(repoPath);
+  });
 }

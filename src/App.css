@@ -529,3 +529,20 @@
 .branch-item.remote:disabled {
   opacity: 0.6;
 }
+
+.branch-you {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rose-500), var(--rose-700));
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 6px rgba(235, 47, 138, 0.5);
+  letter-spacing: 0;
+}
