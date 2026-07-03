@@ -20,6 +20,7 @@ export default function App() {
   const [userName, setUserName] = useState('');
   const [selectedFile, setSelectedFile] = useState<{ path: string; staged: boolean } | null>(null);
   const [focusedBranch, setFocusedBranch] = useState<string | null>(null);
+  const [showGraph, setShowGraph] = useState(false);
 
   const refreshStatus = useCallback(async () => {
     if (!repoPath) return;
@@ -106,18 +107,30 @@ export default function App() {
             </div>
           ) : activeView === 'commits' ? (
             <>
-              {focusedBranch && (
-                <div className="branch-focus-banner">
-                  <span className="branch-focus-icon">◆</span>
-                  <span className="branch-focus-name">{focusedBranch}</span>
-                  <button className="branch-focus-clear" onClick={() => handleFocusBranch(null)} title="Show all branches">
-                    ✕ All branches
-                  </button>
-                </div>
-              )}
+              <div className="history-toolbar">
+                {focusedBranch ? (
+                  <>
+                    <span className="branch-focus-icon">◆</span>
+                    <span className="branch-focus-name">{focusedBranch}</span>
+                    <button className="branch-focus-clear" onClick={() => handleFocusBranch(null)}>
+                      ✕ All branches
+                    </button>
+                  </>
+                ) : (
+                  <span className="history-toolbar-hint">Click a branch to filter</span>
+                )}
+                <button
+                  className={`graph-toggle-btn ${showGraph ? 'active' : ''}`}
+                  onClick={() => setShowGraph((v) => !v)}
+                  title={showGraph ? 'Hide graph' : 'Show graph'}
+                >
+                  {showGraph ? '⬡ Hide graph' : '⬡ Show graph'}
+                </button>
+              </div>
               <CommitGraph
                 commits={commits}
                 selectedHash={selectedCommit?.hash ?? null}
+                showGraph={showGraph}
                 onSelect={setSelectedCommit}
               />
             </>

@@ -3,14 +3,15 @@ import type { GraphCommit } from '../types/git';
 interface CommitGraphProps {
   commits: GraphCommit[];
   selectedHash: string | null;
+  showGraph: boolean;
   onSelect: (commit: GraphCommit) => void;
 }
 
 const ROW_HEIGHT = 60;
-const LANE_WIDTH = 9;
+const LANE_WIDTH = 10;
 const DOT_RADIUS = 4;
-const PADDING = 6;
-const SVG_EXTRA = 10;
+const PADDING = 8;
+const SVG_EXTRA = 12;
 
 function laneX(lane: number): number {
   return PADDING + lane * LANE_WIDTH;
@@ -20,7 +21,7 @@ function rowY(index: number): number {
   return index * ROW_HEIGHT + ROW_HEIGHT / 2;
 }
 
-export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProps) {
+export function CommitGraph({ commits, selectedHash, showGraph, onSelect }: CommitGraphProps) {
   if (commits.length === 0) {
     return <div className="commit-empty"><span>No commits found</span></div>;
   }
@@ -30,51 +31,48 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
   const svgHeight = commits.length * ROW_HEIGHT;
 
   const edgePaths: { d: string; color: string; key: string }[] = [];
-  for (let i = 0; i < commits.length; i++) {
-    const commit = commits[i];
-    for (const edge of commit.edges) {
-      const x1 = laneX(edge.fromLane);
-      const y1 = rowY(i);
-      const x2 = laneX(edge.toLane);
-      const y2 = rowY(edge.toIndex);
-      let d: string;
-      if (x1 === x2) {
-        d = `M ${x1} ${y1} L ${x2} ${y2}`;
-      } else {
-        const midY = (y1 + y2) / 2;
-        d = `M ${x1} ${y1} Q ${x1} ${midY}, ${x2} ${y2}`;
+  if (showGraph) {
+    for (let i = 0; i < commits.length; i++) {
+      const commit = commits[i];
+      for (const edge of commit.edges) {
+        const x1 = laneX(edge.fromLane);
+        const y1 = rowY(i);
+        const x2 = laneX(edge.toLane);
+        const y2 = rowY(edge.toIndex);
+        const d = x1 === x2
+          ? `M ${x1} ${y1} L ${x2} ${y2}`
+          : `M ${x1} ${y1} Q ${x1} ${(y1 + y2) / 2}, ${x2} ${y2}`;
+        edgePaths.push({ d, color: commit.color, key: `${i}-${edge.fromLane}-${edge.toLane}` });
       }
-      edgePaths.push({ d, color: commit.color, key: `${i}-${edge.fromLane}-${edge.toLane}-${edge.toIndex}` });
     }
   }
 
   return (
-    // .commit-list = flex:1; overflow-y:auto — the single scroll container
     <div className="commit-list">
-      {/* inner flex row: SVG column left, commit rows right — both scroll together */}
       <div style={{ display: 'flex' }}>
-        <svg
-          width={svgWidth}
-          height={svgHeight}
-          style={{ display: 'block', flexShrink: 0 }}
-        >
-          {edgePaths.map((ep) => (
-            <path key={ep.key} d={ep.d} stroke={ep.color} strokeWidth={2.5} fill="none" opacity={0.9} />
-          ))}
-          {commits.map((commit, i) => (
-            <circle
-              key={commit.hash}
-              cx={laneX(commit.lane)}
-              cy={rowY(i)}
-              r={DOT_RADIUS}
-              fill={commit.color}
-              stroke="#fff"
-              strokeWidth={2}
-            />
-          ))}
-        </svg>
+        {showGraph && (
+          <svg
+            width={svgWidth}
+            height={svgHeight}
+            style={{ display: 'block', flexShrink: 0 }}
+          >
+            {edgePaths.map((ep) => (
+              <path key={ep.key} d={ep.d} stroke={ep.color} strokeWidth={2} fill="none" opacity={0.85} />
+            ))}
+            {commits.map((commit, i) => (
+              <circle
+                key={commit.hash}
+                cx={laneX(commit.lane)}
+                cy={rowY(i)}
+                r={DOT_RADIUS}
+                fill={commit.color}
+                stroke="#fff"
+                strokeWidth={1.5}
+              />
+            ))}
+          </svg>
+        )}
 
-        {/* commit rows column */}
         <div style={{ flex: 1, minWidth: 0 }}>
           {commits.map((commit) => {
             const refs = commit.refs ? commit.refs.split(', ').filter(Boolean) : [];
@@ -85,10 +83,7 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
                 style={{ height: ROW_HEIGHT, boxSizing: 'border-box', overflow: 'hidden' }}
                 onClick={() => onSelect(commit)}
               >
-                <div
-                  className="commit-avatar"
-                  style={{ backgroundColor: hashToColor(commit.email) }}
-                >
+                <div className="commit-avatar" style={{ backgroundColor: hashToColor(commit.email) }}>
                   {getInitials(commit.author)}
                 </div>
                 <div className="commit-body">

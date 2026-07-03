@@ -537,17 +537,41 @@
   border-left: 2px solid var(--rose-500);
 }
 
-/* === Branch focus banner === */
+/* === History toolbar (focus banner + graph toggle) === */
 
-.branch-focus-banner {
+.history-toolbar {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 16px;
-  background: rgba(235, 47, 138, 0.08);
-  border-bottom: 1px solid rgba(235, 47, 138, 0.2);
+  padding: 5px 16px;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  min-height: 34px;
+}
+
+.history-toolbar-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.graph-toggle-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
   flex-shrink: 0;
 }
+.graph-toggle-btn:hover { color: var(--text-primary); border-color: var(--rose-400); }
+.graph-toggle-btn.active { color: var(--rose-400); border-color: var(--rose-500); background: rgba(235,47,138,0.07); }
+
+/* === Branch focus elements (inside history-toolbar) === */
 
 .branch-focus-icon {
   font-size: 10px;
