@@ -7,10 +7,10 @@ interface CommitGraphProps {
 }
 
 const ROW_HEIGHT = 60;
-const LANE_WIDTH = 14;
-const DOT_RADIUS = 5;
-const PADDING = 10;
-const SVG_EXTRA = 16; // extra right padding so curves aren't clipped
+const LANE_WIDTH = 9;
+const DOT_RADIUS = 4;
+const PADDING = 6;
+const SVG_EXTRA = 10;
 
 function laneX(lane: number): number {
   return PADDING + lane * LANE_WIDTH;
@@ -41,8 +41,8 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
       if (x1 === x2) {
         d = `M ${x1} ${y1} L ${x2} ${y2}`;
       } else {
-        const cp = y1 + ROW_HEIGHT * 0.6;
-        d = `M ${x1} ${y1} C ${x1} ${cp}, ${x2} ${cp}, ${x2} ${y2}`;
+        const midY = (y1 + y2) / 2;
+        d = `M ${x1} ${y1} Q ${x1} ${midY}, ${x2} ${y2}`;
       }
       edgePaths.push({ d, color: commit.color, key: `${i}-${edge.fromLane}-${edge.toLane}-${edge.toIndex}` });
     }
