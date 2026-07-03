@@ -197,8 +197,16 @@ export class GitService {
 }
 
 const GRAPH_COLORS = [
-  '#eb2f8a', '#9b8af7', '#52d9a0', '#f7c948',
-  '#4da6ff', '#f76059', '#ff85bc', '#52c8d9',
+  '#7c4dff', // violet
+  '#26c6da', // teal
+  '#66bb6a', // green
+  '#ffa726', // orange
+  '#42a5f5', // blue
+  '#ef5350', // red
+  '#ab47bc', // purple
+  '#d4e157', // lime
+  '#26a69a', // teal dark
+  '#ec407a', // pink (just one, not first)
 ];
 
 function buildGraph(commits: Commit[]): GraphCommit[] {

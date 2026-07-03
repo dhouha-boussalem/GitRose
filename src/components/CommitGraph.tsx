@@ -60,15 +60,23 @@ export function CommitGraph({ commits, selectedHash, showGraph, onSelect }: Comm
               <path key={ep.key} d={ep.d} stroke={ep.color} strokeWidth={2} fill="none" opacity={0.85} />
             ))}
             {commits.map((commit, i) => (
-              <circle
-                key={commit.hash}
-                cx={laneX(commit.lane)}
-                cy={rowY(i)}
-                r={DOT_RADIUS}
-                fill={commit.color}
-                stroke="#fff"
-                strokeWidth={1.5}
-              />
+              <g key={commit.hash}>
+                <circle
+                  cx={laneX(commit.lane)}
+                  cy={rowY(i)}
+                  r={DOT_RADIUS + 2}
+                  fill={commit.color}
+                  opacity={0.18}
+                />
+                <circle
+                  cx={laneX(commit.lane)}
+                  cy={rowY(i)}
+                  r={DOT_RADIUS}
+                  fill={commit.color}
+                  stroke="#fff"
+                  strokeWidth={1.5}
+                />
+              </g>
             ))}
           </svg>
         )}
