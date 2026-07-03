@@ -170,10 +170,11 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 10px 16px;
+  padding: 8px 16px;
   border-bottom: 1px solid var(--border-subtle);
   cursor: pointer;
   transition: background 0.1s;
+  overflow: hidden;
 }
 .commit-row:hover { background: var(--bg-surface); }
 .commit-row.selected { background: rgba(235,47,138,0.08); border-left: 2px solid var(--rose-500); }

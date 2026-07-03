@@ -6,10 +6,11 @@ interface CommitGraphProps {
   onSelect: (commit: GraphCommit) => void;
 }
 
-const ROW_HEIGHT = 52;
+const ROW_HEIGHT = 60;
 const LANE_WIDTH = 14;
 const DOT_RADIUS = 5;
-const PADDING = 8;
+const PADDING = 10;
+const SVG_EXTRA = 16; // extra right padding so curves aren't clipped
 
 function laneX(lane: number): number {
   return PADDING + lane * LANE_WIDTH;
@@ -25,7 +26,7 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
   }
 
   const maxLanes = Math.max(...commits.map((c) => c.lanes), 1);
-  const svgWidth = PADDING * 2 + maxLanes * LANE_WIDTH;
+  const svgWidth = PADDING * 2 + maxLanes * LANE_WIDTH + SVG_EXTRA;
   const svgHeight = commits.length * ROW_HEIGHT;
 
   const edgePaths: { d: string; color: string; key: string }[] = [];
@@ -81,7 +82,7 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
               <div
                 key={commit.hash}
                 className={`commit-row ${selectedHash === commit.hash ? 'selected' : ''}`}
-                style={{ height: ROW_HEIGHT, boxSizing: 'border-box' }}
+                style={{ height: ROW_HEIGHT, boxSizing: 'border-box', overflow: 'hidden' }}
                 onClick={() => onSelect(commit)}
               >
                 <div
