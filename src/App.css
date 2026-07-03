@@ -121,10 +121,8 @@
 .logo-text {
   font-size: 16px;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--rose-300), var(--rose-500));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--rose-500);
+  letter-spacing: -0.3px;
 }
 
 .sidebar-section { padding: 4px 0; }
@@ -232,10 +230,8 @@
 .welcome-title {
   font-size: 36px;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--rose-200), var(--rose-500));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--rose-500);
+  letter-spacing: -1px;
 }
 .welcome-subtitle { font-size: 15px; color: var(--text-secondary); margin-bottom: 12px; }
 .welcome-cta {

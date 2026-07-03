@@ -1,37 +1,37 @@
 :root {
-  /* === Rose palette === */
-  --rose-50:  #fff0f6;
-  --rose-100: #ffd6e8;
-  --rose-200: #ffadd2;
-  --rose-300: #ff85bc;
-  --rose-400: #f759a3;
-  --rose-500: #eb2f8a;
-  --rose-600: #c4177a;
-  --rose-700: #9b0c63;
+  /* === Brand rose — Veepee-inspired: deep raspberry, not hot pink === */
+  --rose-50:  #fff5f7;
+  --rose-100: #ffe0e6;
+  --rose-200: #ffb3c1;
+  --rose-300: #e8547a;
+  --rose-400: #d42b5a;
+  --rose-500: #c8003b;   /* primary brand */
+  --rose-600: #a80031;
+  --rose-700: #870027;
 
-  /* === Light background === */
-  --bg-deepest:  #fdf6f9;
-  --bg-deep:     #fff0f6;
+  /* === Backgrounds — white + very light neutrals, no pink tint === */
+  --bg-deepest:  #f7f7f8;
+  --bg-deep:     #f0f0f2;
   --bg-surface:  #ffffff;
-  --bg-elevated: #fce4f0;
-  --bg-hover:    #ffd6e8;
+  --bg-elevated: #ebebed;
+  --bg-hover:    #e8e8ea;
 
-  /* === Text === */
-  --text-primary:   #2d0a1e;
-  --text-secondary: #7a3558;
-  --text-muted:     #b07090;
-  --text-accent:    var(--rose-600);
+  /* === Text — charcoal, not purple === */
+  --text-primary:   #1a1a1f;
+  --text-secondary: #555560;
+  --text-muted:     #9090a0;
+  --text-accent:    var(--rose-500);
 
-  /* === Borders === */
-  --border-subtle: #f5c6dc;
-  --border-medium: #f0a0c8;
+  /* === Borders — neutral gray === */
+  --border-subtle: #e2e2e6;
+  --border-medium: #ceced4;
   --border-accent: var(--rose-500);
 
   /* === Status colors === */
   --color-added:    #0a8a55;
   --color-modified: #a07000;
   --color-deleted:  #c0392b;
-  --color-untracked:#6c4fd4;
+  --color-untracked:#5c6bc0;
 
   /* === Typography === */
   --font-ui:   'Inter', system-ui, sans-serif;
@@ -43,8 +43,8 @@
   --radius-lg: 12px;
 
   /* === Shadows === */
-  --shadow-rose: 0 0 20px rgba(235, 47, 138, 0.2);
-  --shadow-panel: 0 4px 24px rgba(196, 23, 122, 0.1);
+  --shadow-rose: 0 0 20px rgba(200, 0, 59, 0.18);
+  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -75,5 +75,5 @@ body {
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--rose-600);
+  background: var(--rose-500);
 }

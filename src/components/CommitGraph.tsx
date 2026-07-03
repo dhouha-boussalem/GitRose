@@ -138,7 +138,7 @@ function getInitials(name: string): string {
 }
 
 function hashToColor(str: string): string {
-  const colors = ['#f759a3', '#eb2f8a', '#c4177a', '#ff85bc', '#9b0c63'];
+  const colors = ['#5c6bc0', '#26a69a', '#43a047', '#f4511e', '#8e24aa', '#00897b', '#1e88e5', '#c8003b', '#e53935', '#6d4c41'];
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
   return colors[Math.abs(hash) % colors.length];
