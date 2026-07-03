@@ -1,13 +1,13 @@
 :root {
-  /* === Brand rose — Veepee-inspired: deep raspberry, not hot pink === */
-  --rose-50:  #fff5f7;
-  --rose-100: #ffe0e6;
-  --rose-200: #ffb3c1;
-  --rose-300: #e8547a;
-  --rose-400: #d42b5a;
-  --rose-500: #c8003b;   /* primary brand */
-  --rose-600: #a80031;
-  --rose-700: #870027;
+  /* === Brand rose — deep rose/fuchsia, clearly pink not red === */
+  --rose-50:  #fff4f8;
+  --rose-100: #ffdaec;
+  --rose-200: #ffadd4;
+  --rose-300: #e8549a;
+  --rose-400: #d42b7e;
+  --rose-500: #c0006e;   /* primary brand: deep rose with blue component */
+  --rose-600: #9e005b;
+  --rose-700: #7c0047;
 
   /* === Backgrounds — white + very light neutrals, no pink tint === */
   --bg-deepest:  #f7f7f8;
@@ -43,7 +43,7 @@
   --radius-lg: 12px;
 
   /* === Shadows === */
-  --shadow-rose: 0 0 20px rgba(200, 0, 59, 0.18);
+  --shadow-rose: 0 0 20px rgba(192, 0, 110, 0.18);
   --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
