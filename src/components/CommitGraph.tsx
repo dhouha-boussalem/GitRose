@@ -7,9 +7,9 @@ interface CommitGraphProps {
 }
 
 const ROW_HEIGHT = 52;
-const LANE_WIDTH = 12;
-const DOT_RADIUS = 4;
-const PADDING = 6;
+const LANE_WIDTH = 14;
+const DOT_RADIUS = 5;
+const PADDING = 8;
 
 function laneX(lane: number): number {
   return PADDING + lane * LANE_WIDTH;
@@ -58,7 +58,7 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
           style={{ display: 'block', flexShrink: 0 }}
         >
           {edgePaths.map((ep) => (
-            <path key={ep.key} d={ep.d} stroke={ep.color} strokeWidth={2} fill="none" opacity={0.75} />
+            <path key={ep.key} d={ep.d} stroke={ep.color} strokeWidth={2.5} fill="none" opacity={0.9} />
           ))}
           {commits.map((commit, i) => (
             <circle
@@ -67,8 +67,8 @@ export function CommitGraph({ commits, selectedHash, onSelect }: CommitGraphProp
               cy={rowY(i)}
               r={DOT_RADIUS}
               fill={commit.color}
-              stroke="var(--bg-surface)"
-              strokeWidth={1.5}
+              stroke="#fff"
+              strokeWidth={2}
             />
           ))}
         </svg>
