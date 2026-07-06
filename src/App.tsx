@@ -97,6 +97,11 @@ export default function App() {
             await window.gitRose.checkout(repoPath, branch);
             await refreshStatus();
           }}
+          onCheckoutRemote={async (remoteBranch) => {
+            const localName = await window.gitRose.checkoutRemote(repoPath, remoteBranch);
+            await refreshStatus();
+            return localName;
+          }}
           onFocus={handleFocusBranch}
         />
         <main className="main-content">

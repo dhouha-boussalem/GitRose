@@ -114,6 +114,7 @@
   border-right: 1px solid var(--border-subtle);
   overflow-y: auto;
   flex-shrink: 0;
+  position: relative;
 }
 
 .sidebar-logo { display: flex; align-items: center; gap: 8px; padding: 16px 16px 8px; }
@@ -526,6 +527,22 @@
 .branch-item.remote:disabled {
   opacity: 0.6;
 }
+
+.sidebar-toast {
+  position: absolute;
+  bottom: 16px;
+  left: 12px;
+  right: 12px;
+  padding: 8px 12px;
+  background: var(--text-primary);
+  color: #fff;
+  font-size: 12px;
+  border-radius: var(--radius-md);
+  text-align: center;
+  animation: toast-in 0.2s ease;
+  z-index: 10;
+}
+@keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 .branch-item.focused {
   background: rgba(235, 47, 138, 0.12);

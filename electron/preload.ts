@@ -14,5 +14,6 @@ contextBridge.exposeInMainWorld('gitRose', {
   push: (repoPath: string) => ipcRenderer.invoke('git:push', repoPath),
   pull: (repoPath: string) => ipcRenderer.invoke('git:pull', repoPath),
   checkout: (repoPath: string, branch: string) => ipcRenderer.invoke('git:checkout', repoPath, branch),
+  checkoutRemote: (repoPath: string, remoteBranch: string) => ipcRenderer.invoke('git:checkout-remote', repoPath, remoteBranch),
   getUser: (repoPath: string) => ipcRenderer.invoke('git:get-user', repoPath),
 });

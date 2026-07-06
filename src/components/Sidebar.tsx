@@ -6,6 +6,7 @@ interface SidebarProps {
   userName: string;
   focusedBranch: string | null;
   onCheckout: (name: string) => Promise<void>;
+  onCheckoutRemote: (remoteBranch: string) => Promise<string>;
   onFocus: (branch: string | null) => void;
 }
 
@@ -34,10 +35,29 @@ function getInitials(name: string): string {
   return name.split(/\s+/).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 }
 
-export function Sidebar({ branches, userName, focusedBranch, onCheckout, onFocus }: SidebarProps) {
+export function Sidebar({ branches, userName, focusedBranch, onCheckout, onCheckoutRemote, onFocus }: SidebarProps) {
   const local = branches.filter((b) => !b.isRemote);
   const remote = branches.filter((b) => b.isRemote);
   const [switching, setSwitching] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  }
+
+  async function handleCheckoutRemote(name: string) {
+    if (switching) return;
+    setSwitching(name);
+    try {
+      const localName = await onCheckoutRemote(name);
+      showToast(`Checked out → ${localName}`);
+    } catch (e: any) {
+      showToast(`Error: ${e?.message ?? 'checkout failed'}`);
+    } finally {
+      setSwitching(null);
+    }
+  }
 
   async function handleCheckout(name: string, isCurrent: boolean) {
     if (isCurrent || switching) return;
@@ -89,14 +109,23 @@ export function Sidebar({ branches, userName, focusedBranch, onCheckout, onFocus
           {remote.map((branch) => (
             <button
               key={branch.name}
-              className="branch-item remote"
-              disabled
+              className={`branch-item remote ${switching === branch.name ? 'switching' : ''}`}
+              onClick={() => onFocus(focusedBranch === branch.name ? null : branch.name)}
+              onDoubleClick={() => handleCheckoutRemote(branch.name)}
+              disabled={!!switching}
+              title="Double-click to checkout locally"
             >
-              <span className="branch-icon">↗</span>
+              <span className="branch-icon">
+                {switching === branch.name ? <span className="branch-spinner" /> : '↗'}
+              </span>
               <span className="branch-name">{branch.name}</span>
             </button>
           ))}
         </div>
+      )}
+
+      {toast && (
+        <div className="sidebar-toast">{toast}</div>
       )}
     </aside>
   );

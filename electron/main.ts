@@ -99,6 +99,10 @@ function registerGitHandlers() {
     return GitService.checkout(repoPath, branch);
   });
 
+  ipcMain.handle('git:checkout-remote', async (_event, repoPath: string, remoteBranch: string) => {
+    return GitService.checkoutRemote(repoPath, remoteBranch);
+  });
+
   ipcMain.handle('git:get-user', async (_event, repoPath: string) => {
     return GitService.getUser(repoPath);
   });
