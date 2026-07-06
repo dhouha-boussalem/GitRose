@@ -51,7 +51,7 @@ function newTab(path: string, index: number): RepoTab {
     selectedCommit: null,
     focusedBranch: null,
     userName: '',
-    activeView: 'commits',
+    activeView: 'status',
     selectedFile: null,
     showGraph: false,
     loading: true,
