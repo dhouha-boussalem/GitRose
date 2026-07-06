@@ -9,7 +9,7 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ repoPath, status, onOpenRepo, activeView, onViewChange }: ToolbarProps) {
-  const repoName = repoPath ? repoPath.split('/').pop() : null;
+  const repoName = repoPath ? repoPath.split(/[\\/]/).filter(Boolean).pop() : null;
   const changes = status ? status.staged.length + status.unstaged.length + status.untracked.length : 0;
 
   return (
