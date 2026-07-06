@@ -175,6 +175,10 @@ export default function App() {
             await window.gitRose.checkout(tab.path, branch);
             await refreshTab(tab);
           }}
+          onCreateBranch={async (name) => {
+            await window.gitRose.createBranch(tab.path, name);
+            await refreshTab(tab);
+          }}
           onCheckoutRemote={async (remoteBranch) => {
             const localName = await window.gitRose.checkoutRemote(tab.path, remoteBranch);
             await refreshTab(tab);

@@ -188,6 +188,10 @@ export class GitService {
     await this.getGit(repoPath).checkout(branch);
   }
 
+  static async createBranch(repoPath: string, branchName: string): Promise<void> {
+    await this.getGit(repoPath).checkoutLocalBranch(branchName);
+  }
+
   static async checkoutRemote(repoPath: string, remoteBranch: string): Promise<string> {
     // remoteBranch is e.g. "origin/feat/xxx" — strip the "origin/" prefix for local name
     const localName = remoteBranch.replace(/^[^/]+\//, '');

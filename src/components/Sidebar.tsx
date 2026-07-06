@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Branch } from '../types/git';
 
 interface SidebarProps {
@@ -7,6 +7,7 @@ interface SidebarProps {
   focusedBranch: string | null;
   onCheckout: (name: string) => Promise<void>;
   onCheckoutRemote: (remoteBranch: string) => Promise<string>;
+  onCreateBranch: (name: string) => Promise<void>;
   onFocus: (branch: string | null) => void;
 }
 
@@ -35,11 +36,14 @@ function getInitials(name: string): string {
   return name.split(/\s+/).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 }
 
-export function Sidebar({ branches, userName, focusedBranch, onCheckout, onCheckoutRemote, onFocus }: SidebarProps) {
+export function Sidebar({ branches, userName, focusedBranch, onCheckout, onCheckoutRemote, onCreateBranch, onFocus }: SidebarProps) {
   const local = branches.filter((b) => !b.isRemote);
   const remote = branches.filter((b) => b.isRemote);
   const [switching, setSwitching] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [newBranchName, setNewBranchName] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   function showToast(msg: string) {
     setToast(msg);
@@ -70,6 +74,25 @@ export function Sidebar({ branches, userName, focusedBranch, onCheckout, onCheck
     onFocus(focusedBranch === name ? null : name);
   }
 
+  function startCreating() {
+    setCreating(true);
+    setNewBranchName('');
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }
+
+  async function confirmCreate() {
+    const name = newBranchName.trim();
+    if (!name) { setCreating(false); return; }
+    setCreating(false);
+    setNewBranchName('');
+    try {
+      await onCreateBranch(name);
+      showToast(`Created → ${name}`);
+    } catch (e: any) {
+      showToast(`Error: ${e?.message ?? 'failed'}`);
+    }
+  }
+
   return (
     <aside className="sidebar">
       <div className="sidebar-section">
@@ -80,7 +103,25 @@ export function Sidebar({ branches, userName, focusedBranch, onCheckout, onCheck
       </div>
 
       <div className="sidebar-section">
-        <div className="sidebar-label">LOCAL BRANCHES</div>
+        <div className="sidebar-label">
+          LOCAL BRANCHES
+          <button className="sidebar-new-branch-btn" onClick={startCreating} title="New branch">+</button>
+        </div>
+        {creating && (
+          <div className="sidebar-new-branch-row">
+            <input
+              ref={inputRef}
+              className="sidebar-new-branch-input"
+              value={newBranchName}
+              onChange={(e) => setNewBranchName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') confirmCreate();
+                if (e.key === 'Escape') setCreating(false);
+              }}
+              placeholder="branch-name"
+            />
+          </div>
+        )}
         {local.map((branch) => (
           <button
             key={branch.name}
