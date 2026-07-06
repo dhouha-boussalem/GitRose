@@ -770,6 +770,19 @@
   border-right: 1px solid var(--border-subtle);
 }
 
+.resize-handle {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--border-subtle);
+  cursor: col-resize;
+  transition: background 0.15s;
+}
+
+.resize-handle:hover,
+.resize-handle:active {
+  background: var(--rose-500);
+}
+
 /* === Diff viewer === */
 
 .diff-viewer {

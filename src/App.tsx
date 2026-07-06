@@ -6,6 +6,7 @@ import { CommitGraph } from './components/CommitGraph';
 import { ActionPanel } from './components/ActionPanel';
 import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
+import { ResizablePanels } from './components/ResizablePanels';
 import './styles/theme.css';
 import './App.css';
 
@@ -222,20 +223,24 @@ export default function App() {
               />
             </>
           ) : (
-            <div className="changes-layout">
-              <ActionPanel
-                repoPath={tab.path}
-                status={tab.status}
-                onRefresh={() => { refreshTab(tab); updateTab(tab.id, { selectedFile: null }); }}
-                onFileSelect={(path, staged) => updateTab(tab.id, { selectedFile: { path, staged } })}
-                selectedFile={tab.selectedFile?.path ?? null}
-              />
-              <DiffViewer
-                repoPath={tab.path}
-                filePath={tab.selectedFile?.path ?? null}
-                staged={tab.selectedFile?.staged ?? false}
-              />
-            </div>
+            <ResizablePanels
+              left={
+                <ActionPanel
+                  repoPath={tab.path}
+                  status={tab.status}
+                  onRefresh={() => { refreshTab(tab); updateTab(tab.id, { selectedFile: null }); }}
+                  onFileSelect={(path, staged) => updateTab(tab.id, { selectedFile: { path, staged } })}
+                  selectedFile={tab.selectedFile?.path ?? null}
+                />
+              }
+              right={
+                <DiffViewer
+                  repoPath={tab.path}
+                  filePath={tab.selectedFile?.path ?? null}
+                  staged={tab.selectedFile?.staged ?? false}
+                />
+              }
+            />
           )}
         </main>
       </div>
