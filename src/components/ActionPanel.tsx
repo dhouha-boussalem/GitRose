@@ -37,6 +37,16 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
     onRefresh();
   }
 
+  async function handleDiscard(file: FileStatus) {
+    const isUntracked = file.status === 'untracked';
+    const msg = isUntracked
+      ? `Delete "${file.path}"?`
+      : `Discard changes to "${file.path}"? This cannot be undone.`;
+    if (!window.confirm(msg)) return;
+    await run(() => window.gitRose.discardFile(repoPath, file.path, isUntracked));
+    onRefresh();
+  }
+
   async function handleUnstage(file: FileStatus) {
     await run(() => window.gitRose.unstageFile(repoPath, file.path));
     onRefresh();
@@ -123,6 +133,7 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
             file={f}
             action="stage"
             onAction={() => handleStage(f)}
+            onDiscard={() => handleDiscard(f)}
             onSelect={() => onFileSelect(f.path, false)}
             selected={selectedFile === f.path}
             disabled={isLoading}
@@ -134,6 +145,7 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
             file={{ path, status: 'untracked', staged: false }}
             action="stage"
             onAction={() => handleStage({ path, status: 'untracked', staged: false })}
+            onDiscard={() => handleDiscard({ path, status: 'untracked', staged: false })}
             onSelect={() => onFileSelect(path, false)}
             selected={selectedFile === path}
             disabled={isLoading}
@@ -209,11 +221,12 @@ const statusClass: Record<string, string> = {
 };
 
 function FileRow({
-  file, action, onAction, onSelect, selected, disabled,
+  file, action, onAction, onDiscard, onSelect, selected, disabled,
 }: {
   file: FileStatus;
   action: 'stage' | 'unstage';
   onAction: () => void;
+  onDiscard?: () => void;
   onSelect: () => void;
   selected: boolean;
   disabled: boolean;
@@ -227,6 +240,16 @@ function FileRow({
         {statusIcon[file.status] ?? '~'}
       </span>
       <span className="action-file-name">{file.path}</span>
+      {onDiscard && (
+        <button
+          className="action-file-btn discard"
+          onClick={(e) => { e.stopPropagation(); onDiscard(); }}
+          disabled={disabled}
+          title="Discard changes"
+        >
+          ↺
+        </button>
+      )}
       <button
         className={`action-file-btn ${action}`}
         onClick={(e) => { e.stopPropagation(); onAction(); }}

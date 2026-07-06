@@ -79,6 +79,10 @@ function registerGitHandlers() {
     return GitService.unstageFile(repoPath, filePath);
   });
 
+  ipcMain.handle('git:discard-file', async (_event, repoPath: string, filePath: string, isUntracked: boolean) => {
+    return GitService.discardFile(repoPath, filePath, isUntracked);
+  });
+
   ipcMain.handle('git:stage-all', async (_event, repoPath: string) => {
     return GitService.stageAll(repoPath);
   });

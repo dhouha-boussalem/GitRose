@@ -49,6 +49,7 @@ declare global {
       getDiff: (repoPath: string, filePath: string, staged: boolean) => Promise<string>;
       stageFile: (repoPath: string, filePath: string) => Promise<void>;
       unstageFile: (repoPath: string, filePath: string) => Promise<void>;
+      discardFile: (repoPath: string, filePath: string, isUntracked: boolean) => Promise<void>;
       stageAll: (repoPath: string) => Promise<void>;
       commit: (repoPath: string, message: string) => Promise<void>;
       push: (repoPath: string) => Promise<void>;

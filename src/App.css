@@ -531,6 +531,12 @@
   color: var(--text-secondary);
 }
 
+.action-file-btn.discard:hover:not(:disabled) {
+  background: rgba(247, 96, 89, 0.15);
+  border-color: var(--color-deleted);
+  color: var(--color-deleted);
+}
+
 .action-file-btn.stage:hover:not(:disabled) {
   background: rgba(82, 217, 160, 0.15);
   border-color: var(--color-added);

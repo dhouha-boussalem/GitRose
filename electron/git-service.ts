@@ -160,6 +160,16 @@ export class GitService {
     await this.getGit(repoPath).add('.');
   }
 
+  static async discardFile(repoPath: string, filePath: string, isUntracked: boolean): Promise<void> {
+    if (isUntracked) {
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      await fs.unlink(path.join(repoPath, filePath));
+    } else {
+      await this.getGit(repoPath).checkout(['--', filePath]);
+    }
+  }
+
   static async commit(repoPath: string, message: string): Promise<void> {
     await this.getGit(repoPath).commit(message);
   }

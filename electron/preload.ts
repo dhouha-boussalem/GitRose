@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('gitRose', {
   getDiff: (repoPath: string, filePath: string, staged: boolean) => ipcRenderer.invoke('git:get-diff', repoPath, filePath, staged),
   stageFile: (repoPath: string, filePath: string) => ipcRenderer.invoke('git:stage-file', repoPath, filePath),
   unstageFile: (repoPath: string, filePath: string) => ipcRenderer.invoke('git:unstage-file', repoPath, filePath),
+  discardFile: (repoPath: string, filePath: string, isUntracked: boolean) => ipcRenderer.invoke('git:discard-file', repoPath, filePath, isUntracked),
   stageAll: (repoPath: string) => ipcRenderer.invoke('git:stage-all', repoPath),
   commit: (repoPath: string, message: string) => ipcRenderer.invoke('git:commit', repoPath, message),
   push: (repoPath: string) => ipcRenderer.invoke('git:push', repoPath),
