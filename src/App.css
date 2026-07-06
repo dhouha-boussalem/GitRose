@@ -53,6 +53,13 @@
   border-color: var(--border-subtle);
 }
 
+.tab-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 .tab-name {
   max-width: 120px;
   overflow: hidden;

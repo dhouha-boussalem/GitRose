@@ -9,10 +9,20 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import './styles/theme.css';
 import './App.css';
 
+const TAB_COLORS = [
+  '#c0006e', '#1e88e5', '#26a69a', '#f4511e',
+  '#8e24aa', '#43a047', '#6d4c41', '#00897b',
+];
+
+function tabColor(index: number): string {
+  return TAB_COLORS[index % TAB_COLORS.length];
+}
+
 interface RepoTab {
   id: string;
   path: string;
   name: string;
+  color: string;
   commits: GraphCommit[];
   branches: Branch[];
   status: RepoStatus | null;
@@ -29,11 +39,12 @@ function repoName(path: string): string {
   return path.split(/[\\/]/).filter(Boolean).pop() ?? path;
 }
 
-function newTab(path: string): RepoTab {
+function newTab(path: string, index: number): RepoTab {
   return {
     id: `${path}-${Date.now()}`,
     path,
     name: repoName(path),
+    color: tabColor(index),
     commits: [],
     branches: [],
     status: null,
@@ -88,7 +99,7 @@ export default function App() {
     // Switch to existing tab if already open
     const existing = tabs.find((t) => t.path === path);
     if (existing) { setActiveId(existing.id); return; }
-    const t = newTab(path);
+    const t = newTab(path, tabs.length);
     setTabs((prev) => [...prev, t]);
     setActiveId(t.id);
     loadRepo(path, t.id);
@@ -133,7 +144,13 @@ export default function App() {
             className={`tab-item ${t.id === activeId ? 'active' : ''}`}
             onClick={() => setActiveId(t.id)}
             title={t.path}
+            style={t.id === activeId ? {
+              borderBottomColor: t.color,
+              borderBottomWidth: 2,
+              color: t.color,
+            } : {}}
           >
+            <span className="tab-dot" style={{ background: t.color }} />
             <span className="tab-name">{t.name}</span>
             <span className="tab-close" onClick={(e) => handleCloseTab(t.id, e)}>×</span>
           </button>
