@@ -225,6 +225,47 @@
   justify-content: space-between;
 }
 
+.sidebar-search-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 10px 8px;
+  padding: 5px 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.sidebar-search-icon {
+  color: var(--text-muted);
+  font-size: 14px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.sidebar-search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: var(--text-primary);
+  min-width: 0;
+}
+.sidebar-search-input::placeholder { color: var(--text-muted); }
+
+.sidebar-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.sidebar-search-clear:hover { color: var(--text-primary); }
+
 .sidebar-new-branch-btn {
   background: none;
   border: none;

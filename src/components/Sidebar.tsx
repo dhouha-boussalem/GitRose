@@ -37,13 +37,16 @@ function getInitials(name: string): string {
 }
 
 export function Sidebar({ branches, userName, focusedBranch, onCheckout, onCheckoutRemote, onCreateBranch, onFocus }: SidebarProps) {
-  const local = branches.filter((b) => !b.isRemote);
-  const remote = branches.filter((b) => b.isRemote);
   const [switching, setSwitching] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [newBranchName, setNewBranchName] = useState('');
+  const [search, setSearch] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const q = search.trim().toLowerCase();
+  const local = branches.filter((b) => !b.isRemote && (!q || b.name.toLowerCase().includes(q)));
+  const remote = branches.filter((b) => b.isRemote && (!q || b.name.toLowerCase().includes(q)));
 
   function showToast(msg: string) {
     setToast(msg);
@@ -100,6 +103,19 @@ export function Sidebar({ branches, userName, focusedBranch, onCheckout, onCheck
           <span className="logo-icon">🌹</span>
           <span className="logo-text">GitRose</span>
         </div>
+      </div>
+
+      <div className="sidebar-search-row">
+        <span className="sidebar-search-icon">⌕</span>
+        <input
+          className="sidebar-search-input"
+          placeholder="Rechercher une branche…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        {search && (
+          <button className="sidebar-search-clear" onClick={() => setSearch('')}>✕</button>
+        )}
       </div>
 
       <div className="sidebar-section">
