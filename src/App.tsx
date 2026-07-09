@@ -7,6 +7,7 @@ import { ActionPanel } from './components/ActionPanel';
 import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ResizablePanels } from './components/ResizablePanels';
+import { CherryPickPanel } from './components/CherryPickPanel';
 import './styles/theme.css';
 import './App.css';
 
@@ -221,6 +222,17 @@ export default function App() {
                 showGraph={tab.showGraph}
                 onSelect={(c) => updateTab(tab.id, { selectedCommit: c })}
               />
+              {tab.selectedCommit && (
+                <CherryPickPanel
+                  commit={tab.selectedCommit}
+                  repoPath={tab.path}
+                  onDone={async () => {
+                    await refreshTab(tab);
+                    updateTab(tab.id, { selectedCommit: null });
+                  }}
+                  onDismiss={() => updateTab(tab.id, { selectedCommit: null })}
+                />
+              )}
             </>
           ) : (
             <ResizablePanels

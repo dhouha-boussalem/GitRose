@@ -209,6 +209,16 @@ export class GitService {
     return localName;
   }
 
+  static async cherryPick(repoPath: string, hash: string): Promise<void> {
+    await this.getGit(repoPath).raw(['cherry-pick', hash]);
+  }
+
+  static async cherryPickToNewBranch(repoPath: string, hash: string, branchName: string): Promise<void> {
+    const git = this.getGit(repoPath);
+    await git.checkoutLocalBranch(branchName);
+    await git.raw(['cherry-pick', hash]);
+  }
+
   static async getUser(repoPath: string): Promise<{ name: string; email: string }> {
     const git = this.getGit(repoPath);
     const name = await git.raw(['config', 'user.name']).then((s) => s.trim()).catch(() => '');

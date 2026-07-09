@@ -18,4 +18,6 @@ contextBridge.exposeInMainWorld('gitRose', {
   createBranch: (repoPath: string, branchName: string) => ipcRenderer.invoke('git:create-branch', repoPath, branchName),
   checkoutRemote: (repoPath: string, remoteBranch: string) => ipcRenderer.invoke('git:checkout-remote', repoPath, remoteBranch),
   getUser: (repoPath: string) => ipcRenderer.invoke('git:get-user', repoPath),
+  cherryPick: (repoPath: string, hash: string) => ipcRenderer.invoke('git:cherry-pick', repoPath, hash),
+  cherryPickToBranch: (repoPath: string, hash: string, branchName: string) => ipcRenderer.invoke('git:cherry-pick-to-branch', repoPath, hash, branchName),
 });
