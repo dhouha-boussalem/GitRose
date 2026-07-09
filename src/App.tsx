@@ -8,6 +8,7 @@ import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ResizablePanels } from './components/ResizablePanels';
 import { CherryPickPanel } from './components/CherryPickPanel';
+import { GitConsole } from './components/GitConsole';
 import './styles/theme.css';
 import './App.css';
 
@@ -34,6 +35,7 @@ interface RepoTab {
   activeView: 'commits' | 'status';
   selectedFile: { path: string; staged: boolean } | null;
   showGraph: boolean;
+  showConsole: boolean;
   loading: boolean;
 }
 
@@ -56,6 +58,7 @@ function newTab(path: string, index: number): RepoTab {
     activeView: 'status',
     selectedFile: null,
     showGraph: false,
+    showConsole: false,
     loading: true,
   };
 }
@@ -166,9 +169,11 @@ export default function App() {
         onOpenRepo={handleOpenRepo}
         activeView={tab.activeView}
         onViewChange={(v) => updateTab(tab.id, { activeView: v })}
+        showConsole={tab.showConsole}
+        onToggleConsole={() => updateTab(tab.id, { showConsole: !tab.showConsole })}
       />
 
-      <div className="app-body">
+      <div className={`app-body ${tab.showConsole ? 'console-open' : ''}`}>
         <Sidebar
           branches={tab.branches}
           userName={tab.userName}
@@ -256,6 +261,13 @@ export default function App() {
           )}
         </main>
       </div>
+
+      {tab.showConsole && (
+        <GitConsole
+          repoPath={tab.path}
+          onClose={() => updateTab(tab.id, { showConsole: false })}
+        />
+      )}
     </div>
   );
 }

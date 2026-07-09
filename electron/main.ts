@@ -115,6 +115,10 @@ function registerGitHandlers() {
     return GitService.getUser(repoPath);
   });
 
+  ipcMain.handle('git:run-command', async (_event, repoPath: string, args: string[]) => {
+    return GitService.runCommand(repoPath, args);
+  });
+
   ipcMain.handle('git:cherry-pick', async (_event, repoPath: string, hash: string) => {
     return GitService.cherryPick(repoPath, hash);
   });

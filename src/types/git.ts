@@ -58,6 +58,7 @@ declare global {
       checkout: (repoPath: string, branch: string) => Promise<void>;
       checkoutRemote: (repoPath: string, remoteBranch: string) => Promise<string>;
       getUser: (repoPath: string) => Promise<{ name: string; email: string }>;
+      runCommand: (repoPath: string, args: string[]) => Promise<string>;
       cherryPick: (repoPath: string, hash: string) => Promise<void>;
       cherryPickToBranch: (repoPath: string, hash: string, branchName: string) => Promise<void>;
     };

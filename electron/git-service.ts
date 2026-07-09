@@ -209,6 +209,13 @@ export class GitService {
     return localName;
   }
 
+  static async runCommand(repoPath: string, args: string[]): Promise<string> {
+    // Only allow git subcommands — strip leading "git" if user typed it
+    const filtered = args[0]?.toLowerCase() === 'git' ? args.slice(1) : args;
+    if (filtered.length === 0) throw new Error('Empty command');
+    return this.getGit(repoPath).raw(filtered);
+  }
+
   static async cherryPick(repoPath: string, hash: string): Promise<void> {
     await this.getGit(repoPath).raw(['cherry-pick', hash]);
   }

@@ -188,6 +188,156 @@
 .sync-pill.ahead { background: rgba(82,217,160,0.15); color: var(--color-added); }
 .sync-pill.behind { background: rgba(247,96,89,0.15); color: var(--color-deleted); }
 
+.toolbar-console-btn {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  letter-spacing: 0.02em;
+}
+.toolbar-console-btn:hover { border-color: var(--rose-500); color: var(--rose-500); }
+.toolbar-console-btn.active {
+  background: #1a1a22;
+  border-color: var(--rose-500);
+  color: var(--rose-500);
+}
+
+/* === Git console === */
+
+.git-console {
+  flex-shrink: 0;
+  height: 240px;
+  display: flex;
+  flex-direction: column;
+  background: #12121a;
+  border-top: 2px solid var(--rose-500);
+}
+
+.git-console-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px;
+  border-bottom: 1px solid #2a2a38;
+  flex-shrink: 0;
+}
+
+.git-console-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rose-300, #eb2f8a);
+}
+
+.git-console-icon {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--rose-500);
+}
+
+.git-console-hints {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+.git-console-hints span {
+  font-size: 10px;
+  color: #454555;
+  font-family: var(--font-mono);
+}
+
+.git-console-close {
+  background: none;
+  border: none;
+  color: #454555;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.git-console-close:hover { color: #fff; }
+
+.git-console-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  cursor: text;
+}
+
+.console-line { white-space: pre-wrap; word-break: break-all; }
+.console-line.input { color: #a0a0c0; }
+.console-line.input::before { content: ''; }
+.console-line.output { color: #c8c8d8; }
+.console-line.error { color: #ff6b6b; }
+.console-line.console-busy { color: #454555; animation: blink 1s infinite; }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.git-console-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-top: 1px solid #2a2a38;
+  flex-shrink: 0;
+}
+
+.console-prompt {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--rose-500);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.git-console-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #e8e8f0;
+  caret-color: var(--rose-500);
+  min-width: 0;
+}
+.git-console-input::placeholder { color: #35354a; }
+.git-console-input:disabled { opacity: 0.5; }
+
+.git-console-run {
+  background: none;
+  border: 1px solid #2a2a38;
+  border-radius: 4px;
+  color: #454555;
+  cursor: pointer;
+  font-size: 14px;
+  width: 26px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.git-console-run:hover:not(:disabled) { color: var(--rose-500); border-color: var(--rose-500); }
+.git-console-run:disabled { opacity: 0.3; cursor: not-allowed; }
+
 /* === Sidebar === */
 
 .sidebar {
