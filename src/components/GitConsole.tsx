@@ -9,6 +9,7 @@ interface ConsoleLine {
 interface GitConsoleProps {
   repoPath: string;
   onClose: () => void;
+  onRefresh: () => void;
 }
 
 function parseArgs(input: string): string[] {
@@ -34,7 +35,7 @@ function parseArgs(input: string): string[] {
 
 let lineId = 0;
 
-export function GitConsole({ repoPath, onClose }: GitConsoleProps) {
+export function GitConsole({ repoPath, onClose, onRefresh }: GitConsoleProps) {
   const [expanded, setExpanded] = useState(false);
   const [lines, setLines] = useState<ConsoleLine[]>([
     { id: lineId++, type: 'output', text: `git console — ${repoPath}` },
@@ -77,6 +78,7 @@ export function GitConsole({ repoPath, onClose }: GitConsoleProps) {
       } else {
         append('output', '(no output)');
       }
+      onRefresh();
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       for (const line of msg.split('\n')) {

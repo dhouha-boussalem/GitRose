@@ -266,6 +266,7 @@ export default function App() {
         <GitConsole
           repoPath={tab.path}
           onClose={() => updateTab(tab.id, { showConsole: false })}
+          onRefresh={() => refreshTab(tab)}
         />
       )}
     </div>
