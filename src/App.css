@@ -13,6 +13,27 @@
   overflow: hidden;
 }
 
+/* Désactive la sélection sur les zones de navigation, la laisse active sur le contenu */
+.tab-bar,
+.toolbar,
+.sidebar,
+.action-panel,
+.history-toolbar,
+.cherry-pick-panel,
+.git-console-header,
+.git-console-input-row {
+  user-select: none;
+}
+
+/* Zones où la sélection est souhaitée */
+.commit-list,
+.diff-viewer,
+.git-console-output,
+.action-file-name,
+.branch-name {
+  user-select: text;
+}
+
 /* === Tab bar === */
 
 .tab-bar {
