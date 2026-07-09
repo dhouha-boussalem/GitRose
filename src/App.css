@@ -263,7 +263,8 @@
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 12px;
+  font-family: Verdana, Geneva, sans-serif;
   cursor: pointer;
   text-align: left;
   transition: color 0.15s, background 0.15s;
