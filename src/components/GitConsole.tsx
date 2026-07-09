@@ -35,6 +35,7 @@ function parseArgs(input: string): string[] {
 let lineId = 0;
 
 export function GitConsole({ repoPath, onClose }: GitConsoleProps) {
+  const [expanded, setExpanded] = useState(false);
   const [lines, setLines] = useState<ConsoleLine[]>([
     { id: lineId++, type: 'output', text: `git console — ${repoPath}` },
     { id: lineId++, type: 'output', text: 'Tape une commande git (ex: log --oneline -10, status, diff)' },
@@ -107,7 +108,7 @@ export function GitConsole({ repoPath, onClose }: GitConsoleProps) {
   }
 
   return (
-    <div className="git-console">
+    <div className={`git-console ${expanded ? 'expanded' : ''}`}>
       <div className="git-console-header">
         <span className="git-console-title">
           <span className="git-console-icon">{'>'}_</span>
@@ -117,6 +118,13 @@ export function GitConsole({ repoPath, onClose }: GitConsoleProps) {
           <span>↑↓ historique</span>
           <span>Ctrl+L effacer</span>
         </div>
+        <button
+          className="git-console-close"
+          onClick={() => setExpanded((v) => !v)}
+          title={expanded ? 'Réduire' : 'Agrandir'}
+        >
+          {expanded ? '⬇' : '⬆'}
+        </button>
         <button className="git-console-close" onClick={onClose} title="Fermer">✕</button>
       </div>
 

@@ -217,7 +217,9 @@
   flex-direction: column;
   background: #12121a;
   border-top: 2px solid var(--rose-500);
+  transition: height 0.2s ease;
 }
+.git-console.expanded { height: 480px; }
 
 .git-console-header {
   display: flex;
