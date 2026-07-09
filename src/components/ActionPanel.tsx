@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import type { RepoStatus, FileStatus } from '../types/git';
 
 interface ActionPanelProps {
@@ -16,6 +16,32 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
   const [opState, setOpState] = useState<OpState>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [pushPullOp, setPushPullOp] = useState<'push' | 'pull' | null>(null);
+  const [splitPct, setSplitPct] = useState(50);
+  const splitRef = useRef<HTMLDivElement>(null);
+
+  const onSplitMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const container = splitRef.current;
+    if (!container) return;
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+
+    const onMove = (ev: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const pct = Math.min(80, Math.max(20, ((ev.clientY - rect.top) / rect.height) * 100));
+      setSplitPct(pct);
+    };
+
+    const onUp = () => {
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }, []);
 
   async function run<T>(fn: () => Promise<T>): Promise<T | null> {
     setOpState('loading');
@@ -114,70 +140,78 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
         </div>
       )}
 
-      {/* Unstaged files */}
-      <div className="action-section">
-        <div className="action-section-header">
-          <span className="action-section-title">
-            Changes ({(status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)})
-          </span>
-          {((status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)) > 0 && (
-            <button className="action-link-btn" onClick={handleStageAll} disabled={isLoading}>
-              Stage all
-            </button>
-          )}
+      {/* Resizable split between unstaged and staged */}
+      <div className="action-split" ref={splitRef}>
+        {/* Unstaged files */}
+        <div className="action-section" style={{ height: `${splitPct}%` }}>
+          <div className="action-section-header">
+            <span className="action-section-title">
+              Changes ({(status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)})
+            </span>
+            {((status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)) > 0 && (
+              <button className="action-link-btn" onClick={handleStageAll} disabled={isLoading}>
+                Stage all
+              </button>
+            )}
+          </div>
+          <div className="action-section-scroll">
+            {status?.unstaged?.map((f) => (
+              <FileRow
+                key={f.path}
+                file={f}
+                action="stage"
+                onAction={() => handleStage(f)}
+                onDiscard={() => handleDiscard(f)}
+                onSelect={() => onFileSelect(f.path, false)}
+                selected={selectedFile === f.path}
+                disabled={isLoading}
+              />
+            ))}
+            {status?.untracked?.map((path) => (
+              <FileRow
+                key={path}
+                file={{ path, status: 'untracked', staged: false }}
+                action="stage"
+                onAction={() => handleStage({ path, status: 'untracked', staged: false })}
+                onDiscard={() => handleDiscard({ path, status: 'untracked', staged: false })}
+                onSelect={() => onFileSelect(path, false)}
+                selected={selectedFile === path}
+                disabled={isLoading}
+              />
+            ))}
+            {(status?.unstaged?.length ?? 0) === 0 && (status?.untracked?.length ?? 0) === 0 && (
+              <div className="action-empty">No changes</div>
+            )}
+          </div>
         </div>
 
-        {status?.unstaged?.map((f) => (
-          <FileRow
-            key={f.path}
-            file={f}
-            action="stage"
-            onAction={() => handleStage(f)}
-            onDiscard={() => handleDiscard(f)}
-            onSelect={() => onFileSelect(f.path, false)}
-            selected={selectedFile === f.path}
-            disabled={isLoading}
-          />
-        ))}
-        {status?.untracked?.map((path) => (
-          <FileRow
-            key={path}
-            file={{ path, status: 'untracked', staged: false }}
-            action="stage"
-            onAction={() => handleStage({ path, status: 'untracked', staged: false })}
-            onDiscard={() => handleDiscard({ path, status: 'untracked', staged: false })}
-            onSelect={() => onFileSelect(path, false)}
-            selected={selectedFile === path}
-            disabled={isLoading}
-          />
-        ))}
-        {(status?.unstaged?.length ?? 0) === 0 && (status?.untracked?.length ?? 0) === 0 && (
-          <div className="action-empty">No changes</div>
-        )}
-      </div>
+        {/* Horizontal resize handle */}
+        <div className="resize-handle-h" onMouseDown={onSplitMouseDown} title="Drag to resize" />
 
-      {/* Staged files */}
-      <div className="action-section">
-        <div className="action-section-header">
-          <span className="action-section-title">
-            Staged ({status?.staged?.length ?? 0})
-          </span>
+        {/* Staged files */}
+        <div className="action-section" style={{ height: `${100 - splitPct}%` }}>
+          <div className="action-section-header">
+            <span className="action-section-title">
+              Staged ({status?.staged?.length ?? 0})
+            </span>
+          </div>
+          <div className="action-section-scroll">
+            {status?.staged?.map((f) => (
+              <FileRow
+                key={f.path}
+                file={f}
+                action="unstage"
+                onAction={() => handleUnstage(f)}
+                onSelect={() => onFileSelect(f.path, true)}
+                selected={selectedFile === f.path}
+                disabled={isLoading}
+              />
+            ))}
+            {(status?.staged?.length ?? 0) === 0 && (
+              <div className="action-empty">No staged files</div>
+            )}
+          </div>
         </div>
-
-        {status?.staged?.map((f) => (
-          <FileRow
-            key={f.path}
-            file={f}
-            action="unstage"
-            onAction={() => handleUnstage(f)}
-            onSelect={() => onFileSelect(f.path, true)}
-            selected={selectedFile === f.path}
-            disabled={isLoading}
-          />
-        ))}
-        {(status?.staged?.length ?? 0) === 0 && (
-          <div className="action-empty">No staged files</div>
-        )}
       </div>
 
       {/* Commit zone */}
