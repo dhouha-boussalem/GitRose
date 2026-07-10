@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import type { RepoStatus, FileStatus } from '../types/git';
+import { StashPanel } from './StashPanel';
 
 interface ActionPanelProps {
   repoPath: string;
@@ -213,6 +214,8 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
           </div>
         </div>
       </div>
+
+      <StashPanel repoPath={repoPath} onRefresh={onRefresh} />
 
       {/* Commit zone */}
       <div className="action-commit-zone">

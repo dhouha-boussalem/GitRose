@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Branch } from '../types/git';
-import { StashPanel } from './StashPanel';
 
 interface SidebarProps {
   branches: Branch[];
@@ -183,8 +182,6 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
           ))}
         </div>
       )}
-
-      <StashPanel repoPath={repoPath} onRefresh={onRefresh} />
 
       {toast && (
         <div className="sidebar-toast">{toast}</div>
