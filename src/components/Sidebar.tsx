@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Branch } from '../types/git';
+import { StashPanel } from './StashPanel';
 
 interface SidebarProps {
   branches: Branch[];
   userName: string;
   focusedBranch: string | null;
+  repoPath: string;
   onCheckout: (name: string) => Promise<void>;
   onCheckoutRemote: (remoteBranch: string) => Promise<string>;
   onCreateBranch: (name: string) => Promise<void>;
   onFocus: (branch: string | null) => void;
+  onRefresh: () => void;
 }
 
 function GirlAvatar() {
@@ -36,7 +39,7 @@ function getInitials(name: string): string {
   return name.split(/\s+/).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 }
 
-export function Sidebar({ branches, userName, focusedBranch, onCheckout, onCheckoutRemote, onCreateBranch, onFocus }: SidebarProps) {
+export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckout, onCheckoutRemote, onCreateBranch, onFocus, onRefresh }: SidebarProps) {
   const [switching, setSwitching] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -180,6 +183,8 @@ export function Sidebar({ branches, userName, focusedBranch, onCheckout, onCheck
           ))}
         </div>
       )}
+
+      <StashPanel repoPath={repoPath} onRefresh={onRefresh} />
 
       {toast && (
         <div className="sidebar-toast">{toast}</div>

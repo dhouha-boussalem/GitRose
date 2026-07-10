@@ -115,6 +115,22 @@ function registerGitHandlers() {
     return GitService.getUser(repoPath);
   });
 
+  ipcMain.handle('git:stash-list', async (_event, repoPath: string) => {
+    return GitService.stashList(repoPath);
+  });
+  ipcMain.handle('git:stash-save', async (_event, repoPath: string, message?: string) => {
+    return GitService.stashSave(repoPath, message);
+  });
+  ipcMain.handle('git:stash-apply', async (_event, repoPath: string, index: number) => {
+    return GitService.stashApply(repoPath, index);
+  });
+  ipcMain.handle('git:stash-pop', async (_event, repoPath: string, index: number) => {
+    return GitService.stashPop(repoPath, index);
+  });
+  ipcMain.handle('git:stash-drop', async (_event, repoPath: string, index: number) => {
+    return GitService.stashDrop(repoPath, index);
+  });
+
   ipcMain.handle('git:run-command', async (_event, repoPath: string, args: string[]) => {
     return GitService.runCommand(repoPath, args);
   });

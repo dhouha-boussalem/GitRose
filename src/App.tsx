@@ -178,6 +178,8 @@ export default function App() {
           branches={tab.branches}
           userName={tab.userName}
           focusedBranch={tab.focusedBranch}
+          repoPath={tab.path}
+          onRefresh={() => refreshTab(tab)}
           onCheckout={async (branch) => {
             await window.gitRose.checkout(tab.path, branch);
             await refreshTab(tab);

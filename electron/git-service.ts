@@ -209,6 +209,32 @@ export class GitService {
     return localName;
   }
 
+  static async stashList(repoPath: string): Promise<{ index: number; message: string; branch: string }[]> {
+    const out = await this.getGit(repoPath).raw(['stash', 'list', '--format=%gd|%s|%D']).catch(() => '');
+    return out.trim().split('\n').filter(Boolean).map((line, i) => {
+      const [ref, message, branch] = line.split('|');
+      return { index: i, message: message?.trim() ?? `stash@{${i}}`, branch: branch?.trim() ?? '' };
+    });
+  }
+
+  static async stashSave(repoPath: string, message?: string): Promise<void> {
+    const args = ['stash', 'push'];
+    if (message) args.push('-m', message);
+    await this.getGit(repoPath).raw(args);
+  }
+
+  static async stashApply(repoPath: string, index: number): Promise<void> {
+    await this.getGit(repoPath).raw(['stash', 'apply', `stash@{${index}}`]);
+  }
+
+  static async stashPop(repoPath: string, index: number): Promise<void> {
+    await this.getGit(repoPath).raw(['stash', 'pop', `stash@{${index}}`]);
+  }
+
+  static async stashDrop(repoPath: string, index: number): Promise<void> {
+    await this.getGit(repoPath).raw(['stash', 'drop', `stash@{${index}}`]);
+  }
+
   static async runCommand(repoPath: string, args: string[]): Promise<string> {
     // Only allow git subcommands — strip leading "git" if user typed it
     const filtered = args[0]?.toLowerCase() === 'git' ? args.slice(1) : args;

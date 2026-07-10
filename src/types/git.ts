@@ -58,6 +58,11 @@ declare global {
       checkout: (repoPath: string, branch: string) => Promise<void>;
       checkoutRemote: (repoPath: string, remoteBranch: string) => Promise<string>;
       getUser: (repoPath: string) => Promise<{ name: string; email: string }>;
+      stashList: (repoPath: string) => Promise<{ index: number; message: string; branch: string }[]>;
+      stashSave: (repoPath: string, message?: string) => Promise<void>;
+      stashApply: (repoPath: string, index: number) => Promise<void>;
+      stashPop: (repoPath: string, index: number) => Promise<void>;
+      stashDrop: (repoPath: string, index: number) => Promise<void>;
       runCommand: (repoPath: string, args: string[]) => Promise<string>;
       cherryPick: (repoPath: string, hash: string) => Promise<void>;
       cherryPickToBranch: (repoPath: string, hash: string, branchName: string) => Promise<void>;

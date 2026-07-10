@@ -361,6 +361,123 @@
 .git-console-run:hover:not(:disabled) { color: var(--rose-500); border-color: var(--rose-500); }
 .git-console-run:disabled { opacity: 0.3; cursor: not-allowed; }
 
+/* === Stash panel === */
+
+.stash-panel {
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 4px;
+}
+
+.stash-label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stash-collapse-arrow {
+  font-size: 8px;
+  color: var(--text-muted);
+  width: 10px;
+}
+
+.stash-count {
+  font-size: 10px;
+  background: var(--rose-500);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0 5px;
+  min-width: 16px;
+  text-align: center;
+  margin-left: 2px;
+}
+
+.stash-save-row {
+  display: flex;
+  gap: 6px;
+  padding: 4px 10px;
+}
+
+.stash-save-btn {
+  padding: 4px 10px;
+  background: var(--rose-500);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.stash-save-btn:hover:not(:disabled) { background: var(--rose-600); }
+.stash-save-btn:disabled { opacity: 0.5; }
+
+.stash-item {
+  padding: 5px 10px 5px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.stash-item-info {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+  min-width: 0;
+}
+
+.stash-item-index {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--rose-500);
+  flex-shrink: 0;
+}
+
+.stash-item-msg {
+  font-size: 11px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stash-item-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.stash-action-btn {
+  font-size: 10px;
+  padding: 2px 7px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.stash-action-btn:hover:not(:disabled) { border-color: var(--rose-500); color: var(--rose-500); }
+.stash-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.stash-action-btn.pop:hover:not(:disabled) { border-color: var(--color-added); color: var(--color-added); }
+.stash-action-btn.drop:hover:not(:disabled) { border-color: var(--color-deleted); color: var(--color-deleted); }
+
+.stash-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 4px 10px;
+  padding: 6px 8px;
+  background: rgba(192,57,43,0.1);
+  border: 1px solid rgba(192,57,43,0.25);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  color: var(--color-deleted);
+}
+.stash-error button { background: none; border: none; cursor: pointer; color: inherit; }
+
 /* === Sidebar === */
 
 .sidebar {
