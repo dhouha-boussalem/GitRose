@@ -18,6 +18,8 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
   const [errorMsg, setErrorMsg] = useState('');
   const [pushPullOp, setPushPullOp] = useState<'push' | 'pull' | null>(null);
   const [splitPct, setSplitPct] = useState(50);
+  const [changesCollapsed, setChangesCollapsed] = useState(false);
+  const [stagedCollapsed, setStagedCollapsed] = useState(false);
   const splitRef = useRef<HTMLDivElement>(null);
 
   const onSplitMouseDown = useCallback((e: React.MouseEvent) => {
@@ -144,74 +146,82 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
       {/* Resizable split between unstaged and staged */}
       <div className="action-split" ref={splitRef}>
         {/* Unstaged files */}
-        <div className="action-section" style={{ height: `${splitPct}%` }}>
-          <div className="action-section-header">
+        <div className="action-section" style={{ height: changesCollapsed ? 'auto' : `${splitPct}%` }}>
+          <div className="action-section-header" onClick={() => setChangesCollapsed(v => !v)} style={{ cursor: 'pointer' }}>
+            <span className="section-collapse-arrow">{changesCollapsed ? '▶' : '▼'}</span>
             <span className="action-section-title">
               Changes ({(status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)})
             </span>
-            {((status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)) > 0 && (
-              <button className="action-link-btn" onClick={handleStageAll} disabled={isLoading}>
+            {!changesCollapsed && ((status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)) > 0 && (
+              <button className="action-link-btn" onClick={(e) => { e.stopPropagation(); handleStageAll(); }} disabled={isLoading}>
                 Stage all
               </button>
             )}
           </div>
-          <div className="action-section-scroll">
-            {status?.unstaged?.map((f) => (
-              <FileRow
-                key={f.path}
-                file={f}
-                action="stage"
-                onAction={() => handleStage(f)}
-                onDiscard={() => handleDiscard(f)}
-                onSelect={() => onFileSelect(f.path, false)}
-                selected={selectedFile === f.path}
-                disabled={isLoading}
-              />
-            ))}
-            {status?.untracked?.map((path) => (
-              <FileRow
-                key={path}
-                file={{ path, status: 'untracked', staged: false }}
-                action="stage"
-                onAction={() => handleStage({ path, status: 'untracked', staged: false })}
-                onDiscard={() => handleDiscard({ path, status: 'untracked', staged: false })}
-                onSelect={() => onFileSelect(path, false)}
-                selected={selectedFile === path}
-                disabled={isLoading}
-              />
-            ))}
-            {(status?.unstaged?.length ?? 0) === 0 && (status?.untracked?.length ?? 0) === 0 && (
-              <div className="action-empty">No changes</div>
-            )}
-          </div>
+          {!changesCollapsed && (
+            <div className="action-section-scroll">
+              {status?.unstaged?.map((f) => (
+                <FileRow
+                  key={f.path}
+                  file={f}
+                  action="stage"
+                  onAction={() => handleStage(f)}
+                  onDiscard={() => handleDiscard(f)}
+                  onSelect={() => onFileSelect(f.path, false)}
+                  selected={selectedFile === f.path}
+                  disabled={isLoading}
+                />
+              ))}
+              {status?.untracked?.map((path) => (
+                <FileRow
+                  key={path}
+                  file={{ path, status: 'untracked', staged: false }}
+                  action="stage"
+                  onAction={() => handleStage({ path, status: 'untracked', staged: false })}
+                  onDiscard={() => handleDiscard({ path, status: 'untracked', staged: false })}
+                  onSelect={() => onFileSelect(path, false)}
+                  selected={selectedFile === path}
+                  disabled={isLoading}
+                />
+              ))}
+              {(status?.unstaged?.length ?? 0) === 0 && (status?.untracked?.length ?? 0) === 0 && (
+                <div className="action-empty">No changes</div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Horizontal resize handle */}
-        <div className="resize-handle-h" onMouseDown={onSplitMouseDown} title="Drag to resize" />
+        {/* Horizontal resize handle — masqué si une section est repliée */}
+        {!changesCollapsed && !stagedCollapsed && (
+          <div className="resize-handle-h" onMouseDown={onSplitMouseDown} title="Drag to resize" />
+        )}
 
         {/* Staged files */}
-        <div className="action-section" style={{ height: `${100 - splitPct}%` }}>
-          <div className="action-section-header">
+        <div className="action-section" style={{ height: stagedCollapsed ? 'auto' : changesCollapsed ? `100%` : `${100 - splitPct}%` }}>
+          <div className="action-section-header" onClick={() => setStagedCollapsed(v => !v)} style={{ cursor: 'pointer' }}>
+            <span className="section-collapse-arrow">{stagedCollapsed ? '▶' : '▼'}</span>
             <span className="action-section-title">
               Staged ({status?.staged?.length ?? 0})
             </span>
           </div>
-          <div className="action-section-scroll">
-            {status?.staged?.map((f) => (
-              <FileRow
-                key={f.path}
-                file={f}
-                action="unstage"
-                onAction={() => handleUnstage(f)}
-                onSelect={() => onFileSelect(f.path, true)}
-                selected={selectedFile === f.path}
-                disabled={isLoading}
-              />
-            ))}
-            {(status?.staged?.length ?? 0) === 0 && (
-              <div className="action-empty">No staged files</div>
-            )}
-          </div>
+          {!stagedCollapsed && (
+            <div className="action-section-scroll">
+              {status?.staged?.map((f) => (
+                <FileRow
+                  key={f.path}
+                  file={f}
+                  action="unstage"
+                  onAction={() => handleUnstage(f)}
+                  onSelect={() => onFileSelect(f.path, true)}
+                  selected={selectedFile === f.path}
+                  disabled={isLoading}
+                />
+              ))}
+              {(status?.staged?.length ?? 0) === 0 && (
+                <div className="action-empty">No staged files</div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

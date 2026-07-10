@@ -814,9 +814,17 @@
   background: var(--rose-500);
 }
 
+.section-collapse-arrow {
+  font-size: 8px;
+  color: var(--text-muted);
+  width: 12px;
+  flex-shrink: 0;
+}
+
 .action-section-header {
   display: flex;
   align-items: center;
+  gap: 4px;
   justify-content: space-between;
   padding: 10px 16px 6px;
   position: sticky;
