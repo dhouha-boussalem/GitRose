@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { StashViewer } from './StashViewer';
 
 interface Stash {
   index: number;
@@ -18,9 +19,7 @@ export function StashPanel({ repoPath, onRefresh }: StashPanelProps) {
   const [stashMsg, setStashMsg] = useState('');
   const [busy, setBusy] = useState<number | 'save' | null>(null);
   const [error, setError] = useState('');
-  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
-  const [previewContent, setPreviewContent] = useState<string>('');
-  const [previewLoading, setPreviewLoading] = useState(false);
+  const [viewerStash, setViewerStash] = useState<{ index: number; message: string } | null>(null);
 
   const loadStashes = useCallback(async () => {
     const list = await window.gitRose.stashList(repoPath).catch(() => []);
@@ -28,24 +27,6 @@ export function StashPanel({ repoPath, onRefresh }: StashPanelProps) {
   }, [repoPath]);
 
   useEffect(() => { loadStashes(); }, [loadStashes]);
-
-  async function togglePreview(index: number) {
-    if (previewIndex === index) {
-      setPreviewIndex(null);
-      setPreviewContent('');
-      return;
-    }
-    setPreviewIndex(index);
-    setPreviewLoading(true);
-    try {
-      const content = await window.gitRose.stashShow(repoPath, index);
-      setPreviewContent(content);
-    } catch (e: any) {
-      setPreviewContent(`Erreur: ${e?.message ?? 'impossible de lire le stash'}`);
-    } finally {
-      setPreviewLoading(false);
-    }
-  }
 
   async function handleSave() {
     setBusy('save');
@@ -162,11 +143,11 @@ export function StashPanel({ repoPath, onRefresh }: StashPanelProps) {
               </div>
               <div className="stash-item-actions">
                 <button
-                  className={`stash-action-btn ${previewIndex === s.index ? 'active' : ''}`}
-                  onClick={() => togglePreview(s.index)}
+                  className={`stash-action-btn ${viewerStash?.index === s.index ? 'active' : ''}`}
+                  onClick={() => setViewerStash(viewerStash?.index === s.index ? null : { index: s.index, message: s.message })}
                   title="Voir le contenu"
                 >
-                  {previewLoading && previewIndex === s.index ? <span className="btn-spinner" /> : '👁'}
+                  👁
                 </button>
                 <button
                   className="stash-action-btn"
@@ -193,23 +174,17 @@ export function StashPanel({ repoPath, onRefresh }: StashPanelProps) {
                   ✕
                 </button>
               </div>
-              {previewIndex === s.index && !previewLoading && (
-                <pre className="stash-diff-preview">
-                  {previewContent.split('\n').map((line, i) => {
-                    const cls = line.startsWith('+') && !line.startsWith('+++')
-                      ? 'diff-add'
-                      : line.startsWith('-') && !line.startsWith('---')
-                      ? 'diff-del'
-                      : line.startsWith('@@')
-                      ? 'diff-hunk'
-                      : '';
-                    return <span key={i} className={cls}>{line}{'\n'}</span>;
-                  })}
-                </pre>
-              )}
             </div>
           ))}
         </>
+      )}
+      {viewerStash && (
+        <StashViewer
+          repoPath={repoPath}
+          stashIndex={viewerStash.index}
+          stashMessage={viewerStash.message}
+          onClose={() => setViewerStash(null)}
+        />
       )}
     </div>
   );

@@ -19,6 +19,8 @@ contextBridge.exposeInMainWorld('gitRose', {
   checkoutRemote: (repoPath: string, remoteBranch: string) => ipcRenderer.invoke('git:checkout-remote', repoPath, remoteBranch),
   getUser: (repoPath: string) => ipcRenderer.invoke('git:get-user', repoPath),
   stashShow: (repoPath: string, index: number) => ipcRenderer.invoke('git:stash-show', repoPath, index),
+  stashShowFiles: (repoPath: string, index: number) => ipcRenderer.invoke('git:stash-show-files', repoPath, index),
+  stashShowFileDiff: (repoPath: string, index: number, filePath: string) => ipcRenderer.invoke('git:stash-show-file-diff', repoPath, index, filePath),
   stashList: (repoPath: string) => ipcRenderer.invoke('git:stash-list', repoPath),
   stashSave: (repoPath: string, message?: string) => ipcRenderer.invoke('git:stash-save', repoPath, message),
   stashApply: (repoPath: string, index: number) => ipcRenderer.invoke('git:stash-apply', repoPath, index),

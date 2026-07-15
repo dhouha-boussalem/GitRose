@@ -221,6 +221,18 @@ export class GitService {
     return this.getGit(repoPath).raw(['stash', 'show', '-p', '--stat', `stash@{${index}}`]);
   }
 
+  static async stashShowFiles(repoPath: string, index: number): Promise<{ path: string; status: string }[]> {
+    const out = await this.getGit(repoPath).raw(['stash', 'show', '--name-status', `stash@{${index}}`]);
+    return out.trim().split('\n').filter(Boolean).map((line) => {
+      const [status, ...rest] = line.split('\t');
+      return { status: status.trim(), path: rest.join('\t').trim() };
+    });
+  }
+
+  static async stashShowFileDiff(repoPath: string, index: number, filePath: string): Promise<string> {
+    return this.getGit(repoPath).raw(['stash', 'show', '-p', `stash@{${index}}`, '--', filePath]);
+  }
+
   static async stashSave(repoPath: string, message?: string): Promise<void> {
     const args = ['stash', 'push'];
     if (message) args.push('-m', message);

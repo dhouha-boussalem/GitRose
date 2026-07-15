@@ -118,6 +118,12 @@ function registerGitHandlers() {
   ipcMain.handle('git:stash-show', async (_event, repoPath: string, index: number) => {
     return GitService.stashShow(repoPath, index);
   });
+  ipcMain.handle('git:stash-show-files', async (_event, repoPath: string, index: number) => {
+    return GitService.stashShowFiles(repoPath, index);
+  });
+  ipcMain.handle('git:stash-show-file-diff', async (_event, repoPath: string, index: number, filePath: string) => {
+    return GitService.stashShowFileDiff(repoPath, index, filePath);
+  });
 
   ipcMain.handle('git:stash-list', async (_event, repoPath: string) => {
     return GitService.stashList(repoPath);
