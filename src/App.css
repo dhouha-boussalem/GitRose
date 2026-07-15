@@ -462,6 +462,23 @@
 .stash-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .stash-action-btn.pop:hover:not(:disabled) { border-color: var(--color-added); color: var(--color-added); }
 .stash-action-btn.drop:hover:not(:disabled) { border-color: var(--color-deleted); color: var(--color-deleted); }
+.stash-action-btn.active { border-color: var(--rose-500); color: var(--rose-500); background: var(--rose-dim, rgba(192,0,110,0.08)); }
+
+.stash-diff-preview {
+  margin-top: 6px;
+  padding: 8px;
+  background: #12121a;
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: #c8c8d8;
+  overflow-x: auto;
+  white-space: pre;
+  max-height: 280px;
+  overflow-y: auto;
+  user-select: text;
+}
 
 .stash-error {
   display: flex;

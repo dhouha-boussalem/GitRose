@@ -18,6 +18,9 @@ export function StashPanel({ repoPath, onRefresh }: StashPanelProps) {
   const [stashMsg, setStashMsg] = useState('');
   const [busy, setBusy] = useState<number | 'save' | null>(null);
   const [error, setError] = useState('');
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+  const [previewContent, setPreviewContent] = useState<string>('');
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const loadStashes = useCallback(async () => {
     const list = await window.gitRose.stashList(repoPath).catch(() => []);
@@ -25,6 +28,24 @@ export function StashPanel({ repoPath, onRefresh }: StashPanelProps) {
   }, [repoPath]);
 
   useEffect(() => { loadStashes(); }, [loadStashes]);
+
+  async function togglePreview(index: number) {
+    if (previewIndex === index) {
+      setPreviewIndex(null);
+      setPreviewContent('');
+      return;
+    }
+    setPreviewIndex(index);
+    setPreviewLoading(true);
+    try {
+      const content = await window.gitRose.stashShow(repoPath, index);
+      setPreviewContent(content);
+    } catch (e: any) {
+      setPreviewContent(`Erreur: ${e?.message ?? 'impossible de lire le stash'}`);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }
 
   async function handleSave() {
     setBusy('save');
@@ -141,6 +162,13 @@ export function StashPanel({ repoPath, onRefresh }: StashPanelProps) {
               </div>
               <div className="stash-item-actions">
                 <button
+                  className={`stash-action-btn ${previewIndex === s.index ? 'active' : ''}`}
+                  onClick={() => togglePreview(s.index)}
+                  title="Voir le contenu"
+                >
+                  {previewLoading && previewIndex === s.index ? <span className="btn-spinner" /> : '👁'}
+                </button>
+                <button
                   className="stash-action-btn"
                   onClick={() => handleApply(s.index)}
                   disabled={busy !== null}
@@ -165,6 +193,20 @@ export function StashPanel({ repoPath, onRefresh }: StashPanelProps) {
                   ✕
                 </button>
               </div>
+              {previewIndex === s.index && !previewLoading && (
+                <pre className="stash-diff-preview">
+                  {previewContent.split('\n').map((line, i) => {
+                    const cls = line.startsWith('+') && !line.startsWith('+++')
+                      ? 'diff-add'
+                      : line.startsWith('-') && !line.startsWith('---')
+                      ? 'diff-del'
+                      : line.startsWith('@@')
+                      ? 'diff-hunk'
+                      : '';
+                    return <span key={i} className={cls}>{line}{'\n'}</span>;
+                  })}
+                </pre>
+              )}
             </div>
           ))}
         </>

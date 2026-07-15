@@ -115,6 +115,10 @@ function registerGitHandlers() {
     return GitService.getUser(repoPath);
   });
 
+  ipcMain.handle('git:stash-show', async (_event, repoPath: string, index: number) => {
+    return GitService.stashShow(repoPath, index);
+  });
+
   ipcMain.handle('git:stash-list', async (_event, repoPath: string) => {
     return GitService.stashList(repoPath);
   });

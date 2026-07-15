@@ -217,6 +217,10 @@ export class GitService {
     });
   }
 
+  static async stashShow(repoPath: string, index: number): Promise<string> {
+    return this.getGit(repoPath).raw(['stash', 'show', '-p', '--stat', `stash@{${index}}`]);
+  }
+
   static async stashSave(repoPath: string, message?: string): Promise<void> {
     const args = ['stash', 'push'];
     if (message) args.push('-m', message);
