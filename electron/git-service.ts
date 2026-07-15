@@ -230,7 +230,7 @@ export class GitService {
   }
 
   static async stashShowFileDiff(repoPath: string, index: number, filePath: string): Promise<string> {
-    return this.getGit(repoPath).raw(['stash', 'show', '-p', `stash@{${index}}`, '--', filePath]);
+    return this.getGit(repoPath).raw(['diff', `stash@{${index}}^`, `stash@{${index}}`, '--', filePath]);
   }
 
   static async stashSave(repoPath: string, message?: string): Promise<void> {
