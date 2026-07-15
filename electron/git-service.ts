@@ -242,6 +242,17 @@ export class GitService {
     return this.getGit(repoPath).raw(filtered);
   }
 
+  static async squashToCommit(repoPath: string, hash: string, message: string): Promise<void> {
+    const git = this.getGit(repoPath);
+    // Reset soft to the parent of the target commit — keeps all changes staged
+    await git.raw(['reset', '--soft', `${hash}~1`]);
+    await git.raw(['commit', '-m', message]);
+  }
+
+  static async rebase(repoPath: string, branch: string): Promise<void> {
+    await this.getGit(repoPath).raw(['rebase', branch]);
+  }
+
   static async cherryPick(repoPath: string, hash: string): Promise<void> {
     await this.getGit(repoPath).raw(['cherry-pick', hash]);
   }

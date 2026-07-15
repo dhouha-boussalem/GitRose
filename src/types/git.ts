@@ -64,6 +64,8 @@ declare global {
       stashPop: (repoPath: string, index: number) => Promise<void>;
       stashDrop: (repoPath: string, index: number) => Promise<void>;
       runCommand: (repoPath: string, args: string[]) => Promise<string>;
+      squashToCommit: (repoPath: string, hash: string, message: string) => Promise<void>;
+      rebase: (repoPath: string, branch: string) => Promise<void>;
       cherryPick: (repoPath: string, hash: string) => Promise<void>;
       cherryPickToBranch: (repoPath: string, hash: string, branchName: string) => Promise<void>;
     };

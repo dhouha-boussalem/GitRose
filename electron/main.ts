@@ -135,6 +135,13 @@ function registerGitHandlers() {
     return GitService.runCommand(repoPath, args);
   });
 
+  ipcMain.handle('git:squash-to-commit', async (_event, repoPath: string, hash: string, message: string) => {
+    return GitService.squashToCommit(repoPath, hash, message);
+  });
+  ipcMain.handle('git:rebase', async (_event, repoPath: string, branch: string) => {
+    return GitService.rebase(repoPath, branch);
+  });
+
   ipcMain.handle('git:cherry-pick', async (_event, repoPath: string, hash: string) => {
     return GitService.cherryPick(repoPath, hash);
   });

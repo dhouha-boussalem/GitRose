@@ -8,6 +8,7 @@ import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ResizablePanels } from './components/ResizablePanels';
 import { CherryPickPanel } from './components/CherryPickPanel';
+import { RebaseBar } from './components/RebaseBar';
 import { GitConsole } from './components/GitConsole';
 import './styles/theme.css';
 import './App.css';
@@ -35,6 +36,7 @@ interface RepoTab {
   activeView: 'commits' | 'status';
   selectedFile: { path: string; staged: boolean } | null;
   showGraph: boolean;
+  showRebase: boolean;
   showConsole: boolean;
   loading: boolean;
 }
@@ -58,6 +60,7 @@ function newTab(path: string, index: number): RepoTab {
     activeView: 'status',
     selectedFile: null,
     showGraph: false,
+    showRebase: false,
     showConsole: false,
     loading: true,
   };
@@ -217,12 +220,26 @@ export default function App() {
                   <span className="history-toolbar-hint">Click a branch to filter</span>
                 )}
                 <button
+                  className={`graph-toggle-btn ${tab.showRebase ? 'active' : ''}`}
+                  onClick={() => updateTab(tab.id, { showRebase: !tab.showRebase })}
+                >
+                  ↥ Rebase
+                </button>
+                <button
                   className={`graph-toggle-btn ${tab.showGraph ? 'active' : ''}`}
                   onClick={() => updateTab(tab.id, { showGraph: !tab.showGraph })}
                 >
                   {tab.showGraph ? '⬡ Hide graph' : '⬡ Show graph'}
                 </button>
               </div>
+              {tab.showRebase && (
+                <RebaseBar
+                  branches={tab.branches.filter(b => !b.current).map(b => b.name)}
+                  repoPath={tab.path}
+                  onDone={async () => { await refreshTab(tab); updateTab(tab.id, { showRebase: false }); }}
+                  onCancel={() => updateTab(tab.id, { showRebase: false })}
+                />
+              )}
               <CommitGraph
                 commits={tab.commits}
                 selectedHash={tab.selectedCommit?.hash ?? null}

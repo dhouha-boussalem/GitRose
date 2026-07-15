@@ -1122,6 +1122,68 @@
   letter-spacing: 0;
 }
 
+/* === Rebase bar === */
+
+.rebase-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.rebase-bar-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.rebase-bar-select {
+  flex: 1;
+  max-width: 240px;
+  padding: 5px 8px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: Verdana, Geneva, sans-serif;
+  outline: none;
+  cursor: pointer;
+}
+.rebase-bar-select:focus { border-color: var(--rose-500); }
+
+.rebase-bar-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+.rebase-bar-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.rebase-bar-btn.primary { background: var(--rose-500); color: #fff; border-color: var(--rose-500); }
+.rebase-bar-btn.primary:hover:not(:disabled) { background: var(--rose-600); }
+.rebase-bar-btn.ghost { background: none; color: var(--text-secondary); border-color: var(--border-subtle); }
+.rebase-bar-btn.ghost:hover:not(:disabled) { background: var(--bg-hover); }
+
+.rebase-bar-error {
+  font-size: 11px;
+  color: var(--color-deleted);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* === Cherry-pick panel === */
 
 .cherry-pick-panel {

@@ -24,6 +24,8 @@ contextBridge.exposeInMainWorld('gitRose', {
   stashPop: (repoPath: string, index: number) => ipcRenderer.invoke('git:stash-pop', repoPath, index),
   stashDrop: (repoPath: string, index: number) => ipcRenderer.invoke('git:stash-drop', repoPath, index),
   runCommand: (repoPath: string, args: string[]) => ipcRenderer.invoke('git:run-command', repoPath, args),
+  squashToCommit: (repoPath: string, hash: string, message: string) => ipcRenderer.invoke('git:squash-to-commit', repoPath, hash, message),
+  rebase: (repoPath: string, branch: string) => ipcRenderer.invoke('git:rebase', repoPath, branch),
   cherryPick: (repoPath: string, hash: string) => ipcRenderer.invoke('git:cherry-pick', repoPath, hash),
   cherryPickToBranch: (repoPath: string, hash: string, branchName: string) => ipcRenderer.invoke('git:cherry-pick-to-branch', repoPath, hash, branchName),
 });
