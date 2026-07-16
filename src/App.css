@@ -472,6 +472,7 @@
   z-index: 200;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   background: var(--bg-surface);
   border-top: 2px solid var(--rose-500);
 }
@@ -506,6 +507,7 @@
 .stash-viewer-body {
   display: flex;
   flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -540,6 +542,7 @@
 
 .stash-viewer-diff {
   flex: 1;
+  min-width: 0;
   overflow: auto;
   background: var(--bg-deepest);
 }
