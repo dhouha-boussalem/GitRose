@@ -47,8 +47,8 @@ export function ResizablePanels({
   }, [width, minWidth, maxWidth]);
 
   return (
-    <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-      <div style={{ width, flexShrink: 0, overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+      <div style={{ width, flexShrink: 0, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {left}
       </div>
       <div
@@ -56,7 +56,7 @@ export function ResizablePanels({
         onMouseDown={onMouseDown}
         title="Drag to resize"
       />
-      <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+      <div style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {right}
       </div>
     </div>
