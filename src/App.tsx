@@ -220,7 +220,7 @@ export default function App() {
                   <span className="history-toolbar-hint">Click a branch to filter</span>
                 )}
                 <button
-                  className={`graph-toggle-btn ${tab.showRebase ? 'active' : ''}`}
+                  className={`graph-toggle-btn rebase-btn ${tab.showRebase ? 'active' : ''}`}
                   onClick={() => updateTab(tab.id, { showRebase: !tab.showRebase })}
                 >
                   ↥ Rebase

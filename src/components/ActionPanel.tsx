@@ -149,7 +149,7 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
         <div className="action-section" style={{ height: changesCollapsed ? 'auto' : `${splitPct}%` }}>
           <div className="action-section-header" onClick={() => setChangesCollapsed(v => !v)} style={{ cursor: 'pointer' }}>
             <span className="section-collapse-arrow">{changesCollapsed ? '▶' : '▼'}</span>
-            <span className="action-section-title">
+            <span className="action-section-title changes-title">
               Changes ({(status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)})
             </span>
             {!changesCollapsed && ((status?.unstaged?.length ?? 0) + (status?.untracked?.length ?? 0)) > 0 && (
@@ -200,7 +200,7 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
         <div className="action-section" style={{ height: stagedCollapsed ? 'auto' : changesCollapsed ? `100%` : `${100 - splitPct}%` }}>
           <div className="action-section-header" onClick={() => setStagedCollapsed(v => !v)} style={{ cursor: 'pointer' }}>
             <span className="section-collapse-arrow">{stagedCollapsed ? '▶' : '▼'}</span>
-            <span className="action-section-title">
+            <span className="action-section-title staged-title">
               Staged ({status?.staged?.length ?? 0})
             </span>
           </div>

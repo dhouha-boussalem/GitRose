@@ -121,7 +121,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
       </div>
 
       <div className="sidebar-section">
-        <div className="sidebar-label">
+        <div className="sidebar-label local-label">
           LOCAL BRANCHES
           <button className="sidebar-new-branch-btn" onClick={startCreating} title="New branch">+</button>
         </div>
@@ -164,7 +164,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
 
       {remote.length > 0 && (
         <div className="sidebar-section">
-          <div className="sidebar-label">REMOTE BRANCHES</div>
+          <div className="sidebar-label remote-label">REMOTE BRANCHES</div>
           {remote.map((branch) => (
             <button
               key={branch.name}

@@ -91,7 +91,7 @@ export function CommitGraph({ commits, selectedHash, showGraph, onSelect }: Comm
                 style={{ height: ROW_HEIGHT, boxSizing: 'border-box', overflow: 'hidden' }}
                 onClick={() => onSelect(commit)}
               >
-                <div className="commit-avatar" style={{ backgroundColor: hashToColor(commit.email) }}>
+                <div className="commit-avatar" style={{ background: hashToColor(commit.email) }}>
                   {getInitials(commit.author)}
                 </div>
                 <div className="commit-body">
@@ -138,8 +138,19 @@ function getInitials(name: string): string {
 }
 
 function hashToColor(str: string): string {
-  const colors = ['#5c6bc0', '#26a69a', '#43a047', '#f4511e', '#8e24aa', '#00897b', '#1e88e5', '#c8003b', '#e53935', '#6d4c41'];
+  const gradients = [
+    'linear-gradient(135deg,#5c6bc0,#9c4dcc)',
+    'linear-gradient(135deg,#00897b,#26a69a)',
+    'linear-gradient(135deg,#2e7d32,#66bb6a)',
+    'linear-gradient(135deg,#e64a19,#ff8f00)',
+    'linear-gradient(135deg,#6a1b9a,#e040fb)',
+    'linear-gradient(135deg,#00695c,#26c6da)',
+    'linear-gradient(135deg,#1565c0,#42a5f5)',
+    'linear-gradient(135deg,#c62828,#ef5350)',
+    'linear-gradient(135deg,#ad1457,#f06292)',
+    'linear-gradient(135deg,#4e342e,#a1887f)',
+  ];
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  return colors[Math.abs(hash) % colors.length];
+  return gradients[Math.abs(hash) % gradients.length];
 }
