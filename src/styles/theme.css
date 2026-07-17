@@ -1,43 +1,37 @@
 :root {
-  /* === Brand — rose poudré inspiré bouquet === */
-  --rose-50:  #fdf4f6;
-  --rose-100: #f9dde4;
-  --rose-200: #f0b8c4;
-  --rose-300: #e8929e;   /* rose poudré clair */
-  --rose-400: #d96878;   /* rose moyen */
-  --rose-500: #c8405e;   /* rose profond — accent principal */
-  --rose-600: #a83050;
-  --rose-700: #882040;
+  /* === Brand rose — deep rose/fuchsia, clearly pink not red === */
+  --rose-50:  #fff4f8;
+  --rose-100: #ffdaec;
+  --rose-200: #ffadd4;
+  --rose-300: #e8549a;
+  --rose-400: #d42b7e;
+  --rose-500: #c0006e;
+  --rose-600: #9e005b;
+  --rose-700: #7c0047;
 
-  /* === Mauve & sauge — couleurs secondaires du bouquet === */
-  --mauve:     #c4a0b8;
-  --mauve-dim: #e8d8e4;
-  --sage:      #8fa878;
-  --sage-dim:  #d8e8d0;
+  /* === Backgrounds === */
+  --bg-deepest:  #f7f7f8;
+  --bg-deep:     #f0f0f2;
+  --bg-surface:  #ffffff;
+  --bg-elevated: #ebebed;
+  --bg-hover:    #e8e8ea;
 
-  /* === Backgrounds — crème chaud, ivoire, papier kraft === */
-  --bg-deepest:  #f7f0e8;   /* crème profond — kraft */
-  --bg-deep:     #f0e8dc;   /* ivoire chaud */
-  --bg-surface:  #fdf8f4;   /* blanc cassé chaud */
-  --bg-elevated: #ece4da;   /* taupe très clair */
-  --bg-hover:    #e8ddd4;   /* hover crème */
-
-  /* === Text — brun-taupe élégant === */
-  --text-primary:   #2e1e20;   /* brun très sombre */
-  --text-secondary: #6e4e54;   /* brun-rose */
-  --text-muted:     #b09898;   /* rose-gris */
+  /* === Text === */
+  --text-primary:   #1a1a1f;
+  --text-secondary: #555560;
+  --text-muted:     #9090a0;
   --text-accent:    var(--rose-500);
 
-  /* === Borders — tons chauds === */
-  --border-subtle: #e0d0c8;
-  --border-medium: #ccc0b4;
+  /* === Borders === */
+  --border-subtle: #e2e2e6;
+  --border-medium: #ceced4;
   --border-accent: var(--rose-500);
 
   /* === Status colors === */
-  --color-added:    #5a8a4e;   /* vert sauge */
-  --color-modified: #a07840;   /* or chaud */
-  --color-deleted:  #c04848;   /* rouge doux */
-  --color-untracked:#8878c0;   /* mauve */
+  --color-added:    #0a8a55;
+  --color-modified: #a07000;
+  --color-deleted:  #c0392b;
+  --color-untracked:#5c6bc0;
 
   /* === Typography === */
   --font-ui:   'Inter', system-ui, sans-serif;
@@ -48,12 +42,12 @@
   --radius-md: 10px;
   --radius-lg: 16px;
 
-  /* === Shadows — plus chaudes === */
-  --shadow-rose:  0 0 20px rgba(200, 64, 94, 0.16);
-  --shadow-panel: 0 4px 24px rgba(80, 40, 40, 0.08);
-  --shadow-sm:    0 1px 4px rgba(80, 40, 40, 0.07);
-  --shadow-md:    0 2px 12px rgba(80, 40, 40, 0.10);
-  --shadow-lg:    0 8px 32px rgba(80, 40, 40, 0.14);
+  /* === Shadows === */
+  --shadow-rose:  0 0 20px rgba(192, 0, 110, 0.18);
+  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-sm:    0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md:    0 2px 12px rgba(0, 0, 0, 0.09);
+  --shadow-lg:    0 8px 32px rgba(0, 0, 0, 0.13);
 }
 
 * {

@@ -473,7 +473,7 @@
 .stash-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .stash-action-btn.pop:hover:not(:disabled) { border-color: var(--color-added); color: var(--color-added); }
 .stash-action-btn.drop:hover:not(:disabled) { border-color: var(--color-deleted); color: var(--color-deleted); }
-.stash-action-btn.active { border-color: var(--rose-500); color: var(--rose-500); background: var(--rose-dim, rgba(200,64,94,0.09)); }
+.stash-action-btn.active { border-color: var(--rose-500); color: var(--rose-500); background: var(--rose-dim, rgba(192,0,110,0.08)); }
 
 /* === Stash viewer === */
 
@@ -542,7 +542,7 @@
   transition: background 0.12s;
 }
 .stash-viewer-file-row:hover { background: var(--bg-hover); color: var(--text-primary); }
-.stash-viewer-file-row.selected { background: var(--active-bg, rgba(200,64,94,0.09)); color: var(--rose-500); }
+.stash-viewer-file-row.selected { background: var(--active-bg, rgba(192,0,110,0.08)); color: var(--rose-500); }
 
 .stash-viewer-file-name {
   overflow: hidden;
@@ -622,7 +622,7 @@
 }
 
 .sidebar-label.local-label  { --sidebar-accent: var(--rose-500); }
-.sidebar-label.remote-label { --sidebar-accent: #a090c4; }
+.sidebar-label.remote-label { --sidebar-accent: #7b8fda; }
 .sidebar-label.stash-label  { --sidebar-accent: #e8a838; }
 
 .sidebar-label {
@@ -717,10 +717,10 @@
   transition: color 0.15s, background 0.15s;
 }
 .branch-item:hover { background: var(--bg-hover); color: var(--text-primary); }
-.branch-item.active { color: var(--rose-500); background: rgba(200,64,94,0.09); font-weight: 600; }
+.branch-item.active { color: var(--rose-500); background: rgba(192,0,110,0.08); font-weight: 600; }
 .branch-item.remote { opacity: 0.85; }
-.branch-item.remote .branch-icon { color: #a090c4; }
-.branch-item.remote .branch-name  { color: #a090c4; }
+.branch-item.remote .branch-icon { color: #7b8fda; }
+.branch-item.remote .branch-name  { color: #7b8fda; }
 .branch-item.remote:hover .branch-name { color: var(--text-primary); }
 .branch-icon { font-size: 10px; width: 14px; flex-shrink: 0; color: var(--rose-500); }
 .branch-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -746,9 +746,9 @@
 }
 .commit-row:hover { background: var(--bg-surface); }
 .commit-row.selected {
-  background: rgba(200,64,94,0.07);
+  background: rgba(192,0,110,0.06);
   border-left: 3px solid var(--rose-500);
-  box-shadow: inset 0 0 0 1px rgba(200,64,94,0.09);
+  box-shadow: inset 0 0 0 1px rgba(192,0,110,0.08);
 }
 
 .commit-avatar {
@@ -773,8 +773,8 @@
 .commit-author { font-size: 11px; color: var(--text-secondary); font-style: italic; }
 .commit-hash { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); background: var(--bg-elevated); padding: 2px 6px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); letter-spacing: 0.04em; }
 .commit-ref { font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600; letter-spacing: 0.02em; }
-.ref-head { background: rgba(200,64,94,0.13); color: var(--rose-500); border: 1px solid rgba(200,64,94,0.22); }
-.ref-remote { background: rgba(136,120,192,0.15); color: #9880c8; border: 1px solid rgba(136,120,192,0.25); }
+.ref-head { background: rgba(192,0,110,0.12); color: var(--rose-500); border: 1px solid rgba(192,0,110,0.20); }
+.ref-remote { background: rgba(155,138,247,0.15); color: #9b8af7; border: 1px solid rgba(155,138,247,0.25); }
 .ref-local { background: rgba(82,217,160,0.12); color: var(--color-added); border: 1px solid rgba(82,217,160,0.2); }
 
 /* === Status panel === */
@@ -800,7 +800,7 @@
 
 .welcome { display: flex; align-items: center; justify-content: center; height: 100vh; background: var(--bg-deepest); }
 .welcome-inner { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.welcome-logo { font-size: 64px; filter: drop-shadow(0 0 24px rgba(200,64,94,0.45)); }
+.welcome-logo { font-size: 64px; filter: drop-shadow(0 0 24px rgba(235,47,138,0.5)); }
 .welcome-title {
   font-size: 36px;
   font-weight: 700;
@@ -820,7 +820,7 @@
   box-shadow: var(--shadow-rose);
   transition: transform 0.15s, box-shadow 0.15s;
 }
-.welcome-cta:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(200,64,94,0.30); }
+.welcome-cta:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(235,47,138,0.35); }
 .welcome-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
 /* === Loading === */
@@ -1089,7 +1089,7 @@
 
 .action-commit-msg:focus {
   border-color: var(--rose-500);
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04), 0 0 0 3px rgba(200,64,94,0.09);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04), 0 0 0 3px rgba(192,0,110,0.08);
 }
 .action-commit-msg::placeholder { color: var(--text-muted); font-style: italic; }
 
@@ -1109,12 +1109,12 @@
   justify-content: center;
   gap: 8px;
   transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 2px 12px rgba(200,64,94,0.26), 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 12px rgba(192,0,110,0.28), 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .action-commit-btn:hover:not(:disabled) {
   opacity: 0.93;
-  box-shadow: 0 4px 20px rgba(200,64,94,0.35), 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(192,0,110,0.38), 0 1px 3px rgba(0,0,0,0.1);
   transform: translateY(-1px);
 }
 
@@ -1185,7 +1185,7 @@
 @keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 .branch-item.focused {
-  background: rgba(200,64,94,0.12);
+  background: rgba(235,47,138,0.12);
   color: var(--rose-300);
   border-left: 2px solid var(--rose-500);
 }
@@ -1222,12 +1222,12 @@
   flex-shrink: 0;
 }
 .graph-toggle-btn:hover { color: var(--text-primary); border-color: var(--border-medium); background: var(--bg-hover); }
-.graph-toggle-btn.active { color: var(--rose-500); border-color: var(--rose-400); background: rgba(200,64,94,0.09); font-weight: 600; }
+.graph-toggle-btn.active { color: var(--rose-500); border-color: var(--rose-400); background: rgba(192,0,110,0.08); font-weight: 600; }
 
 /* Rebase button — bleu indigo */
-.graph-toggle-btn.rebase-btn { color: #9080c0; border-color: rgba(144,128,192,0.4); }
-.graph-toggle-btn.rebase-btn:hover { background: rgba(144,128,192,0.1); border-color: #9080c0; color: #a898d0; }
-.graph-toggle-btn.rebase-btn.active { background: rgba(144,128,192,0.12); border-color: #9080c0; color: #a898d0; }
+.graph-toggle-btn.rebase-btn { color: #6c7fd8; border-color: rgba(108,127,216,0.4); }
+.graph-toggle-btn.rebase-btn:hover { background: rgba(108,127,216,0.1); border-color: #6c7fd8; color: #8897e8; }
+.graph-toggle-btn.rebase-btn.active { background: rgba(108,127,216,0.12); border-color: #6c7fd8; color: #8897e8; }
 
 /* === Branch focus elements (inside history-toolbar) === */
 
@@ -1273,7 +1273,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 6px rgba(200,64,94,0.45);
+  box-shadow: 0 0 6px rgba(235,47,138,0.5);
   letter-spacing: 0;
 }
 
@@ -1588,20 +1588,20 @@
   font-weight: 700;
 }
 
-/* Added line — vert sauge */
-.diff-add .diff-ln   { background: #d8efd0; color: #3a6832; }
-.diff-add .diff-code { background: #e8f5e0; color: #2a5022; }
-.diff-add .diff-sign { color: #5a8a4e; }
+/* Added line */
+.diff-add .diff-ln   { background: #d4f7e7; color: #0a6640; }
+.diff-add .diff-code { background: #e6fbf0; color: #0a4428; }
+.diff-add .diff-sign { color: #0a8a55; }
 
-/* Removed line — rose doux */
-.diff-remove .diff-ln   { background: #f5dde0; color: #882030; }
-.diff-remove .diff-code { background: #faeaec; color: #6a1828; }
-.diff-remove .diff-sign { color: #c04848; }
+/* Removed line */
+.diff-remove .diff-ln   { background: #fde8e8; color: #8a1a1a; }
+.diff-remove .diff-code { background: #fff0f0; color: #5c1010; }
+.diff-remove .diff-sign { color: #c0392b; }
 
-/* Hunk header — mauve */
+/* Hunk header */
 .diff-hunk .diff-code {
-  background: #f0e8f4;
-  color: #8060a0;
+  background: #f0eeff;
+  color: #6c4fd4;
   font-style: italic;
   padding: 2px 12px;
 }
@@ -1627,6 +1627,6 @@
 
 /* Highlight selected file row */
 .action-file-row.selected {
-  background: rgba(200,64,94,0.09);
+  background: rgba(192,0,110,0.08);
   border-left: 2px solid var(--rose-500);
 }
