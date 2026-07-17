@@ -462,7 +462,7 @@
 .stash-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .stash-action-btn.pop:hover:not(:disabled) { border-color: var(--color-added); color: var(--color-added); }
 .stash-action-btn.drop:hover:not(:disabled) { border-color: var(--color-deleted); color: var(--color-deleted); }
-.stash-action-btn.active { border-color: var(--rose-500); color: var(--rose-500); background: var(--rose-dim, rgba(240,80,204,0.12)); }
+.stash-action-btn.active { border-color: var(--rose-500); color: var(--rose-500); background: var(--rose-dim, rgba(192,0,110,0.08)); }
 
 /* === Stash viewer === */
 
@@ -531,7 +531,7 @@
   transition: background 0.12s;
 }
 .stash-viewer-file-row:hover { background: var(--bg-hover); color: var(--text-primary); }
-.stash-viewer-file-row.selected { background: var(--active-bg, rgba(240,80,204,0.12)); color: var(--rose-500); }
+.stash-viewer-file-row.selected { background: var(--active-bg, rgba(192,0,110,0.08)); color: var(--rose-500); }
 
 .stash-viewer-file-name {
   overflow: hidden;
@@ -696,7 +696,7 @@
   transition: color 0.15s, background 0.15s;
 }
 .branch-item:hover { background: var(--bg-hover); color: var(--text-primary); }
-.branch-item.active { color: var(--rose-300); background: rgba(240,80,204,0.12); }
+.branch-item.active { color: var(--rose-300); background: rgba(192,0,110,0.08); }
 .branch-item.remote { opacity: 0.75; }
 .branch-icon { font-size: 10px; width: 14px; flex-shrink: 0; color: var(--rose-500); }
 .branch-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -721,7 +721,7 @@
   overflow: hidden;
 }
 .commit-row:hover { background: var(--bg-surface); }
-.commit-row.selected { background: rgba(240,80,204,0.10); border-left: 2px solid var(--rose-500); }
+.commit-row.selected { background: rgba(235,47,138,0.08); border-left: 2px solid var(--rose-500); }
 
 .commit-avatar {
   width: 32px;
@@ -1061,7 +1061,7 @@
 
 .action-commit-btn:hover:not(:disabled) {
   opacity: 0.9;
-  box-shadow: 0 0 20px rgba(240, 80, 204, 0.45);
+  box-shadow: 0 0 20px rgba(235, 47, 138, 0.4);
 }
 
 .action-commit-btn:active:not(:disabled) { transform: scale(0.98); }
@@ -1130,7 +1130,7 @@
 @keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 .branch-item.focused {
-  background: rgba(240, 80, 204, 0.15);
+  background: rgba(235, 47, 138, 0.12);
   color: var(--rose-300);
   border-left: 2px solid var(--rose-500);
 }
@@ -1167,7 +1167,7 @@
   flex-shrink: 0;
 }
 .graph-toggle-btn:hover { color: var(--text-primary); border-color: var(--rose-400); }
-.graph-toggle-btn.active { color: var(--rose-400); border-color: var(--rose-500); background: rgba(240,80,204,0.10); }
+.graph-toggle-btn.active { color: var(--rose-400); border-color: var(--rose-500); background: rgba(235,47,138,0.08); }
 
 /* === Branch focus elements (inside history-toolbar) === */
 
@@ -1213,7 +1213,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 6px rgba(240, 80, 204, 0.55);
+  box-shadow: 0 0 6px rgba(235, 47, 138, 0.5);
   letter-spacing: 0;
 }
 
@@ -1412,8 +1412,8 @@
   justify-content: space-between;
   gap: 8px;
   padding: 8px 12px;
-  background: rgba(255, 107, 130, 0.12);
-  border: 1px solid rgba(255, 107, 130, 0.28);
+  background: rgba(192, 57, 43, 0.1);
+  border: 1px solid rgba(192, 57, 43, 0.25);
   border-radius: var(--radius-md);
   font-size: 12px;
   color: var(--color-deleted);
@@ -1529,19 +1529,19 @@
 }
 
 /* Added line */
-.diff-add .diff-ln   { background: rgba(74, 222, 143, 0.10); color: #4ade8f; }
-.diff-add .diff-code { background: rgba(74, 222, 143, 0.07); color: #a7f3c8; }
-.diff-add .diff-sign { color: #4ade8f; }
+.diff-add .diff-ln   { background: #d4f7e7; color: #0a6640; }
+.diff-add .diff-code { background: #e6fbf0; color: #0a4428; }
+.diff-add .diff-sign { color: #0a8a55; }
 
 /* Removed line */
-.diff-remove .diff-ln   { background: rgba(255, 107, 130, 0.10); color: #ff6b82; }
-.diff-remove .diff-code { background: rgba(255, 107, 130, 0.07); color: #ffb3be; }
-.diff-remove .diff-sign { color: #ff6b82; }
+.diff-remove .diff-ln   { background: #fde8e8; color: #8a1a1a; }
+.diff-remove .diff-code { background: #fff0f0; color: #5c1010; }
+.diff-remove .diff-sign { color: #c0392b; }
 
 /* Hunk header */
 .diff-hunk .diff-code {
-  background: rgba(240, 80, 204, 0.08);
-  color: var(--rose-600);
+  background: #f0eeff;
+  color: #6c4fd4;
   font-style: italic;
   padding: 2px 12px;
 }
@@ -1567,6 +1567,6 @@
 
 /* Highlight selected file row */
 .action-file-row.selected {
-  background: rgba(240, 80, 204, 0.10);
+  background: rgba(235, 47, 138, 0.08);
   border-left: 2px solid var(--rose-500);
 }

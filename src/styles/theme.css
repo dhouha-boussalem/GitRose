@@ -1,37 +1,37 @@
 :root {
-  /* === Brand rose/fuchsia — vibrant on dark violet === */
-  --rose-50:  #2a0d2e;
-  --rose-100: #3d1145;
-  --rose-200: #7a1f6e;
-  --rose-300: #c42d9e;
-  --rose-400: #e040b8;
-  --rose-500: #f050cc;   /* primary: hot fuchsia/rose */
-  --rose-600: #f878d8;
-  --rose-700: #fbb0ea;
+  /* === Brand rose — deep rose/fuchsia, clearly pink not red === */
+  --rose-50:  #fff4f8;
+  --rose-100: #ffdaec;
+  --rose-200: #ffadd4;
+  --rose-300: #e8549a;
+  --rose-400: #d42b7e;
+  --rose-500: #c0006e;   /* primary brand: deep rose with blue component */
+  --rose-600: #9e005b;
+  --rose-700: #7c0047;
 
-  /* === Backgrounds — deep violet-noir === */
-  --bg-deepest:  #0c0a15;
-  --bg-deep:     #110e1e;
-  --bg-surface:  #16122a;
-  --bg-elevated: #1e1a32;
-  --bg-hover:    #252040;
+  /* === Backgrounds — white + very light neutrals, no pink tint === */
+  --bg-deepest:  #f7f7f8;
+  --bg-deep:     #f0f0f2;
+  --bg-surface:  #ffffff;
+  --bg-elevated: #ebebed;
+  --bg-hover:    #e8e8ea;
 
-  /* === Text — lilas clair à blanc === */
-  --text-primary:   #ede8ff;
-  --text-secondary: #a89cc8;
-  --text-muted:     #6b5f88;
+  /* === Text — charcoal, not purple === */
+  --text-primary:   #1a1a1f;
+  --text-secondary: #555560;
+  --text-muted:     #9090a0;
   --text-accent:    var(--rose-500);
 
-  /* === Borders — violet-gris subtil === */
-  --border-subtle: #2a2440;
-  --border-medium: #3a3358;
+  /* === Borders — neutral gray === */
+  --border-subtle: #e2e2e6;
+  --border-medium: #ceced4;
   --border-accent: var(--rose-500);
 
-  /* === Status colors — adaptés au dark violet === */
-  --color-added:    #4ade8f;
-  --color-modified: #f5c842;
-  --color-deleted:  #ff6b82;
-  --color-untracked:#82a8ff;
+  /* === Status colors === */
+  --color-added:    #0a8a55;
+  --color-modified: #a07000;
+  --color-deleted:  #c0392b;
+  --color-untracked:#5c6bc0;
 
   /* === Typography === */
   --font-ui:   'Inter', system-ui, sans-serif;
@@ -43,8 +43,8 @@
   --radius-lg: 12px;
 
   /* === Shadows === */
-  --shadow-rose: 0 0 24px rgba(240, 80, 204, 0.25);
-  --shadow-panel: 0 4px 32px rgba(0, 0, 0, 0.4);
+  --shadow-rose: 0 0 20px rgba(192, 0, 110, 0.18);
+  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 * {
