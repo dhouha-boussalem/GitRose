@@ -24,10 +24,21 @@ function getInitials(name: string): string {
 }
 
 function hashToColor(str: string): string {
-  const colors = ['#f759a3', '#eb2f8a', '#c4177a', '#ff85bc', '#9b0c63'];
+  const gradients = [
+    'linear-gradient(135deg,#5c6bc0,#9c4dcc)',
+    'linear-gradient(135deg,#00897b,#26a69a)',
+    'linear-gradient(135deg,#2e7d32,#66bb6a)',
+    'linear-gradient(135deg,#e64a19,#ff8f00)',
+    'linear-gradient(135deg,#6a1b9a,#e040fb)',
+    'linear-gradient(135deg,#00695c,#26c6da)',
+    'linear-gradient(135deg,#1565c0,#42a5f5)',
+    'linear-gradient(135deg,#c62828,#ef5350)',
+    'linear-gradient(135deg,#ad1457,#f06292)',
+    'linear-gradient(135deg,#4e342e,#a1887f)',
+  ];
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  return colors[Math.abs(hash) % colors.length];
+  return gradients[Math.abs(hash) % gradients.length];
 }
 
 function parseRefs(refs: string) {
@@ -56,7 +67,7 @@ export function CommitList({ commits, selectedHash, onSelect }: CommitListProps)
           >
             <div
               className="commit-avatar"
-              style={{ backgroundColor: hashToColor(commit.email) }}
+              style={{ background: hashToColor(commit.email) }}
             >
               {getInitials(commit.author)}
             </div>

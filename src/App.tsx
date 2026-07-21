@@ -1,122 +1,293 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { Commit, Branch, RepoStatus } from './types/git';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import type { Branch, RepoStatus, GraphCommit } from './types/git';
 import { Sidebar } from './components/Sidebar';
 import { Toolbar } from './components/Toolbar';
-import { CommitList } from './components/CommitList';
+import { CommitGraph } from './components/CommitGraph';
 import { ActionPanel } from './components/ActionPanel';
 import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
+import { ResizablePanels } from './components/ResizablePanels';
+import { CherryPickPanel } from './components/CherryPickPanel';
+import { RebaseBar } from './components/RebaseBar';
+import { GitConsole } from './components/GitConsole';
 import './styles/theme.css';
 import './App.css';
 
+const TAB_COLORS = [
+  '#c0006e', '#1e88e5', '#26a69a', '#f4511e',
+  '#8e24aa', '#43a047', '#6d4c41', '#00897b',
+];
+
+function tabColor(index: number): string {
+  return TAB_COLORS[index % TAB_COLORS.length];
+}
+
+interface RepoTab {
+  id: string;
+  path: string;
+  name: string;
+  color: string;
+  commits: GraphCommit[];
+  branches: Branch[];
+  status: RepoStatus | null;
+  selectedCommit: GraphCommit | null;
+  focusedBranch: string | null;
+  userName: string;
+  activeView: 'commits' | 'status';
+  selectedFile: { path: string; staged: boolean } | null;
+  showGraph: boolean;
+  showRebase: boolean;
+  showConsole: boolean;
+  loading: boolean;
+}
+
+function repoName(path: string): string {
+  return path.split(/[\\/]/).filter(Boolean).pop() ?? path;
+}
+
+function newTab(path: string, index: number): RepoTab {
+  return {
+    id: `${path}-${Date.now()}`,
+    path,
+    name: repoName(path),
+    color: tabColor(index),
+    commits: [],
+    branches: [],
+    status: null,
+    selectedCommit: null,
+    focusedBranch: null,
+    userName: '',
+    activeView: 'status',
+    selectedFile: null,
+    showGraph: false,
+    showRebase: false,
+    showConsole: false,
+    loading: true,
+  };
+}
+
 export default function App() {
-  const [repoPath, setRepoPath] = useState<string | null>(null);
-  const [commits, setCommits] = useState<Commit[]>([]);
-  const [branches, setBranches] = useState<Branch[]>([]);
-  const [status, setStatus] = useState<RepoStatus | null>(null);
-  const [selectedCommit, setSelectedCommit] = useState<Commit | null>(null);
-  const [activeView, setActiveView] = useState<'commits' | 'status'>('commits');
-  const [loading, setLoading] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [selectedFile, setSelectedFile] = useState<{ path: string; staged: boolean } | null>(null);
+  const [tabs, setTabs] = useState<RepoTab[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const refreshStatus = useCallback(async () => {
-    if (!repoPath) return;
-    const [c, b, s] = await Promise.all([
-      window.gitRose.getCommits(repoPath),
-      window.gitRose.getBranches(repoPath),
-      window.gitRose.getStatus(repoPath),
-    ]);
-    setCommits(c);
-    setBranches(b);
-    setStatus(s);
-  }, [repoPath]);
+  const tab = tabs.find((t) => t.id === activeId) ?? null;
 
-  const loadRepo = useCallback(async (path: string) => {
-    setLoading(true);
+  function updateTab(id: string, patch: Partial<RepoTab>) {
+    setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+  }
+
+  const loadRepo = useCallback(async (path: string, tabId: string) => {
     try {
-      const [c, b, s] = await Promise.all([
-        window.gitRose.getCommits(path),
+      const [c, b, s, u] = await Promise.all([
+        window.gitRose.getGraph(path, undefined),
         window.gitRose.getBranches(path),
         window.gitRose.getStatus(path),
+        window.gitRose.getUser(path).catch(() => ({ name: '', email: '' })),
       ]);
-      setCommits(c);
-      setBranches(b);
-      setStatus(s);
-      setRepoPath(path);
-      window.gitRose.getUser(path).then((u) => setUserName(u.name)).catch(() => {});
+      updateTab(tabId, { commits: c, branches: b, status: s, userName: u.name, loading: false });
     } catch (err) {
-      console.error('Erreur chargement repo:', err);
-    } finally {
-      setLoading(false);
+      console.error('Load repo error:', err);
+      updateTab(tabId, { loading: false });
     }
+  }, []);
+
+  const refreshTab = useCallback(async (t: RepoTab) => {
+    const [c, b, s] = await Promise.all([
+      window.gitRose.getGraph(t.path, t.focusedBranch ?? undefined),
+      window.gitRose.getBranches(t.path),
+      window.gitRose.getStatus(t.path),
+    ]);
+    updateTab(t.id, { commits: c, branches: b, status: s });
   }, []);
 
   const handleOpenRepo = useCallback(async () => {
     const path = await window.gitRose.openRepo();
-    if (path) loadRepo(path);
-  }, [loadRepo]);
+    if (!path) return;
+    // Switch to existing tab if already open
+    const existing = tabs.find((t) => t.path === path);
+    if (existing) { setActiveId(existing.id); return; }
+    const t = newTab(path, tabs.length);
+    setTabs((prev) => [...prev, t]);
+    setActiveId(t.id);
+    loadRepo(path, t.id);
+  }, [tabs, loadRepo]);
 
+  const handleCloseTab = useCallback((id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setTabs((prev) => {
+      const next = prev.filter((t) => t.id !== id);
+      if (activeId === id) setActiveId(next[next.length - 1]?.id ?? null);
+      return next;
+    });
+  }, [activeId]);
+
+  // Poll status for active tab
   useEffect(() => {
-    if (!repoPath) return;
-    const interval = setInterval(() => {
-      window.gitRose.getStatus(repoPath).then(setStatus).catch(console.error);
+    if (pollRef.current) clearInterval(pollRef.current);
+    if (!tab) return;
+    pollRef.current = setInterval(() => {
+      window.gitRose.getStatus(tab.path).then((s) => updateTab(tab.id, { status: s })).catch(() => {});
     }, 5000);
-    return () => clearInterval(interval);
-  }, [repoPath]);
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, [activeId]);
 
-  if (!repoPath) {
+  if (tabs.length === 0 || !tab) {
     return <WelcomeScreen onOpenRepo={handleOpenRepo} />;
+  }
+
+  async function handleFocusBranch(branch: string | null) {
+    if (!tab) return;
+    const c = await window.gitRose.getGraph(tab.path, branch ?? undefined);
+    updateTab(tab.id, { focusedBranch: branch, selectedCommit: null, commits: c });
   }
 
   return (
     <div className="app-layout">
+      {/* Tab bar */}
+      <div className="tab-bar">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            className={`tab-item ${t.id === activeId ? 'active' : ''}`}
+            onClick={() => setActiveId(t.id)}
+            title={t.path}
+            style={t.id === activeId ? {
+              borderBottomColor: t.color,
+              borderBottomWidth: 2,
+              color: t.color,
+            } : {}}
+          >
+            <span className="tab-dot" style={{ background: t.color }} />
+            <span className="tab-name">{t.name}</span>
+            <span className="tab-close" onClick={(e) => handleCloseTab(t.id, e)}>×</span>
+          </button>
+        ))}
+        <button className="tab-add" onClick={handleOpenRepo} title="Open another repository">+</button>
+      </div>
+
       <Toolbar
-        repoPath={repoPath}
-        status={status}
+        repoPath={tab.path}
+        status={tab.status}
         onOpenRepo={handleOpenRepo}
-        activeView={activeView}
-        onViewChange={setActiveView}
+        activeView={tab.activeView}
+        onViewChange={(v) => updateTab(tab.id, { activeView: v })}
+        showConsole={tab.showConsole}
+        onToggleConsole={() => updateTab(tab.id, { showConsole: !tab.showConsole })}
       />
-      <div className="app-body">
+
+      <div className={`app-body ${tab.showConsole ? 'console-open' : ''}`}>
         <Sidebar
-          branches={branches}
-          userName={userName}
+          branches={tab.branches}
+          userName={tab.userName}
+          focusedBranch={tab.focusedBranch}
+          repoPath={tab.path}
+          onRefresh={() => refreshTab(tab)}
           onCheckout={async (branch) => {
-            await window.gitRose.checkout(repoPath, branch);
-            await refreshStatus();
+            await window.gitRose.checkout(tab.path, branch);
+            await refreshTab(tab);
           }}
+          onCreateBranch={async (name) => {
+            await window.gitRose.createBranch(tab.path, name);
+            await refreshTab(tab);
+          }}
+          onCheckoutRemote={async (remoteBranch) => {
+            const localName = await window.gitRose.checkoutRemote(tab.path, remoteBranch);
+            await refreshTab(tab);
+            return localName;
+          }}
+          onFocus={handleFocusBranch}
         />
+
         <main className="main-content">
-          {loading ? (
+          {tab.loading ? (
             <div className="loading">
               <span className="loading-spinner" />
               Loading…
             </div>
-          ) : activeView === 'commits' ? (
-            <CommitList
-              commits={commits}
-              selectedHash={selectedCommit?.hash ?? null}
-              onSelect={setSelectedCommit}
-            />
+          ) : tab.activeView === 'commits' ? (
+            <>
+              <div className="history-toolbar">
+                {tab.focusedBranch ? (
+                  <>
+                    <span className="branch-focus-icon">◆</span>
+                    <span className="branch-focus-name">{tab.focusedBranch}</span>
+                    <button className="branch-focus-clear" onClick={() => handleFocusBranch(null)}>
+                      ✕ All branches
+                    </button>
+                  </>
+                ) : (
+                  <span className="history-toolbar-hint">Click a branch to filter</span>
+                )}
+                <button
+                  className={`graph-toggle-btn rebase-btn ${tab.showRebase ? 'active' : ''}`}
+                  onClick={() => updateTab(tab.id, { showRebase: !tab.showRebase })}
+                >
+                  ↥ Rebase
+                </button>
+                <button
+                  className={`graph-toggle-btn ${tab.showGraph ? 'active' : ''}`}
+                  onClick={() => updateTab(tab.id, { showGraph: !tab.showGraph })}
+                >
+                  {tab.showGraph ? '⬡ Hide graph' : '⬡ Show graph'}
+                </button>
+              </div>
+              {tab.showRebase && (
+                <RebaseBar
+                  branches={tab.branches.filter(b => !b.current).map(b => b.name)}
+                  repoPath={tab.path}
+                  onDone={async () => { await refreshTab(tab); updateTab(tab.id, { showRebase: false }); }}
+                  onCancel={() => updateTab(tab.id, { showRebase: false })}
+                />
+              )}
+              <CommitGraph
+                commits={tab.commits}
+                selectedHash={tab.selectedCommit?.hash ?? null}
+                showGraph={tab.showGraph}
+                onSelect={(c) => updateTab(tab.id, { selectedCommit: c })}
+              />
+              {tab.selectedCommit && (
+                <CherryPickPanel
+                  commit={tab.selectedCommit}
+                  repoPath={tab.path}
+                  onDone={async () => {
+                    await refreshTab(tab);
+                    updateTab(tab.id, { selectedCommit: null });
+                  }}
+                  onDismiss={() => updateTab(tab.id, { selectedCommit: null })}
+                />
+              )}
+            </>
           ) : (
-            <div className="changes-layout">
-              <ActionPanel
-                repoPath={repoPath}
-                status={status}
-                onRefresh={() => { refreshStatus(); setSelectedFile(null); }}
-                onFileSelect={(path, staged) => setSelectedFile({ path, staged })}
-                selectedFile={selectedFile?.path ?? null}
-              />
-              <DiffViewer
-                repoPath={repoPath}
-                filePath={selectedFile?.path ?? null}
-                staged={selectedFile?.staged ?? false}
-              />
-            </div>
+            <ResizablePanels
+              left={
+                <ActionPanel
+                  repoPath={tab.path}
+                  status={tab.status}
+                  onRefresh={() => { refreshTab(tab); updateTab(tab.id, { selectedFile: null }); }}
+                  onFileSelect={(path, staged) => updateTab(tab.id, { selectedFile: { path, staged } })}
+                  selectedFile={tab.selectedFile?.path ?? null}
+                />
+              }
+              right={
+                <DiffViewer
+                  repoPath={tab.path}
+                  filePath={tab.selectedFile?.path ?? null}
+                  staged={tab.selectedFile?.staged ?? false}
+                />
+              }
+            />
           )}
         </main>
       </div>
+
+      {tab.showConsole && (
+        <GitConsole
+          repoPath={tab.path}
+          onClose={() => updateTab(tab.id, { showConsole: false })}
+          onRefresh={() => refreshTab(tab)}
+        />
+      )}
     </div>
   );
 }

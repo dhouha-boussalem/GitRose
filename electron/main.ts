@@ -55,6 +55,10 @@ function registerGitHandlers() {
     return GitService.getCommits(repoPath);
   });
 
+  ipcMain.handle('git:get-graph', async (_event, repoPath: string, ref?: string) => {
+    return GitService.getGraphCommits(repoPath, 200, ref);
+  });
+
   ipcMain.handle('git:get-branches', async (_event, repoPath: string) => {
     return GitService.getBranches(repoPath);
   });
@@ -73,6 +77,10 @@ function registerGitHandlers() {
 
   ipcMain.handle('git:unstage-file', async (_event, repoPath: string, filePath: string) => {
     return GitService.unstageFile(repoPath, filePath);
+  });
+
+  ipcMain.handle('git:discard-file', async (_event, repoPath: string, filePath: string, isUntracked: boolean) => {
+    return GitService.discardFile(repoPath, filePath, isUntracked);
   });
 
   ipcMain.handle('git:stage-all', async (_event, repoPath: string) => {
@@ -95,7 +103,60 @@ function registerGitHandlers() {
     return GitService.checkout(repoPath, branch);
   });
 
+  ipcMain.handle('git:create-branch', async (_event, repoPath: string, branchName: string) => {
+    return GitService.createBranch(repoPath, branchName);
+  });
+
+  ipcMain.handle('git:checkout-remote', async (_event, repoPath: string, remoteBranch: string) => {
+    return GitService.checkoutRemote(repoPath, remoteBranch);
+  });
+
   ipcMain.handle('git:get-user', async (_event, repoPath: string) => {
     return GitService.getUser(repoPath);
+  });
+
+  ipcMain.handle('git:stash-show', async (_event, repoPath: string, index: number) => {
+    return GitService.stashShow(repoPath, index);
+  });
+  ipcMain.handle('git:stash-show-files', async (_event, repoPath: string, index: number) => {
+    return GitService.stashShowFiles(repoPath, index);
+  });
+  ipcMain.handle('git:stash-show-file-diff', async (_event, repoPath: string, index: number, filePath: string) => {
+    return GitService.stashShowFileDiff(repoPath, index, filePath);
+  });
+
+  ipcMain.handle('git:stash-list', async (_event, repoPath: string) => {
+    return GitService.stashList(repoPath);
+  });
+  ipcMain.handle('git:stash-save', async (_event, repoPath: string, message?: string) => {
+    return GitService.stashSave(repoPath, message);
+  });
+  ipcMain.handle('git:stash-apply', async (_event, repoPath: string, index: number) => {
+    return GitService.stashApply(repoPath, index);
+  });
+  ipcMain.handle('git:stash-pop', async (_event, repoPath: string, index: number) => {
+    return GitService.stashPop(repoPath, index);
+  });
+  ipcMain.handle('git:stash-drop', async (_event, repoPath: string, index: number) => {
+    return GitService.stashDrop(repoPath, index);
+  });
+
+  ipcMain.handle('git:run-command', async (_event, repoPath: string, args: string[]) => {
+    return GitService.runCommand(repoPath, args);
+  });
+
+  ipcMain.handle('git:squash-to-commit', async (_event, repoPath: string, hash: string, message: string) => {
+    return GitService.squashToCommit(repoPath, hash, message);
+  });
+  ipcMain.handle('git:rebase', async (_event, repoPath: string, branch: string) => {
+    return GitService.rebase(repoPath, branch);
+  });
+
+  ipcMain.handle('git:cherry-pick', async (_event, repoPath: string, hash: string) => {
+    return GitService.cherryPick(repoPath, hash);
+  });
+
+  ipcMain.handle('git:cherry-pick-to-branch', async (_event, repoPath: string, hash: string, branchName: string) => {
+    return GitService.cherryPickToNewBranch(repoPath, hash, branchName);
   });
 }

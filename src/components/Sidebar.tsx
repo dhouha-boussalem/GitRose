@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Branch } from '../types/git';
 
 interface SidebarProps {
   branches: Branch[];
   userName: string;
+  focusedBranch: string | null;
+  repoPath: string;
   onCheckout: (name: string) => Promise<void>;
+  onCheckoutRemote: (remoteBranch: string) => Promise<string>;
+  onCreateBranch: (name: string) => Promise<void>;
+  onFocus: (branch: string | null) => void;
+  onRefresh: () => void;
 }
 
 function GirlAvatar() {
@@ -32,16 +38,64 @@ function getInitials(name: string): string {
   return name.split(/\s+/).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 }
 
-export function Sidebar({ branches, userName, onCheckout }: SidebarProps) {
-  const local = branches.filter((b) => !b.isRemote);
-  const remote = branches.filter((b) => b.isRemote);
+export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckout, onCheckoutRemote, onCreateBranch, onFocus, onRefresh }: SidebarProps) {
   const [switching, setSwitching] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [newBranchName, setNewBranchName] = useState('');
+  const [search, setSearch] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const q = search.trim().toLowerCase();
+  const local = branches.filter((b) => !b.isRemote && (!q || b.name.toLowerCase().includes(q)));
+  const remote = branches.filter((b) => b.isRemote && (!q || b.name.toLowerCase().includes(q)));
+
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  }
+
+  async function handleCheckoutRemote(name: string) {
+    if (switching) return;
+    setSwitching(name);
+    try {
+      const localName = await onCheckoutRemote(name);
+      showToast(`Checked out → ${localName}`);
+    } catch (e: any) {
+      showToast(`Error: ${e?.message ?? 'checkout failed'}`);
+    } finally {
+      setSwitching(null);
+    }
+  }
 
   async function handleCheckout(name: string, isCurrent: boolean) {
     if (isCurrent || switching) return;
     setSwitching(name);
     await onCheckout(name);
     setSwitching(null);
+  }
+
+  function handleFocus(name: string) {
+    onFocus(focusedBranch === name ? null : name);
+  }
+
+  function startCreating() {
+    setCreating(true);
+    setNewBranchName('');
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }
+
+  async function confirmCreate() {
+    const name = newBranchName.trim();
+    if (!name) { setCreating(false); return; }
+    setCreating(false);
+    setNewBranchName('');
+    try {
+      await onCreateBranch(name);
+      showToast(`Created → ${name}`);
+    } catch (e: any) {
+      showToast(`Error: ${e?.message ?? 'failed'}`);
+    }
   }
 
   return (
@@ -53,16 +107,47 @@ export function Sidebar({ branches, userName, onCheckout }: SidebarProps) {
         </div>
       </div>
 
+      <div className="sidebar-search-row">
+        <span className="sidebar-search-icon">⌕</span>
+        <input
+          className="sidebar-search-input"
+          placeholder="Rechercher une branche…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        {search && (
+          <button className="sidebar-search-clear" onClick={() => setSearch('')}>✕</button>
+        )}
+      </div>
+
       <div className="sidebar-section">
-        <div className="sidebar-label">LOCAL BRANCHES</div>
+        <div className="sidebar-label local-label">
+          LOCAL BRANCHES
+          <button className="sidebar-new-branch-btn" onClick={startCreating} title="New branch">+</button>
+        </div>
+        {creating && (
+          <div className="sidebar-new-branch-row">
+            <input
+              ref={inputRef}
+              className="sidebar-new-branch-input"
+              value={newBranchName}
+              onChange={(e) => setNewBranchName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') confirmCreate();
+                if (e.key === 'Escape') setCreating(false);
+              }}
+              placeholder="branch-name"
+            />
+          </div>
+        )}
         {local.map((branch) => (
           <button
             key={branch.name}
-            className={`branch-item ${branch.current ? 'active' : ''} ${switching === branch.name ? 'switching' : ''}`}
+            className={`branch-item ${branch.current ? 'active' : ''} ${switching === branch.name ? 'switching' : ''} ${focusedBranch === branch.name ? 'focused' : ''}`}
+            onClick={() => handleFocus(branch.name)}
             onDoubleClick={() => handleCheckout(branch.name, branch.current)}
-            onClick={() => {}}
             disabled={!!switching}
-            title={branch.current ? 'Current branch' : `Double-click to switch to ${branch.name}`}
+            title={`Click to view history · Double-click to switch`}
           >
             <span className="branch-icon">
               {switching === branch.name ? <span className="branch-spinner" /> : branch.current ? '◆' : '◇'}
@@ -79,18 +164,27 @@ export function Sidebar({ branches, userName, onCheckout }: SidebarProps) {
 
       {remote.length > 0 && (
         <div className="sidebar-section">
-          <div className="sidebar-label">REMOTE BRANCHES</div>
+          <div className="sidebar-label remote-label">REMOTE BRANCHES</div>
           {remote.map((branch) => (
             <button
               key={branch.name}
-              className="branch-item remote"
-              disabled
+              className={`branch-item remote ${switching === branch.name ? 'switching' : ''}`}
+              onClick={() => onFocus(focusedBranch === branch.name ? null : branch.name)}
+              onDoubleClick={() => handleCheckoutRemote(branch.name)}
+              disabled={!!switching}
+              title="Double-click to checkout locally"
             >
-              <span className="branch-icon">↗</span>
+              <span className="branch-icon">
+                {switching === branch.name ? <span className="branch-spinner" /> : '↗'}
+              </span>
               <span className="branch-name">{branch.name}</span>
             </button>
           ))}
         </div>
+      )}
+
+      {toast && (
+        <div className="sidebar-toast">{toast}</div>
       )}
     </aside>
   );
