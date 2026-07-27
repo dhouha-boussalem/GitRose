@@ -1184,6 +1184,73 @@
 }
 @keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
+/* Checkout blocked dialog */
+.checkout-blocked-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(2px);
+}
+.checkout-blocked-dialog {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 24px 24px 20px;
+  max-width: 360px;
+  width: 90%;
+  animation: dialog-in 0.18s ease;
+}
+@keyframes dialog-in { from { opacity: 0; transform: scale(0.96) translateY(-8px); } to { opacity: 1; transform: none; } }
+.checkout-blocked-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.checkout-blocked-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+.checkout-blocked-desc strong {
+  color: var(--rose-500);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.checkout-blocked-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.checkout-blocked-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  text-align: left;
+}
+.checkout-blocked-btn:hover { background: var(--bg-hover); border-color: var(--border-medium); }
+.checkout-blocked-btn.stash { border-color: var(--mint-500); color: var(--mint-500); background: rgba(74, 170, 136, 0.07); }
+.checkout-blocked-btn.stash:hover { background: rgba(74, 170, 136, 0.14); }
+.checkout-blocked-btn.discard { border-color: var(--color-deleted); color: var(--color-deleted); background: rgba(192, 48, 64, 0.06); }
+.checkout-blocked-btn.discard:hover { background: rgba(192, 48, 64, 0.12); }
+.checkout-blocked-btn.cancel { color: var(--text-muted); font-weight: 400; }
+.checkout-blocked-btn-icon { font-size: 14px; }
+
 .branch-item.focused {
   background: rgba(204,36,104,0.12);
   color: var(--rose-300);

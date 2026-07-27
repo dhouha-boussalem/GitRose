@@ -170,6 +170,12 @@ export class GitService {
     }
   }
 
+  static async discardAll(repoPath: string): Promise<void> {
+    const git = this.getGit(repoPath);
+    await git.raw(['reset', '--hard', 'HEAD']);
+    await git.raw(['clean', '-fd']);
+  }
+
   static async commit(repoPath: string, message: string): Promise<void> {
     await this.getGit(repoPath).commit(message);
   }

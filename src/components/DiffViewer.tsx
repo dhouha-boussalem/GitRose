@@ -89,7 +89,7 @@ export function DiffViewer({ repoPath, filePath, staged }: DiffViewerProps) {
   return (
     <div className="diff-viewer">
       <div className="diff-header">
-        <span className="diff-filename">{filePath}</span>
+        <span className="diff-filename" title={filePath}>{filePath}</span>
         <span className="diff-mode">{staged ? 'Staged' : 'Unstaged'}</span>
       </div>
       <div className="diff-body">
