@@ -189,7 +189,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
             onClick={() => handleFocus(branch.name)}
             onDoubleClick={() => handleCheckout(branch.name, branch.current)}
             disabled={!!switching}
-            title={`Click to view history · Double-click to switch`}
+            title={branch.name}
           >
             <span className="branch-icon">
               {switching === branch.name ? <span className="branch-spinner" /> : branch.current ? '◆' : '◇'}
@@ -214,7 +214,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
               onClick={() => onFocus(focusedBranch === branch.name ? null : branch.name)}
               onDoubleClick={() => handleCheckoutRemote(branch.name)}
               disabled={!!switching}
-              title="Double-click to checkout locally"
+              title={branch.name}
             >
               <span className="branch-icon">
                 {switching === branch.name ? <span className="branch-spinner" /> : '↗'}
