@@ -22,6 +22,12 @@ export function Toolbar({ repoPath, status, onOpenRepo, activeView, onViewChange
             <>
               <span className="toolbar-repo-icon">📁</span>
               <span className="toolbar-repo-name">{repoName}</span>
+              {status?.current && (
+                <>
+                  <span className="toolbar-repo-sep">/</span>
+                  <span className="toolbar-branch-name" title={status.current}>{status.current}</span>
+                </>
+              )}
             </>
           ) : (
             <>
