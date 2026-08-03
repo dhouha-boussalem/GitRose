@@ -10,6 +10,7 @@
 .app-body {
   display: flex;
   flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -614,10 +615,14 @@
   border-right: 1px solid var(--sidebar-border);
   box-shadow: 2px 0 20px rgba(0, 0, 0, 0.22);
   overflow-y: auto;
+  overflow-x: hidden;
   flex-shrink: 0;
   position: relative;
   z-index: 10;
   scrollbar-color: var(--sidebar-scrollbar) transparent;
+  /* force scroll to activate — sidebar must stay within the viewport height */
+  height: 100%;
+  max-height: 100%;
 }
 .sidebar::-webkit-scrollbar-thumb { background: var(--sidebar-scrollbar); }
 .sidebar::-webkit-scrollbar-thumb:hover { background: var(--rose-500); }
