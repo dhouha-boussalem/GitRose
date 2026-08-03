@@ -147,8 +147,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
 
   async function handleDelete(name: string, e: React.MouseEvent) {
     e.stopPropagation();
-    const force = !window.confirm(`Delete branch "${name}"?\n\nIf it has unmerged commits, use force delete.`);
-    if (force === false) return; // cancelled
+    if (!window.confirm(`Delete branch "${name}"?`)) return;
     try {
       await window.gitRose.deleteBranch(repoPath, name, false);
       onRefresh();
