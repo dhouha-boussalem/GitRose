@@ -48,6 +48,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
   const [blockedCheckout, setBlockedCheckout] = useState<{ branch: string; error: string } | null>(null);
   const [mergeTarget, setMergeTarget] = useState<string | null>(null);
   const [hoveredBranch, setHoveredBranch] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ name: string; force: boolean } | null>(null);
   const [sidebarWidth, setSidebarWidth] = useState(220);
 
   const onResizeMouseDown = useCallback((e: React.MouseEvent) => {
@@ -145,26 +146,22 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
     onFocus(focusedBranch === name ? null : name);
   }
 
-  async function handleDelete(name: string, e: React.MouseEvent) {
+  function handleDelete(name: string, e: React.MouseEvent) {
     e.stopPropagation();
-    if (!window.confirm(`Delete branch "${name}"?`)) return;
+    setDeleteConfirm({ name, force: false });
+  }
+
+  async function confirmDelete(name: string, force: boolean) {
+    setDeleteConfirm(null);
     try {
-      await window.gitRose.deleteBranch(repoPath, name, false);
+      await window.gitRose.deleteBranch(repoPath, name, force);
       onRefresh();
-      showToast(`Deleted ${name}`);
+      showToast(force ? `Force deleted ${name}` : `Deleted ${name}`);
     } catch (err: any) {
       const msg: string = String(err?.message ?? err ?? '');
       const isUnmerged = msg.includes('not fully merged') || msg.includes('fully merged') || msg.includes('-D');
-      if (isUnmerged) {
-        if (window.confirm(`"${name}" has unmerged commits. Force delete anyway?`)) {
-          try {
-            await window.gitRose.deleteBranch(repoPath, name, true);
-            onRefresh();
-            showToast(`Force deleted ${name}`);
-          } catch (e2: any) {
-            showToast(`Error: ${e2?.message ?? 'failed'}`);
-          }
-        }
+      if (isUnmerged && !force) {
+        setDeleteConfirm({ name, force: true });
       } else {
         showToast(`Error: ${msg || 'delete failed'}`);
       }
@@ -364,6 +361,35 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
                 Merge
               </button>
               <button className="checkout-blocked-btn cancel" onClick={() => setMergeTarget(null)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirm && (
+        <div className="checkout-blocked-overlay" onClick={() => setDeleteConfirm(null)}>
+          <div className="checkout-blocked-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="checkout-blocked-title">
+              {deleteConfirm.force ? 'Force delete branch' : 'Delete branch'}
+            </div>
+            <div className="checkout-blocked-desc">
+              {deleteConfirm.force ? (
+                <><strong>{deleteConfirm.name}</strong> has unmerged commits. Force delete anyway? This cannot be undone.</>
+              ) : (
+                <>Delete <strong>{deleteConfirm.name}</strong>? This cannot be undone.</>
+              )}
+            </div>
+            <div className="checkout-blocked-actions">
+              <button
+                className="checkout-blocked-btn discard"
+                onClick={() => confirmDelete(deleteConfirm.name, deleteConfirm.force)}
+              >
+                <span className="checkout-blocked-btn-icon">{deleteConfirm.force ? '⚠' : '✕'}</span>
+                {deleteConfirm.force ? 'Force delete' : 'Delete'}
+              </button>
+              <button className="checkout-blocked-btn cancel" onClick={() => setDeleteConfirm(null)}>
                 Cancel
               </button>
             </div>
