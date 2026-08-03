@@ -189,25 +189,28 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-section">
+      {/* Fixed header */}
+      <div className="sidebar-header">
         <div className="sidebar-logo">
           <span className="logo-icon">🌹</span>
           <span className="logo-text">GitRose</span>
         </div>
+        <div className="sidebar-search-row">
+          <span className="sidebar-search-icon">⌕</span>
+          <input
+            className="sidebar-search-input"
+            placeholder="Rechercher une branche…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && (
+            <button className="sidebar-search-clear" onClick={() => setSearch('')}>✕</button>
+          )}
+        </div>
       </div>
 
-      <div className="sidebar-search-row">
-        <span className="sidebar-search-icon">⌕</span>
-        <input
-          className="sidebar-search-input"
-          placeholder="Rechercher une branche…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        {search && (
-          <button className="sidebar-search-clear" onClick={() => setSearch('')}>✕</button>
-        )}
-      </div>
+      {/* Scrollable branch list */}
+      <div className="sidebar-scroll">
 
       <div className="sidebar-section">
         <div className="sidebar-label local-label">
@@ -291,6 +294,8 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
           ))}
         </div>
       )}
+
+      </div>{/* end sidebar-scroll */}
 
       {toast && (
         <div className="sidebar-toast">{toast}</div>
