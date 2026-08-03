@@ -609,11 +609,12 @@
 /* === Sidebar === */
 
 .sidebar {
-  width: 220px;
-  min-width: 180px;
+  /* width set via inline style — resizable */
+  min-width: 160px;
+  max-width: 400px;
   background: var(--sidebar-bg);
-  border-right: 1px solid var(--sidebar-border);
-  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.22);
+  border-right: none;
+  box-shadow: none;
   overflow: hidden;
   flex-shrink: 0;
   position: relative;
@@ -621,6 +622,29 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.sidebar-header,
+.sidebar-scroll {
+  border-right: 1px solid var(--sidebar-border);
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.22);
+}
+
+.sidebar-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.15s;
+  z-index: 20;
+}
+.sidebar-resize-handle:hover,
+.sidebar-resize-handle:active {
+  background: var(--rose-500);
+  opacity: 0.5;
 }
 
 .sidebar-header {

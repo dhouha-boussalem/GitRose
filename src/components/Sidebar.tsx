@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import type { Branch } from '../types/git';
 
 interface SidebarProps {
@@ -48,6 +48,27 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
   const [blockedCheckout, setBlockedCheckout] = useState<{ branch: string; error: string } | null>(null);
   const [mergeTarget, setMergeTarget] = useState<string | null>(null);
   const [hoveredBranch, setHoveredBranch] = useState<string | null>(null);
+  const [sidebarWidth, setSidebarWidth] = useState(220);
+
+  const onResizeMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = sidebarWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    const onMove = (ev: MouseEvent) => {
+      const next = Math.min(400, Math.max(160, startW + ev.clientX - startX));
+      setSidebarWidth(next);
+    };
+    const onUp = () => {
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }, [sidebarWidth]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const q = search.trim().toLowerCase();
@@ -188,7 +209,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
   }
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" style={{ width: sidebarWidth }}>
       {/* Fixed header */}
       <div className="sidebar-header">
         <div className="sidebar-logo">
@@ -350,6 +371,8 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
           </div>
         </div>
       )}
+
+      <div className="sidebar-resize-handle" onMouseDown={onResizeMouseDown} title="Drag to resize" />
     </aside>
   );
 }
