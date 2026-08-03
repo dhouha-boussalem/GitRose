@@ -33,6 +33,7 @@ export interface RepoStatus {
   staged: FileStatus[];
   unstaged: FileStatus[];
   untracked: string[];
+  conflicted: string[];
   ahead: number;
   behind: number;
   current: string | null;
@@ -55,6 +56,13 @@ declare global {
       commit: (repoPath: string, message: string) => Promise<void>;
       push: (repoPath: string) => Promise<void>;
       pull: (repoPath: string) => Promise<void>;
+      fetch: (repoPath: string) => Promise<void>;
+      commitAmend: (repoPath: string, message: string) => Promise<void>;
+      deleteBranch: (repoPath: string, name: string, force: boolean) => Promise<void>;
+      merge: (repoPath: string, branch: string) => Promise<void>;
+      getConflicts: (repoPath: string) => Promise<{ path: string; status: string }[]>;
+      getConflictContent: (repoPath: string, filePath: string) => Promise<{ ours: string; base: string; theirs: string; raw: string }>;
+      resolveConflict: (repoPath: string, filePath: string, content: string) => Promise<void>;
       createBranch: (repoPath: string, branchName: string) => Promise<void>;
       checkout: (repoPath: string, branch: string) => Promise<void>;
       checkoutRemote: (repoPath: string, remoteBranch: string) => Promise<string>;

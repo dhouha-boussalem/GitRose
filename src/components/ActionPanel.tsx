@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import type { RepoStatus, FileStatus } from '../types/git';
 import { StashPanel } from './StashPanel';
 
@@ -14,13 +14,29 @@ type OpState = 'idle' | 'loading' | 'error';
 
 export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selectedFile }: ActionPanelProps) {
   const [commitMsg, setCommitMsg] = useState('');
+  const [amend, setAmend] = useState(false);
+  const [lastCommitMsg, setLastCommitMsg] = useState('');
   const [opState, setOpState] = useState<OpState>('idle');
   const [errorMsg, setErrorMsg] = useState('');
-  const [pushPullOp, setPushPullOp] = useState<'push' | 'pull' | null>(null);
+  const [pushPullOp, setPushPullOp] = useState<'push' | 'pull' | 'fetch' | null>(null);
   const [splitPct, setSplitPct] = useState(50);
   const [changesCollapsed, setChangesCollapsed] = useState(false);
   const [stagedCollapsed, setStagedCollapsed] = useState(false);
   const splitRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    window.gitRose.runCommand(repoPath, ['log', '-1', '--format=%s'])
+      .then((msg) => setLastCommitMsg(msg.trim()))
+      .catch(() => {});
+  }, [repoPath, status]);
+
+  useEffect(() => {
+    if (amend) {
+      setCommitMsg(lastCommitMsg);
+    } else {
+      setCommitMsg('');
+    }
+  }, [amend]);
 
   const onSplitMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -86,15 +102,6 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
     onRefresh();
   }
 
-  async function handleCommit() {
-    if (!commitMsg.trim()) return;
-    const ok = await run(() => window.gitRose.commit(repoPath, commitMsg.trim()));
-    if (ok !== null) {
-      setCommitMsg('');
-      onRefresh();
-    }
-  }
-
   async function handlePush() {
     setPushPullOp('push');
     await run(() => window.gitRose.push(repoPath));
@@ -109,14 +116,44 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
     onRefresh();
   }
 
-  const canCommit = (status?.staged?.length ?? 0) > 0 && commitMsg.trim().length > 0;
+  async function handleFetch() {
+    setPushPullOp('fetch');
+    await run(() => window.gitRose.fetch(repoPath));
+    setPushPullOp(null);
+    onRefresh();
+  }
+
+  async function handleCommit() {
+    if (!commitMsg.trim()) return;
+    const ok = await run(() =>
+      amend
+        ? window.gitRose.commitAmend(repoPath, commitMsg.trim())
+        : window.gitRose.commit(repoPath, commitMsg.trim())
+    );
+    if (ok !== null) {
+      setCommitMsg('');
+      setAmend(false);
+      onRefresh();
+    }
+  }
+
+  const canCommit = ((status?.staged?.length ?? 0) > 0 || amend) && commitMsg.trim().length > 0;
   const isLoading = opState === 'loading';
 
   return (
     <div className="action-panel">
 
-      {/* Push / Pull */}
+      {/* Fetch / Pull / Push */}
       <div className="action-sync-bar">
+        <button
+          className={`action-sync-btn fetch ${pushPullOp === 'fetch' ? 'loading' : ''}`}
+          onClick={handleFetch}
+          disabled={isLoading}
+          title="Fetch (download refs, no merge)"
+        >
+          {pushPullOp === 'fetch' ? <span className="btn-spinner" /> : '⟳'}
+          Fetch
+        </button>
         <button
           className={`action-sync-btn pull ${pushPullOp === 'pull' ? 'loading' : ''}`}
           onClick={handlePull}
@@ -229,9 +266,23 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
 
       {/* Commit zone */}
       <div className="action-commit-zone">
+        <label className="action-amend-row">
+          <input
+            type="checkbox"
+            className="action-amend-check"
+            checked={amend}
+            onChange={(e) => setAmend(e.target.checked)}
+          />
+          <span className="action-amend-label">Amend last commit</span>
+          {amend && lastCommitMsg && (
+            <span className="action-amend-prev" title={lastCommitMsg}>
+              {lastCommitMsg.length > 30 ? lastCommitMsg.slice(0, 30) + '…' : lastCommitMsg}
+            </span>
+          )}
+        </label>
         <textarea
           className="action-commit-msg"
-          placeholder="Commit message…"
+          placeholder={amend ? 'New commit message…' : 'Commit message…'}
           value={commitMsg}
           onChange={(e) => setCommitMsg(e.target.value)}
           onKeyDown={(e) => {
@@ -245,7 +296,7 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
           disabled={!canCommit || isLoading}
         >
           {isLoading ? <span className="btn-spinner" /> : null}
-          Commit
+          {amend ? 'Amend commit' : 'Commit'}
         </button>
         <div className="action-commit-hint">Ctrl+Enter to commit</div>
       </div>

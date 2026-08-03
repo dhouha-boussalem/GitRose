@@ -103,6 +103,34 @@ function registerGitHandlers() {
     return GitService.pull(repoPath);
   });
 
+  ipcMain.handle('git:fetch', async (_event, repoPath: string) => {
+    return GitService.fetch(repoPath);
+  });
+
+  ipcMain.handle('git:commit-amend', async (_event, repoPath: string, message: string) => {
+    return GitService.commitAmend(repoPath, message);
+  });
+
+  ipcMain.handle('git:delete-branch', async (_event, repoPath: string, name: string, force: boolean) => {
+    return GitService.deleteBranch(repoPath, name, force);
+  });
+
+  ipcMain.handle('git:merge', async (_event, repoPath: string, branch: string) => {
+    return GitService.merge(repoPath, branch);
+  });
+
+  ipcMain.handle('git:get-conflicts', async (_event, repoPath: string) => {
+    return GitService.getConflicts(repoPath);
+  });
+
+  ipcMain.handle('git:get-conflict-content', async (_event, repoPath: string, filePath: string) => {
+    return GitService.getConflictContent(repoPath, filePath);
+  });
+
+  ipcMain.handle('git:resolve-conflict', async (_event, repoPath: string, filePath: string, content: string) => {
+    return GitService.resolveConflict(repoPath, filePath, content);
+  });
+
   ipcMain.handle('git:checkout', async (_event, repoPath: string, branch: string) => {
     return GitService.checkout(repoPath, branch);
   });

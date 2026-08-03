@@ -120,6 +120,7 @@ export class GitService {
       staged,
       unstaged,
       untracked: status.not_added,
+      conflicted: status.conflicted,
       ahead: status.ahead,
       behind: status.behind,
       current: status.current,
@@ -198,6 +199,58 @@ export class GitService {
 
   static async pull(repoPath: string): Promise<void> {
     await this.getGit(repoPath).pull();
+  }
+
+  static async fetch(repoPath: string): Promise<void> {
+    await this.getGit(repoPath).fetch();
+  }
+
+  static async commitAmend(repoPath: string, message: string): Promise<void> {
+    await this.getGit(repoPath).raw(['commit', '--amend', '-m', message]);
+  }
+
+  static async deleteBranch(repoPath: string, name: string, force: boolean): Promise<void> {
+    await this.getGit(repoPath).deleteLocalBranch(name, force);
+  }
+
+  static async merge(repoPath: string, branch: string): Promise<void> {
+    await this.getGit(repoPath).merge([branch]);
+  }
+
+  static async getConflicts(repoPath: string): Promise<{ path: string; status: string }[]> {
+    const git = this.getGit(repoPath);
+    const status = await git.status();
+    return status.conflicted.map((path) => ({ path, status: 'conflict' }));
+  }
+
+  static async getConflictContent(repoPath: string, filePath: string): Promise<{ ours: string; base: string; theirs: string; raw: string }> {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const raw = await fs.readFile(path.join(repoPath, filePath), 'utf-8');
+
+    const oursLines: string[] = [];
+    const baseLines: string[] = [];
+    const theirsLines: string[] = [];
+    let section: 'ours' | 'base' | 'theirs' | 'none' = 'none';
+
+    for (const line of raw.split('\n')) {
+      if (line.startsWith('<<<<<<<')) { section = 'ours'; continue; }
+      if (line.startsWith('=======')) { section = 'theirs'; continue; }
+      if (line.startsWith('>>>>>>>')) { section = 'none'; continue; }
+      if (line.startsWith('|||||||')) { section = 'base'; continue; }
+      if (section === 'ours') oursLines.push(line);
+      else if (section === 'base') baseLines.push(line);
+      else if (section === 'theirs') theirsLines.push(line);
+      else { oursLines.push(line); theirsLines.push(line); baseLines.push(line); }
+    }
+    return { ours: oursLines.join('\n'), base: baseLines.join('\n'), theirs: theirsLines.join('\n'), raw };
+  }
+
+  static async resolveConflict(repoPath: string, filePath: string, content: string): Promise<void> {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    await fs.writeFile(path.join(repoPath, filePath), content, 'utf-8');
+    await this.getGit(repoPath).add(filePath);
   }
 
   static async checkout(repoPath: string, branch: string): Promise<void> {

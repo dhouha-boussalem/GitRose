@@ -10,6 +10,7 @@ import { ResizablePanels } from './components/ResizablePanels';
 import { CherryPickPanel } from './components/CherryPickPanel';
 import { RebaseBar } from './components/RebaseBar';
 import { GitConsole } from './components/GitConsole';
+import { ConflictPanel } from './components/ConflictPanel';
 import './styles/theme.css';
 import './App.css';
 
@@ -197,6 +198,7 @@ export default function App() {
             return localName;
           }}
           onFocus={handleFocusBranch}
+          currentBranch={tab.status?.current ?? null}
         />
 
         <main className="main-content">
@@ -261,13 +263,18 @@ export default function App() {
           ) : (
             <ResizablePanels
               left={
-                <ActionPanel
-                  repoPath={tab.path}
-                  status={tab.status}
-                  onRefresh={() => { refreshTab(tab); updateTab(tab.id, { selectedFile: null }); }}
-                  onFileSelect={(path, staged) => updateTab(tab.id, { selectedFile: { path, staged } })}
-                  selectedFile={tab.selectedFile?.path ?? null}
-                />
+                <>
+                  {(tab.status?.conflicted?.length ?? 0) > 0 && (
+                    <ConflictPanel repoPath={tab.path} onRefresh={() => refreshTab(tab)} />
+                  )}
+                  <ActionPanel
+                    repoPath={tab.path}
+                    status={tab.status}
+                    onRefresh={() => { refreshTab(tab); updateTab(tab.id, { selectedFile: null }); }}
+                    onFileSelect={(path, staged) => updateTab(tab.id, { selectedFile: { path, staged } })}
+                    selectedFile={tab.selectedFile?.path ?? null}
+                  />
+                </>
               }
               right={
                 <DiffViewer
