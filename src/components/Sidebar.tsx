@@ -44,6 +44,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
   const [creating, setCreating] = useState(false);
   const [newBranchName, setNewBranchName] = useState('');
   const [search, setSearch] = useState('');
+  const [blockedCheckout, setBlockedCheckout] = useState<{ branch: string; error: string } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const q = search.trim().toLowerCase();
@@ -71,8 +72,49 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
   async function handleCheckout(name: string, isCurrent: boolean) {
     if (isCurrent || switching) return;
     setSwitching(name);
-    await onCheckout(name);
-    setSwitching(null);
+    try {
+      await onCheckout(name);
+    } catch (e: any) {
+      const msg: string = e?.message ?? '';
+      const isBlocked = msg.includes('Your local changes') || msg.includes('local changes') || msg.includes('Please commit') || msg.includes('would be overwritten');
+      if (isBlocked) {
+        setBlockedCheckout({ branch: name, error: msg });
+      } else {
+        showToast(`Error: ${msg || 'checkout failed'}`);
+      }
+    } finally {
+      setSwitching(null);
+    }
+  }
+
+  async function handleStashAndCheckout(branch: string) {
+    setBlockedCheckout(null);
+    setSwitching(branch);
+    try {
+      await window.gitRose.stashSave(repoPath, `Auto-stash before switching to ${branch}`);
+      await onCheckout(branch);
+      onRefresh();
+      showToast(`Stashed changes → checked out ${branch}`);
+    } catch (e: any) {
+      showToast(`Error: ${e?.message ?? 'failed'}`);
+    } finally {
+      setSwitching(null);
+    }
+  }
+
+  async function handleDiscardAndCheckout(branch: string) {
+    setBlockedCheckout(null);
+    setSwitching(branch);
+    try {
+      await window.gitRose.discardAll(repoPath);
+      await onCheckout(branch);
+      onRefresh();
+      showToast(`Discarded changes → checked out ${branch}`);
+    } catch (e: any) {
+      showToast(`Error: ${e?.message ?? 'failed'}`);
+    } finally {
+      setSwitching(null);
+    }
   }
 
   function handleFocus(name: string) {
@@ -147,7 +189,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
             onClick={() => handleFocus(branch.name)}
             onDoubleClick={() => handleCheckout(branch.name, branch.current)}
             disabled={!!switching}
-            title={`Click to view history · Double-click to switch`}
+            title={branch.name}
           >
             <span className="branch-icon">
               {switching === branch.name ? <span className="branch-spinner" /> : branch.current ? '◆' : '◇'}
@@ -172,7 +214,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
               onClick={() => onFocus(focusedBranch === branch.name ? null : branch.name)}
               onDoubleClick={() => handleCheckoutRemote(branch.name)}
               disabled={!!switching}
-              title="Double-click to checkout locally"
+              title={branch.name}
             >
               <span className="branch-icon">
                 {switching === branch.name ? <span className="branch-spinner" /> : '↗'}
@@ -185,6 +227,36 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
 
       {toast && (
         <div className="sidebar-toast">{toast}</div>
+      )}
+
+      {blockedCheckout && (
+        <div className="checkout-blocked-overlay" onClick={() => setBlockedCheckout(null)}>
+          <div className="checkout-blocked-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="checkout-blocked-title">Uncommitted changes</div>
+            <div className="checkout-blocked-desc">
+              You have local changes that would be overwritten by switching to <strong>{blockedCheckout.branch}</strong>.
+            </div>
+            <div className="checkout-blocked-actions">
+              <button
+                className="checkout-blocked-btn stash"
+                onClick={() => handleStashAndCheckout(blockedCheckout.branch)}
+              >
+                <span className="checkout-blocked-btn-icon">📦</span>
+                Stash &amp; checkout
+              </button>
+              <button
+                className="checkout-blocked-btn discard"
+                onClick={() => handleDiscardAndCheckout(blockedCheckout.branch)}
+              >
+                <span className="checkout-blocked-btn-icon">🗑</span>
+                Discard &amp; checkout
+              </button>
+              <button className="checkout-blocked-btn cancel" onClick={() => setBlockedCheckout(null)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </aside>
   );

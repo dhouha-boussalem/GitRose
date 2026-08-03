@@ -50,6 +50,7 @@ declare global {
       stageFile: (repoPath: string, filePath: string) => Promise<void>;
       unstageFile: (repoPath: string, filePath: string) => Promise<void>;
       discardFile: (repoPath: string, filePath: string, isUntracked: boolean) => Promise<void>;
+      discardAll: (repoPath: string) => Promise<void>;
       stageAll: (repoPath: string) => Promise<void>;
       commit: (repoPath: string, message: string) => Promise<void>;
       push: (repoPath: string) => Promise<void>;

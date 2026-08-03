@@ -286,7 +286,7 @@ function FileRow({
       <span className={`status-badge ${statusClass[file.status] ?? 'modified'}`}>
         {statusIcon[file.status] ?? '~'}
       </span>
-      <span className="action-file-name">{file.path}</span>
+      <span className="action-file-name" title={file.path}>{file.path}</span>
       {onDiscard && (
         <button
           className="action-file-btn discard"

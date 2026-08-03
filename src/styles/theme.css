@@ -1,38 +1,48 @@
 :root {
-  /* === Brand — rose corail vif, tiré du bouquet === */
+  /* === Brand — rose vif, Postman-orange intensity === */
   --rose-50:  #fff0f4;
   --rose-100: #ffd6e4;
   --rose-200: #ffaac8;
-  --rose-300: #f072a0;
-  --rose-400: #e04880;
-  --rose-500: #cc2468;   /* corail-rose franc */
-  --rose-600: #a81858;
-  --rose-700: #840e48;
+  --rose-300: #f870a8;
+  --rose-400: #f04880;
+  --rose-500: #f03060;   /* vibrant rose, Postman-orange presence */
+  --rose-600: #c81f4a;
+  --rose-700: #a01038;
 
-  /* === Accents bouquet — mauve & menthe === */
-  --mauve-500: #b06ab0;   /* mauve des petites fleurs */
-  --mint-500:  #4aaa88;   /* vert menthe des feuilles */
+  /* === Accents === */
+  --mauve-500: #b06ab0;
+  --mint-500:  #4aaa88;
 
-  /* === Backgrounds — blanc pur, gris très légèrement frais === */
-  --bg-deepest:  #f5f5f7;
-  --bg-deep:     #eeeef2;
+  /* === Main content backgrounds — clean light === */
+  --bg-deepest:  #f4f4f8;
+  --bg-deep:     #ededf2;
   --bg-surface:  #ffffff;
-  --bg-elevated: #e8e8ed;
-  --bg-hover:    #e2e2e8;
+  --bg-elevated: #e8e8ee;
+  --bg-hover:    #e0e0e8;
 
-  /* === Text — gris-bleu sombre, pas marron === */
+  /* === Main content text === */
   --text-primary:   #18181f;
-  --text-secondary: #52525e;
-  --text-muted:     #8e8ea0;
+  --text-secondary: #50505e;
+  --text-muted:     #8888a0;
   --text-accent:    var(--rose-500);
 
+  /* === Sidebar — dark Postman-style === */
+  --sidebar-bg:          #1f1e2e;
+  --sidebar-bg-hover:    #2a2940;
+  --sidebar-bg-active:   rgba(240, 48, 96, 0.16);
+  --sidebar-text:        #c4c4d8;
+  --sidebar-text-muted:  #60607a;
+  --sidebar-border:      #2c2b3e;
+  --sidebar-search-bg:   #171626;
+  --sidebar-scrollbar:   #3a3854;
+
   /* === Borders === */
-  --border-subtle: #dedee6;
-  --border-medium: #c8c8d4;
+  --border-subtle: #dcdce6;
+  --border-medium: #c4c4d2;
   --border-accent: var(--rose-500);
 
   /* === Status colors === */
-  --color-added:    #1a8f5a;
+  --color-added:    #1a9060;
   --color-modified: #9a6f00;
   --color-deleted:  #c03040;
   --color-untracked: var(--mauve-500);
@@ -42,16 +52,16 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* === Spacing === */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
 
   /* === Shadows === */
-  --shadow-rose:  0 0 20px rgba(204, 36, 104, 0.18);
-  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.08);
-  --shadow-sm:    0 1px 4px rgba(0, 0, 0, 0.06);
-  --shadow-md:    0 2px 12px rgba(0, 0, 0, 0.09);
-  --shadow-lg:    0 8px 32px rgba(0, 0, 0, 0.13);
+  --shadow-rose:  0 0 24px rgba(240, 48, 96, 0.22);
+  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.10);
+  --shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.07);
+  --shadow-md:    0 2px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg:    0 8px 32px rgba(0, 0, 0, 0.16);
 }
 
 * {

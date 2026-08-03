@@ -80,7 +80,7 @@ export function StashViewer({ repoPath, stashIndex, stashMessage, onClose }: Sta
               <span className={`status-badge ${STATUS_CLASS[f.status] ?? 'modified'}`}>
                 {STATUS_ICON[f.status] ?? '~'}
               </span>
-              <span className="stash-viewer-file-name">{f.path}</span>
+              <span className="stash-viewer-file-name" title={f.path}>{f.path}</span>
             </div>
           ))}
         </div>
