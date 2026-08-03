@@ -35,6 +35,7 @@ export interface RepoStatus {
   staged: FileStatus[];
   unstaged: FileStatus[];
   untracked: string[];
+  conflicted: string[];
   ahead: number;
   behind: number;
   current: string | null;
