@@ -153,10 +153,10 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
       onRefresh();
       showToast(`Deleted ${name}`);
     } catch (err: any) {
-      // Likely unmerged — offer force delete
-      const msg: string = err?.message ?? '';
-      if (msg.includes('not fully merged') || msg.includes('fully merged')) {
-        if (window.confirm(`"${name}" has unmerged commits. Force delete?`)) {
+      const msg: string = String(err?.message ?? err ?? '');
+      const isUnmerged = msg.includes('not fully merged') || msg.includes('fully merged') || msg.includes('-D');
+      if (isUnmerged) {
+        if (window.confirm(`"${name}" has unmerged commits. Force delete anyway?`)) {
           try {
             await window.gitRose.deleteBranch(repoPath, name, true);
             onRefresh();

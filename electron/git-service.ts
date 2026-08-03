@@ -211,7 +211,7 @@ export class GitService {
   }
 
   static async deleteBranch(repoPath: string, name: string, force: boolean): Promise<void> {
-    await this.getGit(repoPath).deleteLocalBranch(name, force);
+    await this.getGit(repoPath).raw(['branch', force ? '-D' : '-d', name]);
   }
 
   static async merge(repoPath: string, branch: string): Promise<void> {
