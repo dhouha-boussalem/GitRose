@@ -81,8 +81,17 @@ export class GitService {
   }
 
   static async getGraphCommits(repoPath: string, maxCount = 200, ref?: string): Promise<GraphCommit[]> {
-    const commits = await this.getCommits(repoPath, maxCount, ref);
-    return buildGraph(commits);
+    try {
+      const commits = await this.getCommits(repoPath, maxCount, ref);
+      return buildGraph(commits);
+    } catch {
+      // ref may no longer exist (e.g. deleted branch); fall back to all branches
+      if (ref) {
+        const commits = await this.getCommits(repoPath, maxCount, undefined);
+        return buildGraph(commits);
+      }
+      return [];
+    }
   }
 
   static async getBranches(repoPath: string): Promise<Branch[]> {

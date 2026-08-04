@@ -155,6 +155,7 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
     setDeleteConfirm(null);
     try {
       await window.gitRose.deleteBranch(repoPath, name, force);
+      if (focusedBranch === name) onFocus(null);
       onRefresh();
       showToast(force ? `Force deleted ${name}` : `Deleted ${name}`);
     } catch (err: any) {
