@@ -1971,6 +1971,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  position: relative;
 }
 
 .commits-layout .commit-list {
@@ -1980,19 +1981,25 @@
 }
 
 .cd-panel {
-  width: 360px;
-  flex-shrink: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: calc(100% - 60px);
+  max-width: 900px;
   display: flex;
   flex-direction: column;
   border-left: 1px solid var(--border-color);
   background: var(--bg-primary);
   overflow: hidden;
-  animation: cdSlideIn 0.15s ease;
+  z-index: 10;
+  box-shadow: -6px 0 32px rgba(0,0,0,0.18);
+  animation: cdSlideIn 0.18s ease;
 }
 
 @keyframes cdSlideIn {
-  from { width: 0; opacity: 0; }
-  to   { width: 360px; opacity: 1; }
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
 }
 
 .cd-header {
