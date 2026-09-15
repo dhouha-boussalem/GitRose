@@ -243,20 +243,22 @@ export default function App() {
                   onCancel={() => updateTab(tab.id, { showRebase: false })}
                 />
               )}
-              <CommitGraph
-                commits={tab.commits}
-                selectedHash={tab.selectedCommit?.hash ?? null}
-                showGraph={tab.showGraph}
-                onSelect={(c) => updateTab(tab.id, { selectedCommit: c })}
-              />
-              {tab.selectedCommit && (
-                <CommitDetail
-                  commit={tab.selectedCommit}
-                  repoPath={tab.path}
-                  onRefresh={() => refreshTab(tab)}
-                  onClose={() => updateTab(tab.id, { selectedCommit: null })}
+              <div className="commits-layout">
+                <CommitGraph
+                  commits={tab.commits}
+                  selectedHash={tab.selectedCommit?.hash ?? null}
+                  showGraph={tab.showGraph}
+                  onSelect={(c) => updateTab(tab.id, { selectedCommit: c })}
                 />
-              )}
+                {tab.selectedCommit && (
+                  <CommitDetail
+                    commit={tab.selectedCommit}
+                    repoPath={tab.path}
+                    onRefresh={() => refreshTab(tab)}
+                    onClose={() => updateTab(tab.id, { selectedCommit: null })}
+                  />
+                )}
+              </div>
             </>
           ) : (
             <ResizablePanels
