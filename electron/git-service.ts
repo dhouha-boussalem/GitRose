@@ -327,6 +327,18 @@ export class GitService {
     return this.getGit(repoPath).raw(filtered);
   }
 
+  static async getCommitFiles(repoPath: string, hash: string): Promise<{ path: string; status: string }[]> {
+    const out = await this.getGit(repoPath).raw(['diff-tree', '--no-commit-id', '-r', '--name-status', hash]);
+    return out.trim().split('\n').filter(Boolean).map((line) => {
+      const [status, ...rest] = line.split('\t');
+      return { status: status.trim()[0], path: rest.join('\t').trim() };
+    });
+  }
+
+  static async getCommitFileDiff(repoPath: string, hash: string, filePath: string): Promise<string> {
+    return this.getGit(repoPath).raw(['show', `${hash}`, '--', filePath]);
+  }
+
   static async squashToCommit(repoPath: string, hash: string, message: string): Promise<void> {
     const git = this.getGit(repoPath);
     // Reset soft to the parent of the target commit — keeps all changes staged

@@ -191,4 +191,12 @@ function registerGitHandlers() {
   ipcMain.handle('git:cherry-pick-to-branch', async (_event, repoPath: string, hash: string, branchName: string) => {
     return GitService.cherryPickToNewBranch(repoPath, hash, branchName);
   });
+
+  ipcMain.handle('git:get-commit-files', async (_event, repoPath: string, hash: string) => {
+    return GitService.getCommitFiles(repoPath, hash);
+  });
+
+  ipcMain.handle('git:get-commit-file-diff', async (_event, repoPath: string, hash: string, filePath: string) => {
+    return GitService.getCommitFileDiff(repoPath, hash, filePath);
+  });
 }

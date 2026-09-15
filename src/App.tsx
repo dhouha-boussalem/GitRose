@@ -8,6 +8,7 @@ import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ResizablePanels } from './components/ResizablePanels';
 import { CherryPickPanel } from './components/CherryPickPanel';
+import { CommitDetail } from './components/CommitDetail';
 import { RebaseBar } from './components/RebaseBar';
 import { GitConsole } from './components/GitConsole';
 import { ConflictPanel } from './components/ConflictPanel';
@@ -249,14 +250,11 @@ export default function App() {
                 onSelect={(c) => updateTab(tab.id, { selectedCommit: c })}
               />
               {tab.selectedCommit && (
-                <CherryPickPanel
+                <CommitDetail
                   commit={tab.selectedCommit}
                   repoPath={tab.path}
-                  onDone={async () => {
-                    await refreshTab(tab);
-                    updateTab(tab.id, { selectedCommit: null });
-                  }}
-                  onDismiss={() => updateTab(tab.id, { selectedCommit: null })}
+                  onRefresh={() => refreshTab(tab)}
+                  onClose={() => updateTab(tab.id, { selectedCommit: null })}
                 />
               )}
             </>
