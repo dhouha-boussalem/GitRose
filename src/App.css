@@ -788,7 +788,7 @@
 
 /* === Main content === */
 
-.main-content { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+.main-content { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; position: relative; }
 
 /* === Commit list === */
 
@@ -1971,7 +1971,6 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  position: relative;
 }
 
 .commits-layout .commit-list {
@@ -1985,20 +1984,19 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: calc(100% - 60px);
-  max-width: 900px;
+  width: calc(100% - 48px);
   display: flex;
   flex-direction: column;
-  border-left: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-rose);
   background: var(--bg-primary);
   overflow: hidden;
-  z-index: 10;
-  box-shadow: -6px 0 32px rgba(0,0,0,0.18);
-  animation: cdSlideIn 0.18s ease;
+  z-index: 50;
+  box-shadow: -12px 0 48px rgba(0,0,0,0.28);
+  animation: cdSlideIn 0.18s cubic-bezier(0.22,1,0.36,1);
 }
 
 @keyframes cdSlideIn {
-  from { transform: translateX(40px); opacity: 0; }
+  from { transform: translateX(60px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
 

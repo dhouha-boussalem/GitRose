@@ -203,6 +203,14 @@ export default function App() {
         />
 
         <main className="main-content">
+          {tab.selectedCommit && tab.activeView === 'commits' && (
+            <CommitDetail
+              commit={tab.selectedCommit}
+              repoPath={tab.path}
+              onRefresh={() => refreshTab(tab)}
+              onClose={() => updateTab(tab.id, { selectedCommit: null })}
+            />
+          )}
           {tab.loading ? (
             <div className="loading">
               <span className="loading-spinner" />
@@ -250,14 +258,6 @@ export default function App() {
                   showGraph={tab.showGraph}
                   onSelect={(c) => updateTab(tab.id, { selectedCommit: c })}
                 />
-                {tab.selectedCommit && (
-                  <CommitDetail
-                    commit={tab.selectedCommit}
-                    repoPath={tab.path}
-                    onRefresh={() => refreshTab(tab)}
-                    onClose={() => updateTab(tab.id, { selectedCommit: null })}
-                  />
-                )}
               </div>
             </>
           ) : (
