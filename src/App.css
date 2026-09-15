@@ -788,7 +788,7 @@
 
 /* === Main content === */
 
-.main-content { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+.main-content { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
 
 /* === Commit list === */
 
@@ -1964,7 +1964,7 @@
 .conflict-accept-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 
-/* === Commit Detail Panel (inline side panel) === */
+/* === Commit Detail Panel === */
 
 .commits-layout {
   display: flex;
@@ -1973,30 +1973,52 @@
   overflow: hidden;
 }
 
-.commits-layout .commit-list {
+/* Commit list pane — full width by default, collapses to 48px when detail is open */
+.commits-list-pane {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: flex 0.18s ease, min-width 0.18s ease;
+}
+.commits-list-pane.collapsed {
+  flex: 0 0 48px;
+  min-width: 48px;
+  overflow: hidden;
+}
+/* Hide text in collapsed commit rows, only show avatars */
+.commits-list-pane.collapsed .commit-body,
+.commits-list-pane.collapsed .commit-date {
+  display: none;
+}
+.commits-list-pane.collapsed .commit-row {
+  padding: 0 6px;
+  justify-content: center;
+}
+.commits-list-pane.collapsed .commit-avatar {
+  margin: 0;
+  flex-shrink: 0;
+}
+.commits-list-pane .commit-list {
+  flex: 1;
   overflow-y: auto;
 }
 
+/* Detail panel */
 .cd-panel {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: calc(100% - 48px);
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  border-left: 3px solid var(--accent-rose);
+  border-left: 2px solid var(--accent-rose);
   background: var(--bg-primary);
   overflow: hidden;
-  z-index: 50;
-  box-shadow: -12px 0 48px rgba(0,0,0,0.28);
   animation: cdSlideIn 0.18s cubic-bezier(0.22,1,0.36,1);
 }
 
 @keyframes cdSlideIn {
-  from { transform: translateX(60px); opacity: 0; }
+  from { transform: translateX(30px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
 
