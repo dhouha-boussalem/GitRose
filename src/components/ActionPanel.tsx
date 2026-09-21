@@ -178,19 +178,14 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
         </button>
         <div className="pull-split-wrap" ref={pullMenuRef}>
           <button
-            className={`action-sync-btn pull pull-main ${(pushPullOp === 'pull' || pushPullOp === 'pull-rebase') ? 'loading' : ''}`}
-            onClick={handlePull}
+            className={`action-sync-btn pull ${(pushPullOp === 'pull' || pushPullOp === 'pull-rebase') ? 'loading' : ''}`}
+            onClick={() => setPullMenuOpen((o) => !o)}
             disabled={isLoading}
           >
             {(pushPullOp === 'pull' || pushPullOp === 'pull-rebase') ? <span className="btn-spinner" /> : '↓'}
             {pushPullOp === 'pull-rebase' ? 'Pull --rebase' : 'Pull'}
+            <span className="pull-chevron">▾</span>
           </button>
-          <button
-            className="pull-arrow-btn"
-            onClick={() => setPullMenuOpen((o) => !o)}
-            disabled={isLoading}
-            title="Options Pull"
-          >▾</button>
           {pullMenuOpen && (
             <div className="pull-dropdown">
               <button className="pull-dropdown-item" onClick={handlePull}>↓ Pull (merge)</button>
