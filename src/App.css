@@ -2742,15 +2742,17 @@
   height: 32px;
   padding: 0 10px;
   font-size: 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid #3a3858;
   border-radius: var(--radius-sm);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
+  background: #111020;
+  color: #e0e0f0;
   outline: none;
   font-family: inherit;
   width: 100%;
 }
+.clone-input::placeholder { color: #606080; }
 .clone-input:focus { border-color: var(--accent-rose); }
+.clone-label { color: #9090b0; }
 
 .clone-dest-row {
   display: flex;
@@ -2761,15 +2763,15 @@
 .clone-browse-btn {
   font-size: 11px;
   padding: 0 10px;
-  border: 1px solid var(--border-color);
+  border: 1px solid #3a3858;
   border-radius: var(--radius-sm);
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
+  background: #111020;
+  color: #9090b0;
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.12s;
 }
-.clone-browse-btn:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-primary); }
+.clone-browse-btn:hover:not(:disabled) { background: #2a2940; color: #e0e0f0; }
 
 .clone-error {
   font-size: 11px;
