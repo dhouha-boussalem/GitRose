@@ -227,7 +227,7 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
             <span className="pull-chevron">▾</span>
           </button>
           {pushMenuOpen && (
-            <div className="pull-dropdown">
+            <div className="pull-dropdown align-right">
               <button className="pull-dropdown-item" onClick={handlePush}>↑ Push</button>
               <button className="pull-dropdown-item danger" onClick={() => { setPushMenuOpen(false); setConfirmForcePush(true); }}>
                 ⚠ Force push

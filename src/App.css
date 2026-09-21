@@ -918,6 +918,7 @@
   height: 100%;
   overflow: hidden;
 }
+.action-panel .action-sync-bar { overflow: visible; }
 
 .action-sync-bar {
   display: flex;
@@ -966,7 +967,7 @@
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  min-width: 160px;
+  min-width: 170px;
   background: #1a1928;
   border: 1px solid #3a3858;
   border-radius: var(--radius-sm);
@@ -2843,3 +2844,4 @@
 .force-push-btn.ghost:hover { background: var(--bg-hover, #2a2940); }
 .pull-dropdown-item.danger { color: #e05555; }
 .pull-dropdown-item.danger:hover { background: rgba(220,50,50,0.1); }
+.pull-dropdown.align-right { left: auto; right: 0; }
