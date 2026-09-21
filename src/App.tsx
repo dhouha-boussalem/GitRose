@@ -258,9 +258,6 @@ export default function App() {
                   🏷 Tags
                 </button>
               </div>
-              {tab.showTags && (
-                <TagsPanel repoPath={tab.path} onClose={() => updateTab(tab.id, { showTags: false })} />
-              )}
               {tab.showRebase && (
                 <RebaseBar
                   branches={tab.branches.filter(b => !b.current).map(b => b.name)}
@@ -327,6 +324,10 @@ export default function App() {
           onClose={() => updateTab(tab.id, { showConsole: false })}
           onRefresh={() => refreshTab(tab)}
         />
+      )}
+
+      {tab.showTags && (
+        <TagsPanel repoPath={tab.path} onClose={() => updateTab(tab.id, { showTags: false })} />
       )}
     </div>
   );
