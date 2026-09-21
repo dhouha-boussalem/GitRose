@@ -151,6 +151,7 @@ export function CommitDetail({ commit, repoPath, onClose, onRefresh }: CommitDet
               <button className="cd-action-btn ghost" onClick={() => setMode('detail')}>Annuler</button>
             </div>
           </div>
+        )}
         {mode === 'reset' && (
           <div className="cd-reset-panel">
             <div className="cd-reset-title">Réinitialiser HEAD vers ce commit</div>
