@@ -103,6 +103,10 @@ function registerGitHandlers() {
     return GitService.pull(repoPath);
   });
 
+  ipcMain.handle('git:pull-rebase', async (_event, repoPath: string) => {
+    return GitService.pullRebase(repoPath);
+  });
+
   ipcMain.handle('git:fetch', async (_event, repoPath: string) => {
     return GitService.fetch(repoPath);
   });

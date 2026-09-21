@@ -18,7 +18,9 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
   const [lastCommitMsg, setLastCommitMsg] = useState('');
   const [opState, setOpState] = useState<OpState>('idle');
   const [errorMsg, setErrorMsg] = useState('');
-  const [pushPullOp, setPushPullOp] = useState<'push' | 'pull' | 'fetch' | null>(null);
+  const [pushPullOp, setPushPullOp] = useState<'push' | 'pull' | 'pull-rebase' | 'fetch' | null>(null);
+  const [pullMenuOpen, setPullMenuOpen] = useState(false);
+  const pullMenuRef = useRef<HTMLDivElement>(null);
   const [splitPct, setSplitPct] = useState(50);
   const [changesCollapsed, setChangesCollapsed] = useState(false);
   const [stagedCollapsed, setStagedCollapsed] = useState(false);
@@ -110,11 +112,31 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
   }
 
   async function handlePull() {
+    setPullMenuOpen(false);
     setPushPullOp('pull');
     await run(() => window.gitRose.pull(repoPath));
     setPushPullOp(null);
     onRefresh();
   }
+
+  async function handlePullRebase() {
+    setPullMenuOpen(false);
+    setPushPullOp('pull-rebase');
+    await run(() => window.gitRose.pullRebase(repoPath));
+    setPushPullOp(null);
+    onRefresh();
+  }
+
+  useEffect(() => {
+    if (!pullMenuOpen) return;
+    function close(e: MouseEvent) {
+      if (pullMenuRef.current && !pullMenuRef.current.contains(e.target as Node)) {
+        setPullMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [pullMenuOpen]);
 
   async function handleFetch() {
     setPushPullOp('fetch');
@@ -154,14 +176,28 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
           {pushPullOp === 'fetch' ? <span className="btn-spinner" /> : '⟳'}
           Fetch
         </button>
-        <button
-          className={`action-sync-btn pull ${pushPullOp === 'pull' ? 'loading' : ''}`}
-          onClick={handlePull}
-          disabled={isLoading}
-        >
-          {pushPullOp === 'pull' ? <span className="btn-spinner" /> : '↓'}
-          Pull
-        </button>
+        <div className="pull-split-wrap" ref={pullMenuRef}>
+          <button
+            className={`action-sync-btn pull pull-main ${(pushPullOp === 'pull' || pushPullOp === 'pull-rebase') ? 'loading' : ''}`}
+            onClick={handlePull}
+            disabled={isLoading}
+          >
+            {(pushPullOp === 'pull' || pushPullOp === 'pull-rebase') ? <span className="btn-spinner" /> : '↓'}
+            {pushPullOp === 'pull-rebase' ? 'Pull --rebase' : 'Pull'}
+          </button>
+          <button
+            className="pull-arrow-btn"
+            onClick={() => setPullMenuOpen((o) => !o)}
+            disabled={isLoading}
+            title="Options Pull"
+          >▾</button>
+          {pullMenuOpen && (
+            <div className="pull-dropdown">
+              <button className="pull-dropdown-item" onClick={handlePull}>↓ Pull (merge)</button>
+              <button className="pull-dropdown-item" onClick={handlePullRebase}>↕ Pull --rebase</button>
+            </div>
+          )}
+        </div>
         <button
           className={`action-sync-btn push ${pushPullOp === 'push' ? 'loading' : ''}`}
           onClick={handlePush}

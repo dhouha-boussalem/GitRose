@@ -56,6 +56,7 @@ declare global {
       commit: (repoPath: string, message: string) => Promise<void>;
       push: (repoPath: string) => Promise<void>;
       pull: (repoPath: string) => Promise<void>;
+      pullRebase: (repoPath: string) => Promise<void>;
       fetch: (repoPath: string) => Promise<void>;
       commitAmend: (repoPath: string, message: string) => Promise<void>;
       deleteBranch: (repoPath: string, name: string, force: boolean) => Promise<void>;

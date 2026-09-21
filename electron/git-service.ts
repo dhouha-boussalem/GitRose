@@ -203,6 +203,10 @@ export class GitService {
     await this.getGit(repoPath).pull();
   }
 
+  static async pullRebase(repoPath: string): Promise<void> {
+    await this.getGit(repoPath).pull(['--rebase']);
+  }
+
   static async fetch(repoPath: string): Promise<void> {
     await this.getGit(repoPath).fetch();
   }
