@@ -127,6 +127,22 @@ function registerGitHandlers() {
     return GitService.revertCommit(repoPath, hash);
   });
 
+  ipcMain.handle('git:get-tags', async (_event, repoPath: string) => {
+    return GitService.getTags(repoPath);
+  });
+  ipcMain.handle('git:create-tag', async (_event, repoPath: string, name: string, hash: string, message?: string) => {
+    return GitService.createTag(repoPath, name, hash, message);
+  });
+  ipcMain.handle('git:delete-tag', async (_event, repoPath: string, name: string) => {
+    return GitService.deleteTag(repoPath, name);
+  });
+  ipcMain.handle('git:push-tag', async (_event, repoPath: string, name: string) => {
+    return GitService.pushTag(repoPath, name);
+  });
+  ipcMain.handle('git:delete-remote-tag', async (_event, repoPath: string, name: string) => {
+    return GitService.deleteRemoteTag(repoPath, name);
+  });
+
   ipcMain.handle('git:merge', async (_event, repoPath: string, branch: string) => {
     return GitService.merge(repoPath, branch);
   });

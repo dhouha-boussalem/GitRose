@@ -9,6 +9,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { ResizablePanels } from './components/ResizablePanels';
 import { CherryPickPanel } from './components/CherryPickPanel';
 import { CommitDetail } from './components/CommitDetail';
+import { TagsPanel } from './components/TagsPanel';
 import { RebaseBar } from './components/RebaseBar';
 import { GitConsole } from './components/GitConsole';
 import { ConflictPanel } from './components/ConflictPanel';
@@ -42,6 +43,7 @@ interface RepoTab {
   showConsole: boolean;
   loading: boolean;
   commitSearch: string;
+  showTags: boolean;
 }
 
 function repoName(path: string): string {
@@ -67,6 +69,7 @@ function newTab(path: string, index: number): RepoTab {
     showConsole: false,
     loading: true,
     commitSearch: '',
+    showTags: false,
   };
 }
 
@@ -248,7 +251,16 @@ export default function App() {
                 >
                   {tab.showGraph ? '⬡ Hide graph' : '⬡ Show graph'}
                 </button>
+                <button
+                  className={`graph-toggle-btn ${tab.showTags ? 'active' : ''}`}
+                  onClick={() => updateTab(tab.id, { showTags: !tab.showTags })}
+                >
+                  🏷 Tags
+                </button>
               </div>
+              {tab.showTags && (
+                <TagsPanel repoPath={tab.path} onClose={() => updateTab(tab.id, { showTags: false })} />
+              )}
               {tab.showRebase && (
                 <RebaseBar
                   branches={tab.branches.filter(b => !b.current).map(b => b.name)}

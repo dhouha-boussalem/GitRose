@@ -62,6 +62,11 @@ declare global {
       renameBranch: (repoPath: string, oldName: string, newName: string) => Promise<void>;
       resetToCommit: (repoPath: string, hash: string, mode: 'soft' | 'mixed' | 'hard') => Promise<void>;
       revertCommit: (repoPath: string, hash: string) => Promise<void>;
+      getTags: (repoPath: string) => Promise<{ name: string; hash: string; date: string; message: string }[]>;
+      createTag: (repoPath: string, name: string, hash: string, message?: string) => Promise<void>;
+      deleteTag: (repoPath: string, name: string) => Promise<void>;
+      pushTag: (repoPath: string, name: string) => Promise<void>;
+      deleteRemoteTag: (repoPath: string, name: string) => Promise<void>;
       merge: (repoPath: string, branch: string) => Promise<void>;
       getConflicts: (repoPath: string) => Promise<{ path: string; status: string }[]>;
       getConflictContent: (repoPath: string, filePath: string) => Promise<{ ours: string; base: string; theirs: string; raw: string }>;

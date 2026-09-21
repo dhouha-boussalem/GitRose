@@ -227,6 +227,36 @@ export class GitService {
     await this.getGit(repoPath).raw(['revert', '--no-edit', hash]);
   }
 
+  static async getTags(repoPath: string): Promise<{ name: string; hash: string; date: string; message: string }[]> {
+    const out = await this.getGit(repoPath)
+      .raw(['tag', '-l', '--sort=-version:refname', '--format=%(refname:short)|%(objectname:short)|%(creatordate:short)|%(subject)'])
+      .catch(() => '');
+    return out.trim().split('\n').filter(Boolean).map((line) => {
+      const [name, hash, date, ...rest] = line.split('|');
+      return { name: name.trim(), hash: hash.trim(), date: date.trim(), message: rest.join('|').trim() };
+    });
+  }
+
+  static async createTag(repoPath: string, name: string, hash: string, message?: string): Promise<void> {
+    if (message) {
+      await this.getGit(repoPath).raw(['tag', '-a', name, hash, '-m', message]);
+    } else {
+      await this.getGit(repoPath).raw(['tag', name, hash]);
+    }
+  }
+
+  static async deleteTag(repoPath: string, name: string): Promise<void> {
+    await this.getGit(repoPath).raw(['tag', '-d', name]);
+  }
+
+  static async pushTag(repoPath: string, name: string): Promise<void> {
+    await this.getGit(repoPath).raw(['push', 'origin', name]);
+  }
+
+  static async deleteRemoteTag(repoPath: string, name: string): Promise<void> {
+    await this.getGit(repoPath).raw(['push', 'origin', '--delete', name]);
+  }
+
   static async merge(repoPath: string, branch: string): Promise<void> {
     await this.getGit(repoPath).merge([branch]);
   }
