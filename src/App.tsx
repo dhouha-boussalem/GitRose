@@ -41,7 +41,6 @@ interface RepoTab {
   userName: string;
   activeView: 'commits' | 'status';
   selectedFile: { path: string; staged: boolean } | null;
-  showGraph: boolean;
   showRebase: boolean;
   showConsole: boolean;
   loading: boolean;
@@ -67,7 +66,6 @@ function newTab(path: string, index: number): RepoTab {
     userName: '',
     activeView: 'status',
     selectedFile: null,
-    showGraph: false,
     showRebase: false,
     showConsole: false,
     loading: true,
@@ -281,12 +279,6 @@ export default function App() {
                   ↥ Rebase
                 </button>
                 <button
-                  className={`graph-toggle-btn ${tab.showGraph ? 'active' : ''}`}
-                  onClick={() => updateTab(tab.id, { showGraph: !tab.showGraph })}
-                >
-                  {tab.showGraph ? '⬡ Hide graph' : '⬡ Show graph'}
-                </button>
-                <button
                   className={`graph-toggle-btn ${tab.showTags ? 'active' : ''}`}
                   onClick={() => updateTab(tab.id, { showTags: !tab.showTags })}
                 >
@@ -323,7 +315,6 @@ export default function App() {
                         })
                       : tab.commits}
                     selectedHash={tab.selectedCommit?.hash ?? null}
-                    showGraph={tab.showGraph && !tab.commitSearch}
                     onSelect={(c) => updateTab(tab.id, { selectedCommit: c })}
                   />
                 </div>
