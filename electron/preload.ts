@@ -51,6 +51,8 @@ contextBridge.exposeInMainWorld('gitRose', {
   cherryPickToBranch: (repoPath: string, hash: string, branchName: string) => ipcRenderer.invoke('git:cherry-pick-to-branch', repoPath, hash, branchName),
   getCommitFiles: (repoPath: string, hash: string) => ipcRenderer.invoke('git:get-commit-files', repoPath, hash),
   getCommitFileDiff: (repoPath: string, hash: string, filePath: string) => ipcRenderer.invoke('git:get-commit-file-diff', repoPath, hash, filePath),
+  getBranchDiffFiles: (repoPath: string, base: string, compare: string) => ipcRenderer.invoke('git:branch-diff-files', repoPath, base, compare),
+  getBranchDiffFileDiff: (repoPath: string, base: string, compare: string, filePath: string) => ipcRenderer.invoke('git:branch-diff-file-diff', repoPath, base, compare, filePath),
   cloneRepo: (url: string, destPath: string) => ipcRenderer.invoke('git:clone-repo', url, destPath),
   pickCloneDir: () => ipcRenderer.invoke('git:pick-clone-dir'),
 });

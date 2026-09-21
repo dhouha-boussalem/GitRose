@@ -2845,3 +2845,85 @@
 .pull-dropdown-item.danger { color: #e05555; }
 .pull-dropdown-item.danger:hover { background: rgba(220,50,50,0.1); }
 .pull-dropdown.align-right { left: auto; right: 0; }
+
+/* === Branch Diff Panel === */
+.bd-panel {
+  width: 860px;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background: #1a1928;
+  border: 1px solid #3a3858;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  overflow: hidden;
+  animation: cdSlideIn 0.16s ease;
+}
+
+.bd-selectors {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #2c2b3e;
+  flex-shrink: 0;
+}
+.bd-select {
+  height: 28px;
+  padding: 0 8px;
+  font-size: 12px;
+  border: 1px solid #3a3858;
+  border-radius: var(--radius-sm);
+  background: #111020;
+  color: #e0e0f0;
+  cursor: pointer;
+  outline: none;
+  max-width: 220px;
+}
+.bd-select:focus { border-color: var(--accent-rose); }
+.bd-arrow { color: #606080; font-size: 16px; }
+.bd-count { margin-left: auto; font-size: 11px; color: #606080; }
+
+.bd-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.bd-file-list {
+  width: 240px;
+  flex-shrink: 0;
+  border-right: 1px solid #2c2b3e;
+  overflow-y: auto;
+}
+.bd-file-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #1e1d2c;
+  transition: background 0.1s;
+}
+.bd-file-row:hover { background: #232233; }
+.bd-file-row.selected { background: rgba(240,48,96,0.1); border-left: 2px solid var(--accent-rose); }
+.bd-file-status { font-size: 10px; font-weight: 700; flex-shrink: 0; }
+.bd-file-path { font-size: 11px; color: #c0c0d8; word-break: break-all; }
+
+.bd-diff-pane {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.bd-diff-content {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 8px 0;
+}
+.bd-diff-line { padding: 0 12px; white-space: pre; }
+.bd-diff-line.added { background: rgba(26,144,96,0.15); color: #4caf80; }
+.bd-diff-line.removed { background: rgba(192,48,64,0.15); color: #e06070; }
+.bd-diff-line.hunk { color: #6080c0; background: rgba(96,128,192,0.08); }

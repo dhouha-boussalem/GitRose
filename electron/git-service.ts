@@ -418,6 +418,18 @@ export class GitService {
     await git.clone(url, destPath);
     return destPath;
   }
+
+  static async getBranchDiffFiles(repoPath: string, base: string, compare: string): Promise<{ path: string; status: string }[]> {
+    const out = await this.getGit(repoPath).raw(['diff', '--name-status', `${base}...${compare}`]).catch(() => '');
+    return out.trim().split('\n').filter(Boolean).map((line) => {
+      const [status, ...rest] = line.split('\t');
+      return { status: status.trim(), path: rest.join('\t').trim() };
+    });
+  }
+
+  static async getBranchDiffFileDiff(repoPath: string, base: string, compare: string, filePath: string): Promise<string> {
+    return this.getGit(repoPath).raw(['diff', `${base}...${compare}`, '--', filePath]).catch(() => '');
+  }
 }
 
 const GRAPH_COLORS = [

@@ -9,6 +9,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { ResizablePanels } from './components/ResizablePanels';
 import { CherryPickPanel } from './components/CherryPickPanel';
 import { CloneDialog } from './components/CloneDialog';
+import { BranchDiffPanel } from './components/BranchDiffPanel';
 import { CommitDetail } from './components/CommitDetail';
 import { TagsPanel } from './components/TagsPanel';
 import { RebaseBar } from './components/RebaseBar';
@@ -78,6 +79,7 @@ export default function App() {
   const [tabs, setTabs] = useState<RepoTab[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [showClone, setShowClone] = useState(false);
+  const [showBranchDiff, setShowBranchDiff] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const tab = tabs.find((t) => t.id === activeId) ?? null;
@@ -275,6 +277,12 @@ export default function App() {
                 >
                   🏷 Tags
                 </button>
+                <button
+                  className="graph-toggle-btn"
+                  onClick={() => setShowBranchDiff(true)}
+                >
+                  ⇄ Diff branches
+                </button>
               </div>
               {tab.showRebase && (
                 <RebaseBar
@@ -349,6 +357,15 @@ export default function App() {
       )}
 
       {showClone && <CloneDialog onClose={() => setShowClone(false)} onCloned={handleCloned} />}
+
+      {showBranchDiff && (
+        <BranchDiffPanel
+          repoPath={tab.path}
+          branches={tab.branches}
+          currentBranch={tab.status?.current ?? null}
+          onClose={() => setShowBranchDiff(false)}
+        />
+      )}
     </div>
   );
 }

@@ -236,6 +236,14 @@ function registerGitHandlers() {
     return GitService.getCommitFileDiff(repoPath, hash, filePath);
   });
 
+  ipcMain.handle('git:branch-diff-files', async (_event, repoPath: string, base: string, compare: string) => {
+    return GitService.getBranchDiffFiles(repoPath, base, compare);
+  });
+
+  ipcMain.handle('git:branch-diff-file-diff', async (_event, repoPath: string, base: string, compare: string, filePath: string) => {
+    return GitService.getBranchDiffFileDiff(repoPath, base, compare, filePath);
+  });
+
   ipcMain.handle('git:clone-repo', async (_event, url: string, destPath: string) => {
     return GitService.cloneRepo(url, destPath);
   });
