@@ -636,6 +636,8 @@
   flex-direction: column;
   height: 100%;
 }
+.sidebar::-webkit-scrollbar-thumb { background: var(--sidebar-scrollbar); }
+.sidebar::-webkit-scrollbar-thumb:hover { background: var(--rose-500); }
 
 .sidebar-header,
 .sidebar-scroll {
