@@ -2,6 +2,8 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('gitRose', {
   openRepo: () => ipcRenderer.invoke('git:open-repo'),
+  getRecentRepos: () => ipcRenderer.invoke('git:get-recent-repos'),
+  addRecentRepo: (repoPath: string) => ipcRenderer.invoke('git:add-recent-repo', repoPath),
   getCommits: (repoPath: string) => ipcRenderer.invoke('git:get-commits', repoPath),
   getGraph: (repoPath: string, ref?: string) => ipcRenderer.invoke('git:get-graph', repoPath, ref),
   getBranches: (repoPath: string) => ipcRenderer.invoke('git:get-branches', repoPath),

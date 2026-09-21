@@ -128,6 +128,7 @@ export default function App() {
 
   const handleCloned = useCallback((path: string) => {
     setShowClone(false);
+    window.gitRose.addRecentRepo(path).catch(() => {});
     const existing = tabs.find((t) => t.path === path);
     if (existing) { setActiveId(existing.id); return; }
     const t = newTab(path, tabs.length);
@@ -144,6 +145,18 @@ export default function App() {
       return next;
     });
   }, [activeId]);
+
+  // Restore last opened repo on startup
+  useEffect(() => {
+    window.gitRose.getRecentRepos().then((paths) => {
+      if (paths.length === 0) return;
+      const path = paths[0];
+      const t = newTab(path, 0);
+      setTabs([t]);
+      setActiveId(t.id);
+      loadRepo(path, t.id);
+    }).catch(() => {});
+  }, []);
 
   // Poll status for active tab
   useEffect(() => {

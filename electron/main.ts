@@ -1,6 +1,32 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import { GitService } from './git-service';
+
+function getRecentReposPath() {
+  return path.join(app.getPath('userData'), 'recent-repos.json');
+}
+
+function readRecentRepos(): string[] {
+  try {
+    const data = fs.readFileSync(getRecentReposPath(), 'utf8');
+    return JSON.parse(data) as string[];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentRepos(repos: string[]) {
+  try {
+    fs.writeFileSync(getRecentReposPath(), JSON.stringify(repos), 'utf8');
+  } catch {}
+}
+
+function addRecentRepo(repoPath: string) {
+  const repos = readRecentRepos().filter(r => r !== repoPath);
+  repos.unshift(repoPath);
+  saveRecentRepos(repos.slice(0, 10));
+}
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -48,7 +74,15 @@ function registerGitHandlers() {
       title: 'Ouvrir un dépôt Git',
     });
     if (result.canceled || result.filePaths.length === 0) return null;
-    return result.filePaths[0];
+    const repoPath = result.filePaths[0];
+    addRecentRepo(repoPath);
+    return repoPath;
+  });
+
+  ipcMain.handle('git:get-recent-repos', () => readRecentRepos());
+
+  ipcMain.handle('git:add-recent-repo', (_event, repoPath: string) => {
+    addRecentRepo(repoPath);
   });
 
   ipcMain.handle('git:get-commits', async (_event, repoPath: string) => {

@@ -43,6 +43,8 @@ declare global {
   interface Window {
     gitRose: {
       openRepo: () => Promise<string | null>;
+      getRecentRepos: () => Promise<string[]>;
+      addRecentRepo: (repoPath: string) => Promise<void>;
       getCommits: (repoPath: string) => Promise<Commit[]>;
       getGraph: (repoPath: string, ref?: string) => Promise<GraphCommit[]>;
       getBranches: (repoPath: string) => Promise<Branch[]>;
