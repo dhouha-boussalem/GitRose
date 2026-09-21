@@ -14,6 +14,11 @@
   "build": {
     "appId": "com.gitrose.app",
     "productName": "GitRose",
+    "publish": {
+      "provider": "github",
+      "owner": "dhouha-boussalem",
+      "repo": "GitRose"
+    },
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
