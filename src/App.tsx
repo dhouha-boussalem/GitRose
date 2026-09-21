@@ -41,6 +41,7 @@ interface RepoTab {
   showRebase: boolean;
   showConsole: boolean;
   loading: boolean;
+  commitSearch: string;
 }
 
 function repoName(path: string): string {
@@ -65,6 +66,7 @@ function newTab(path: string, index: number): RepoTab {
     showRebase: false,
     showConsole: false,
     loading: true,
+    commitSearch: '',
   };
 }
 
@@ -222,6 +224,18 @@ export default function App() {
                 ) : (
                   <span className="history-toolbar-hint">Click a branch to filter</span>
                 )}
+                <div className="history-search-wrap">
+                  <span className="history-search-icon">⌕</span>
+                  <input
+                    className="history-search-input"
+                    placeholder="Rechercher…"
+                    value={tab.commitSearch}
+                    onChange={(e) => updateTab(tab.id, { commitSearch: e.target.value })}
+                  />
+                  {tab.commitSearch && (
+                    <button className="history-search-clear" onClick={() => updateTab(tab.id, { commitSearch: '' })}>✕</button>
+                  )}
+                </div>
                 <button
                   className={`graph-toggle-btn rebase-btn ${tab.showRebase ? 'active' : ''}`}
                   onClick={() => updateTab(tab.id, { showRebase: !tab.showRebase })}
@@ -246,9 +260,14 @@ export default function App() {
               <div className="commits-layout">
                 <div className={`commits-list-pane${tab.selectedCommit ? ' collapsed' : ''}`}>
                   <CommitGraph
-                    commits={tab.commits}
+                    commits={tab.commitSearch
+                      ? tab.commits.filter(c => {
+                          const q = tab.commitSearch.toLowerCase();
+                          return c.message.toLowerCase().includes(q) || c.author.toLowerCase().includes(q) || c.shortHash.toLowerCase().includes(q);
+                        })
+                      : tab.commits}
                     selectedHash={tab.selectedCommit?.hash ?? null}
-                    showGraph={tab.showGraph}
+                    showGraph={tab.showGraph && !tab.commitSearch}
                     onSelect={(c) => updateTab(tab.id, { selectedCommit: c })}
                   />
                 </div>

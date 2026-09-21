@@ -1340,6 +1340,49 @@
   flex: 1;
 }
 
+.history-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0 8px;
+  height: 26px;
+  width: 200px;
+  transition: border-color 0.15s;
+}
+.history-search-wrap:focus-within { border-color: var(--accent-rose); }
+
+.history-search-icon {
+  color: var(--text-secondary);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.history-search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: var(--text-primary);
+  min-width: 0;
+}
+.history-search-input::placeholder { color: var(--text-muted); }
+
+.history-search-clear {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.history-search-clear:hover { color: var(--text-primary); }
+
 .graph-toggle-btn {
   background: none;
   border: 1px solid var(--border-medium);
