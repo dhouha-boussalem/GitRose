@@ -59,6 +59,7 @@ declare global {
       fetch: (repoPath: string) => Promise<void>;
       commitAmend: (repoPath: string, message: string) => Promise<void>;
       deleteBranch: (repoPath: string, name: string, force: boolean) => Promise<void>;
+      renameBranch: (repoPath: string, oldName: string, newName: string) => Promise<void>;
       merge: (repoPath: string, branch: string) => Promise<void>;
       getConflicts: (repoPath: string) => Promise<{ path: string; status: string }[]>;
       getConflictContent: (repoPath: string, filePath: string) => Promise<{ ours: string; base: string; theirs: string; raw: string }>;

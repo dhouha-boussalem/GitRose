@@ -215,6 +215,10 @@ export class GitService {
     await this.getGit(repoPath).raw(['branch', force ? '-D' : '-d', name]);
   }
 
+  static async renameBranch(repoPath: string, oldName: string, newName: string): Promise<void> {
+    await this.getGit(repoPath).raw(['branch', '-m', oldName, newName]);
+  }
+
   static async merge(repoPath: string, branch: string): Promise<void> {
     await this.getGit(repoPath).merge([branch]);
   }

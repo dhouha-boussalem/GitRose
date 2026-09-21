@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('gitRose', {
   fetch: (repoPath: string) => ipcRenderer.invoke('git:fetch', repoPath),
   commitAmend: (repoPath: string, message: string) => ipcRenderer.invoke('git:commit-amend', repoPath, message),
   deleteBranch: (repoPath: string, name: string, force: boolean) => ipcRenderer.invoke('git:delete-branch', repoPath, name, force),
+  renameBranch: (repoPath: string, oldName: string, newName: string) => ipcRenderer.invoke('git:rename-branch', repoPath, oldName, newName),
   merge: (repoPath: string, branch: string) => ipcRenderer.invoke('git:merge', repoPath, branch),
   getConflicts: (repoPath: string) => ipcRenderer.invoke('git:get-conflicts', repoPath),
   getConflictContent: (repoPath: string, filePath: string) => ipcRenderer.invoke('git:get-conflict-content', repoPath, filePath),

@@ -49,6 +49,8 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
   const [mergeTarget, setMergeTarget] = useState<string | null>(null);
   const [hoveredBranch, setHoveredBranch] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ name: string; force: boolean } | null>(null);
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
   const [sidebarWidth, setSidebarWidth] = useState(220);
 
   const onResizeMouseDown = useCallback((e: React.MouseEvent) => {
@@ -149,6 +151,27 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
   function handleDelete(name: string, e: React.MouseEvent) {
     e.stopPropagation();
     setDeleteConfirm({ name, force: false });
+  }
+
+  function handleRename(name: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    setRenaming(name);
+    setRenameValue(name);
+  }
+
+  async function confirmRename() {
+    const newName = renameValue.trim();
+    const oldName = renaming!;
+    setRenaming(null);
+    if (!newName || newName === oldName) return;
+    try {
+      await window.gitRose.renameBranch(repoPath, oldName, newName);
+      if (focusedBranch === oldName) onFocus(null);
+      onRefresh();
+      showToast(`Renamed ${oldName} → ${newName}`);
+    } catch (e: any) {
+      showToast(`Error: ${e?.message ?? 'rename failed'}`);
+    }
   }
 
   async function confirmDelete(name: string, force: boolean) {
@@ -257,36 +280,60 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
             onMouseEnter={() => setHoveredBranch(branch.name)}
             onMouseLeave={() => setHoveredBranch(null)}
           >
-            <button
-              className={`branch-item ${branch.current ? 'active' : ''} ${switching === branch.name ? 'switching' : ''} ${focusedBranch === branch.name ? 'focused' : ''}`}
-              onClick={() => handleFocus(branch.name)}
-              onDoubleClick={() => handleCheckout(branch.name, branch.current)}
-              disabled={!!switching}
-              title={branch.name}
-            >
-              <span className="branch-icon">
-                {switching === branch.name ? <span className="branch-spinner" /> : branch.current ? '◆' : '◇'}
-              </span>
-              <span className="branch-name">{branch.name}</span>
-              {branch.current && (
-                <span className="branch-you" title={userName || 'You'}>
-                  {userName ? getInitials(userName) : <GirlAvatar />}
-                </span>
-              )}
-            </button>
-            {hoveredBranch === branch.name && !branch.current && (
-              <div className="branch-actions">
-                <button
-                  className="branch-action-btn merge"
-                  title={`Merge ${branch.name} into ${currentBranch}`}
-                  onClick={(e) => { e.stopPropagation(); setMergeTarget(branch.name); }}
-                >⇒</button>
-                <button
-                  className="branch-action-btn delete"
-                  title={`Delete ${branch.name}`}
-                  onClick={(e) => handleDelete(branch.name, e)}
-                >✕</button>
+            {renaming === branch.name ? (
+              <div className="sidebar-rename-row">
+                <input
+                  className="sidebar-rename-input"
+                  autoFocus
+                  value={renameValue}
+                  onChange={(e) => setRenameValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') confirmRename();
+                    if (e.key === 'Escape') setRenaming(null);
+                  }}
+                  onBlur={confirmRename}
+                  onClick={(e) => e.stopPropagation()}
+                />
               </div>
+            ) : (
+              <>
+                <button
+                  className={`branch-item ${branch.current ? 'active' : ''} ${switching === branch.name ? 'switching' : ''} ${focusedBranch === branch.name ? 'focused' : ''}`}
+                  onClick={() => handleFocus(branch.name)}
+                  onDoubleClick={() => handleCheckout(branch.name, branch.current)}
+                  disabled={!!switching}
+                  title={branch.name}
+                >
+                  <span className="branch-icon">
+                    {switching === branch.name ? <span className="branch-spinner" /> : branch.current ? '◆' : '◇'}
+                  </span>
+                  <span className="branch-name">{branch.name}</span>
+                  {branch.current && (
+                    <span className="branch-you" title={userName || 'You'}>
+                      {userName ? getInitials(userName) : <GirlAvatar />}
+                    </span>
+                  )}
+                </button>
+                {hoveredBranch === branch.name && !branch.current && (
+                  <div className="branch-actions">
+                    <button
+                      className="branch-action-btn rename"
+                      title={`Rename ${branch.name}`}
+                      onClick={(e) => handleRename(branch.name, e)}
+                    >✎</button>
+                    <button
+                      className="branch-action-btn merge"
+                      title={`Merge ${branch.name} into ${currentBranch}`}
+                      onClick={(e) => { e.stopPropagation(); setMergeTarget(branch.name); }}
+                    >⇒</button>
+                    <button
+                      className="branch-action-btn delete"
+                      title={`Delete ${branch.name}`}
+                      onClick={(e) => handleDelete(branch.name, e)}
+                    >✕</button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         ))}

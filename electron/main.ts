@@ -115,6 +115,10 @@ function registerGitHandlers() {
     return GitService.deleteBranch(repoPath, name, force);
   });
 
+  ipcMain.handle('git:rename-branch', async (_event, repoPath: string, oldName: string, newName: string) => {
+    return GitService.renameBranch(repoPath, oldName, newName);
+  });
+
   ipcMain.handle('git:merge', async (_event, repoPath: string, branch: string) => {
     return GitService.merge(repoPath, branch);
   });

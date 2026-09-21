@@ -1828,6 +1828,26 @@
 .branch-action-btn.merge:hover { background: rgba(74,170,136,0.15); color: #6dd8b0; }
 .branch-action-btn.delete { color: #a05060; }
 .branch-action-btn.delete:hover { background: rgba(192,48,64,0.18); color: #f07080; }
+.branch-action-btn.rename { color: var(--sidebar-text-muted); }
+.branch-action-btn.rename:hover { background: rgba(240,48,96,0.15); color: var(--accent-rose); }
+
+.sidebar-rename-row {
+  display: flex;
+  align-items: center;
+  padding: 3px 8px;
+}
+.sidebar-rename-input {
+  flex: 1;
+  height: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+  border: 1px solid var(--accent-rose);
+  border-radius: var(--radius-sm);
+  background: var(--sidebar-search-bg);
+  color: var(--sidebar-text);
+  outline: none;
+  font-family: inherit;
+}
 
 /* === Conflict panel === */
 .conflict-panel {
