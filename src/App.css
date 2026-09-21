@@ -2927,3 +2927,31 @@
 .bd-diff-line.added { background: rgba(26,144,96,0.15); color: #4caf80; }
 .bd-diff-line.removed { background: rgba(192,48,64,0.15); color: #e06070; }
 .bd-diff-line.hunk { color: #6080c0; background: rgba(96,128,192,0.08); }
+
+/* === Remotes Panel === */
+.remotes-panel {
+  width: 580px;
+  max-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  background: #1a1928;
+  border: 1px solid #3a3858;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  overflow: hidden;
+  animation: cdSlideIn 0.16s ease;
+}
+.remote-row {
+  padding: 10px 16px;
+  border-bottom: 1px solid #2c2b3e;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.1s;
+}
+.remote-row:hover { background: #232233; }
+.remote-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.remote-name { font-size: 13px; font-weight: 700; color: var(--accent-rose); }
+.remote-url { font-size: 11px; color: #9090b0; font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.remote-url.push { color: #606080; }
+.remote-edit-form { display: flex; flex-direction: column; gap: 6px; width: 100%; }

@@ -236,6 +236,12 @@ function registerGitHandlers() {
     return GitService.getCommitFileDiff(repoPath, hash, filePath);
   });
 
+  ipcMain.handle('git:get-remotes', async (_event, repoPath: string) => GitService.getRemotes(repoPath));
+  ipcMain.handle('git:add-remote', async (_event, repoPath: string, name: string, url: string) => GitService.addRemote(repoPath, name, url));
+  ipcMain.handle('git:remove-remote', async (_event, repoPath: string, name: string) => GitService.removeRemote(repoPath, name));
+  ipcMain.handle('git:rename-remote', async (_event, repoPath: string, oldName: string, newName: string) => GitService.renameRemote(repoPath, oldName, newName));
+  ipcMain.handle('git:set-remote-url', async (_event, repoPath: string, name: string, url: string) => GitService.setRemoteUrl(repoPath, name, url));
+
   ipcMain.handle('git:branch-diff-files', async (_event, repoPath: string, base: string, compare: string) => {
     return GitService.getBranchDiffFiles(repoPath, base, compare);
   });

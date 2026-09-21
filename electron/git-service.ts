@@ -419,6 +419,36 @@ export class GitService {
     return destPath;
   }
 
+  static async getRemotes(repoPath: string): Promise<{ name: string; fetchUrl: string; pushUrl: string }[]> {
+    const out = await this.getGit(repoPath).raw(['remote', '-v']).catch(() => '');
+    const map = new Map<string, { fetchUrl: string; pushUrl: string }>();
+    for (const line of out.trim().split('\n').filter(Boolean)) {
+      const m = line.match(/^(\S+)\s+(\S+)\s+\((fetch|push)\)$/);
+      if (!m) continue;
+      const [, name, url, type] = m;
+      const entry = map.get(name) ?? { fetchUrl: '', pushUrl: '' };
+      if (type === 'fetch') entry.fetchUrl = url; else entry.pushUrl = url;
+      map.set(name, entry);
+    }
+    return Array.from(map.entries()).map(([name, v]) => ({ name, ...v }));
+  }
+
+  static async addRemote(repoPath: string, name: string, url: string): Promise<void> {
+    await this.getGit(repoPath).raw(['remote', 'add', name, url]);
+  }
+
+  static async removeRemote(repoPath: string, name: string): Promise<void> {
+    await this.getGit(repoPath).raw(['remote', 'remove', name]);
+  }
+
+  static async renameRemote(repoPath: string, oldName: string, newName: string): Promise<void> {
+    await this.getGit(repoPath).raw(['remote', 'rename', oldName, newName]);
+  }
+
+  static async setRemoteUrl(repoPath: string, name: string, url: string): Promise<void> {
+    await this.getGit(repoPath).raw(['remote', 'set-url', name, url]);
+  }
+
   static async getBranchDiffFiles(repoPath: string, base: string, compare: string): Promise<{ path: string; status: string }[]> {
     const out = await this.getGit(repoPath).raw(['diff', '--name-status', `${base}...${compare}`]).catch(() => '');
     return out.trim().split('\n').filter(Boolean).map((line) => {

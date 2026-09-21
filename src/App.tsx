@@ -10,6 +10,7 @@ import { ResizablePanels } from './components/ResizablePanels';
 import { CherryPickPanel } from './components/CherryPickPanel';
 import { CloneDialog } from './components/CloneDialog';
 import { BranchDiffPanel } from './components/BranchDiffPanel';
+import { RemotesPanel } from './components/RemotesPanel';
 import { CommitDetail } from './components/CommitDetail';
 import { TagsPanel } from './components/TagsPanel';
 import { RebaseBar } from './components/RebaseBar';
@@ -80,6 +81,7 @@ export default function App() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [showClone, setShowClone] = useState(false);
   const [showBranchDiff, setShowBranchDiff] = useState(false);
+  const [showRemotes, setShowRemotes] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const tab = tabs.find((t) => t.id === activeId) ?? null;
@@ -283,6 +285,12 @@ export default function App() {
                 >
                   ⇄ Diff branches
                 </button>
+                <button
+                  className="graph-toggle-btn"
+                  onClick={() => setShowRemotes(true)}
+                >
+                  ⚡ Remotes
+                </button>
               </div>
               {tab.showRebase && (
                 <RebaseBar
@@ -357,6 +365,10 @@ export default function App() {
       )}
 
       {showClone && <CloneDialog onClose={() => setShowClone(false)} onCloned={handleCloned} />}
+
+      {showRemotes && (
+        <RemotesPanel repoPath={tab.path} onClose={() => setShowRemotes(false)} />
+      )}
 
       {showBranchDiff && (
         <BranchDiffPanel
