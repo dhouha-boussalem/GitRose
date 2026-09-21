@@ -90,6 +90,8 @@ declare global {
       cherryPickToBranch: (repoPath: string, hash: string, branchName: string) => Promise<void>;
       getCommitFiles: (repoPath: string, hash: string) => Promise<{ path: string; status: string }[]>;
       getCommitFileDiff: (repoPath: string, hash: string, filePath: string) => Promise<string>;
+      cloneRepo: (url: string, destPath: string) => Promise<string>;
+      pickCloneDir: () => Promise<string | null>;
     };
   }
 }

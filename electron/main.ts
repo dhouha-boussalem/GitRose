@@ -227,4 +227,14 @@ function registerGitHandlers() {
   ipcMain.handle('git:get-commit-file-diff', async (_event, repoPath: string, hash: string, filePath: string) => {
     return GitService.getCommitFileDiff(repoPath, hash, filePath);
   });
+
+  ipcMain.handle('git:clone-repo', async (_event, url: string, destPath: string) => {
+    return GitService.cloneRepo(url, destPath);
+  });
+
+  ipcMain.handle('git:pick-clone-dir', async () => {
+    const { dialog } = await import('electron');
+    const result = await dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] });
+    return result.canceled ? null : result.filePaths[0];
+  });
 }

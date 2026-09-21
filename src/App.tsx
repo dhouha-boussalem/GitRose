@@ -8,6 +8,7 @@ import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ResizablePanels } from './components/ResizablePanels';
 import { CherryPickPanel } from './components/CherryPickPanel';
+import { CloneDialog } from './components/CloneDialog';
 import { CommitDetail } from './components/CommitDetail';
 import { TagsPanel } from './components/TagsPanel';
 import { RebaseBar } from './components/RebaseBar';
@@ -76,6 +77,7 @@ function newTab(path: string, index: number): RepoTab {
 export default function App() {
   const [tabs, setTabs] = useState<RepoTab[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [showClone, setShowClone] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const tab = tabs.find((t) => t.id === activeId) ?? null;
@@ -120,6 +122,16 @@ export default function App() {
     loadRepo(path, t.id);
   }, [tabs, loadRepo]);
 
+  const handleCloned = useCallback((path: string) => {
+    setShowClone(false);
+    const existing = tabs.find((t) => t.path === path);
+    if (existing) { setActiveId(existing.id); return; }
+    const t = newTab(path, tabs.length);
+    setTabs((prev) => [...prev, t]);
+    setActiveId(t.id);
+    loadRepo(path, t.id);
+  }, [tabs, loadRepo]);
+
   const handleCloseTab = useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setTabs((prev) => {
@@ -140,7 +152,12 @@ export default function App() {
   }, [activeId]);
 
   if (tabs.length === 0 || !tab) {
-    return <WelcomeScreen onOpenRepo={handleOpenRepo} />;
+    return (
+      <>
+        <WelcomeScreen onOpenRepo={handleOpenRepo} onClone={() => setShowClone(true)} />
+        {showClone && <CloneDialog onClose={() => setShowClone(false)} onCloned={handleCloned} />}
+      </>
+    );
   }
 
   async function handleFocusBranch(branch: string | null) {
@@ -171,6 +188,7 @@ export default function App() {
           </button>
         ))}
         <button className="tab-add" onClick={handleOpenRepo} title="Open another repository">+</button>
+        <button className="tab-add" onClick={() => setShowClone(true)} title="Cloner un dépôt">⬇</button>
       </div>
 
       <Toolbar
@@ -329,6 +347,8 @@ export default function App() {
       {tab.showTags && (
         <TagsPanel repoPath={tab.path} onClose={() => updateTab(tab.id, { showTags: false })} />
       )}
+
+      {showClone && <CloneDialog onClose={() => setShowClone(false)} onCloned={handleCloned} />}
     </div>
   );
 }

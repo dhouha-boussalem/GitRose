@@ -895,6 +895,13 @@
   transition: transform 0.15s, box-shadow 0.15s;
 }
 .welcome-cta:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(240,48,96,0.35); }
+.welcome-cta-secondary {
+  background: none;
+  border: 1px solid var(--accent-rose);
+  color: var(--accent-rose);
+  box-shadow: none;
+}
+.welcome-cta-secondary:hover { background: rgba(240,48,96,0.08); box-shadow: none; }
 .welcome-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
 /* === Loading === */
@@ -2700,4 +2707,81 @@
   border-radius: 20px;
   white-space: nowrap;
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+/* === Clone Dialog === */
+.clone-dialog {
+  width: 500px;
+  background: var(--bg-deepest);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+  overflow: hidden;
+  animation: cdSlideIn 0.16s ease;
+}
+@media (prefers-color-scheme: dark) {
+  .clone-dialog { background: #1a1928; }
+}
+
+.clone-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.clone-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.clone-input {
+  height: 32px;
+  padding: 0 10px;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  outline: none;
+  font-family: inherit;
+  width: 100%;
+}
+.clone-input:focus { border-color: var(--accent-rose); }
+
+.clone-dest-row {
+  display: flex;
+  gap: 6px;
+}
+.clone-dest-row .clone-input { flex: 1; }
+
+.clone-browse-btn {
+  font-size: 11px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s;
+}
+.clone-browse-btn:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-primary); }
+
+.clone-error {
+  font-size: 11px;
+  color: #e05555;
+  background: rgba(220,50,50,0.08);
+  border: 1px solid rgba(220,50,50,0.2);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+}
+
+.clone-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
 }

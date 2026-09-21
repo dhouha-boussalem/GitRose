@@ -400,6 +400,12 @@ export class GitService {
     const email = await git.raw(['config', 'user.email']).then((s) => s.trim()).catch(() => '');
     return { name, email };
   }
+
+  static async cloneRepo(url: string, destPath: string): Promise<string> {
+    const git = simpleGit();
+    await git.clone(url, destPath);
+    return destPath;
+  }
 }
 
 const GRAPH_COLORS = [
