@@ -123,6 +123,10 @@ function registerGitHandlers() {
     return GitService.resetToCommit(repoPath, hash, mode);
   });
 
+  ipcMain.handle('git:revert-commit', async (_event, repoPath: string, hash: string) => {
+    return GitService.revertCommit(repoPath, hash);
+  });
+
   ipcMain.handle('git:merge', async (_event, repoPath: string, branch: string) => {
     return GitService.merge(repoPath, branch);
   });

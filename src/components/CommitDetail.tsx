@@ -8,7 +8,7 @@ interface CommitDetailProps {
   onRefresh: () => void;
 }
 
-type Mode = 'detail' | 'cherry-new-branch' | 'squash' | 'reset';
+type Mode = 'detail' | 'cherry-new-branch' | 'squash' | 'reset' | 'revert';
 
 const STATUS_ICON: Record<string, string> = { M: '✎', A: '+', D: '−', R: '→', C: '©' };
 const STATUS_CLASS: Record<string, string> = { M: 'modified', A: 'added', D: 'deleted', R: 'renamed' };
@@ -132,8 +132,25 @@ export function CommitDetail({ commit, repoPath, onClose, onRefresh }: CommitDet
             <button className="cd-action-btn" disabled={busy} onClick={() => setMode('reset')}>
               ↺ Reset
             </button>
+            <button className="cd-action-btn" disabled={busy} onClick={() => setMode('revert')}>
+              ⎌ Revert
+            </button>
           </>
         )}
+        {mode === 'revert' && (
+          <div className="cd-reset-panel">
+            <div className="cd-reset-title">Revert ce commit</div>
+            <div className="cd-reset-desc" style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 6 }}>
+              Crée un nouveau commit qui annule les changements de <code style={{ color: 'var(--accent-rose)' }}>{commit.shortHash}</code>. L'historique est préservé.
+            </div>
+            <div className="cd-actions" style={{ padding: 0, border: 'none', flexWrap: 'nowrap' }}>
+              <button className="cd-action-btn primary" disabled={busy}
+                onClick={() => run(() => window.gitRose.revertCommit(repoPath, commit.hash))}>
+                {busy ? '…' : '⎌ Confirmer le revert'}
+              </button>
+              <button className="cd-action-btn ghost" onClick={() => setMode('detail')}>Annuler</button>
+            </div>
+          </div>
         {mode === 'reset' && (
           <div className="cd-reset-panel">
             <div className="cd-reset-title">Réinitialiser HEAD vers ce commit</div>
