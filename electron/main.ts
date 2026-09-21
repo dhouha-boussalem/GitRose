@@ -1,6 +1,32 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import { GitService } from './git-service';
+
+function getRecentReposPath() {
+  return path.join(app.getPath('userData'), 'recent-repos.json');
+}
+
+function readRecentRepos(): string[] {
+  try {
+    const data = fs.readFileSync(getRecentReposPath(), 'utf8');
+    return JSON.parse(data) as string[];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentRepos(repos: string[]) {
+  try {
+    fs.writeFileSync(getRecentReposPath(), JSON.stringify(repos), 'utf8');
+  } catch {}
+}
+
+function addRecentRepo(repoPath: string) {
+  const repos = readRecentRepos().filter(r => r !== repoPath);
+  repos.unshift(repoPath);
+  saveRecentRepos(repos.slice(0, 10));
+}
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -48,7 +74,15 @@ function registerGitHandlers() {
       title: 'Ouvrir un dépôt Git',
     });
     if (result.canceled || result.filePaths.length === 0) return null;
-    return result.filePaths[0];
+    const repoPath = result.filePaths[0];
+    addRecentRepo(repoPath);
+    return repoPath;
+  });
+
+  ipcMain.handle('git:get-recent-repos', () => readRecentRepos());
+
+  ipcMain.handle('git:add-recent-repo', (_event, repoPath: string) => {
+    addRecentRepo(repoPath);
   });
 
   ipcMain.handle('git:get-commits', async (_event, repoPath: string) => {
@@ -99,8 +133,72 @@ function registerGitHandlers() {
     return GitService.push(repoPath);
   });
 
+  ipcMain.handle('git:force-push', async (_event, repoPath: string) => {
+    return GitService.forcePush(repoPath);
+  });
+
   ipcMain.handle('git:pull', async (_event, repoPath: string) => {
     return GitService.pull(repoPath);
+  });
+
+  ipcMain.handle('git:pull-rebase', async (_event, repoPath: string) => {
+    return GitService.pullRebase(repoPath);
+  });
+
+  ipcMain.handle('git:fetch', async (_event, repoPath: string) => {
+    return GitService.fetch(repoPath);
+  });
+
+  ipcMain.handle('git:commit-amend', async (_event, repoPath: string, message: string) => {
+    return GitService.commitAmend(repoPath, message);
+  });
+
+  ipcMain.handle('git:delete-branch', async (_event, repoPath: string, name: string, force: boolean) => {
+    return GitService.deleteBranch(repoPath, name, force);
+  });
+
+  ipcMain.handle('git:rename-branch', async (_event, repoPath: string, oldName: string, newName: string) => {
+    return GitService.renameBranch(repoPath, oldName, newName);
+  });
+
+  ipcMain.handle('git:reset-to-commit', async (_event, repoPath: string, hash: string, mode: 'soft' | 'mixed' | 'hard') => {
+    return GitService.resetToCommit(repoPath, hash, mode);
+  });
+
+  ipcMain.handle('git:revert-commit', async (_event, repoPath: string, hash: string) => {
+    return GitService.revertCommit(repoPath, hash);
+  });
+
+  ipcMain.handle('git:get-tags', async (_event, repoPath: string) => {
+    return GitService.getTags(repoPath);
+  });
+  ipcMain.handle('git:create-tag', async (_event, repoPath: string, name: string, hash: string, message?: string) => {
+    return GitService.createTag(repoPath, name, hash, message);
+  });
+  ipcMain.handle('git:delete-tag', async (_event, repoPath: string, name: string) => {
+    return GitService.deleteTag(repoPath, name);
+  });
+  ipcMain.handle('git:push-tag', async (_event, repoPath: string, name: string) => {
+    return GitService.pushTag(repoPath, name);
+  });
+  ipcMain.handle('git:delete-remote-tag', async (_event, repoPath: string, name: string) => {
+    return GitService.deleteRemoteTag(repoPath, name);
+  });
+
+  ipcMain.handle('git:merge', async (_event, repoPath: string, branch: string) => {
+    return GitService.merge(repoPath, branch);
+  });
+
+  ipcMain.handle('git:get-conflicts', async (_event, repoPath: string) => {
+    return GitService.getConflicts(repoPath);
+  });
+
+  ipcMain.handle('git:get-conflict-content', async (_event, repoPath: string, filePath: string) => {
+    return GitService.getConflictContent(repoPath, filePath);
+  });
+
+  ipcMain.handle('git:resolve-conflict', async (_event, repoPath: string, filePath: string, content: string) => {
+    return GitService.resolveConflict(repoPath, filePath, content);
   });
 
   ipcMain.handle('git:checkout', async (_event, repoPath: string, branch: string) => {
@@ -162,5 +260,37 @@ function registerGitHandlers() {
 
   ipcMain.handle('git:cherry-pick-to-branch', async (_event, repoPath: string, hash: string, branchName: string) => {
     return GitService.cherryPickToNewBranch(repoPath, hash, branchName);
+  });
+
+  ipcMain.handle('git:get-commit-files', async (_event, repoPath: string, hash: string) => {
+    return GitService.getCommitFiles(repoPath, hash);
+  });
+
+  ipcMain.handle('git:get-commit-file-diff', async (_event, repoPath: string, hash: string, filePath: string) => {
+    return GitService.getCommitFileDiff(repoPath, hash, filePath);
+  });
+
+  ipcMain.handle('git:get-remotes', async (_event, repoPath: string) => GitService.getRemotes(repoPath));
+  ipcMain.handle('git:add-remote', async (_event, repoPath: string, name: string, url: string) => GitService.addRemote(repoPath, name, url));
+  ipcMain.handle('git:remove-remote', async (_event, repoPath: string, name: string) => GitService.removeRemote(repoPath, name));
+  ipcMain.handle('git:rename-remote', async (_event, repoPath: string, oldName: string, newName: string) => GitService.renameRemote(repoPath, oldName, newName));
+  ipcMain.handle('git:set-remote-url', async (_event, repoPath: string, name: string, url: string) => GitService.setRemoteUrl(repoPath, name, url));
+
+  ipcMain.handle('git:branch-diff-files', async (_event, repoPath: string, base: string, compare: string) => {
+    return GitService.getBranchDiffFiles(repoPath, base, compare);
+  });
+
+  ipcMain.handle('git:branch-diff-file-diff', async (_event, repoPath: string, base: string, compare: string, filePath: string) => {
+    return GitService.getBranchDiffFileDiff(repoPath, base, compare, filePath);
+  });
+
+  ipcMain.handle('git:clone-repo', async (_event, url: string, destPath: string) => {
+    return GitService.cloneRepo(url, destPath);
+  });
+
+  ipcMain.handle('git:pick-clone-dir', async () => {
+    const { dialog } = await import('electron');
+    const result = await dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] });
+    return result.canceled ? null : result.filePaths[0];
   });
 }

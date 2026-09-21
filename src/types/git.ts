@@ -33,6 +33,7 @@ export interface RepoStatus {
   staged: FileStatus[];
   unstaged: FileStatus[];
   untracked: string[];
+  conflicted: string[];
   ahead: number;
   behind: number;
   current: string | null;
@@ -42,6 +43,8 @@ declare global {
   interface Window {
     gitRose: {
       openRepo: () => Promise<string | null>;
+      getRecentRepos: () => Promise<string[]>;
+      addRecentRepo: (repoPath: string) => Promise<void>;
       getCommits: (repoPath: string) => Promise<Commit[]>;
       getGraph: (repoPath: string, ref?: string) => Promise<GraphCommit[]>;
       getBranches: (repoPath: string) => Promise<Branch[]>;
@@ -54,7 +57,24 @@ declare global {
       stageAll: (repoPath: string) => Promise<void>;
       commit: (repoPath: string, message: string) => Promise<void>;
       push: (repoPath: string) => Promise<void>;
+      forcePush: (repoPath: string) => Promise<void>;
       pull: (repoPath: string) => Promise<void>;
+      pullRebase: (repoPath: string) => Promise<void>;
+      fetch: (repoPath: string) => Promise<void>;
+      commitAmend: (repoPath: string, message: string) => Promise<void>;
+      deleteBranch: (repoPath: string, name: string, force: boolean) => Promise<void>;
+      renameBranch: (repoPath: string, oldName: string, newName: string) => Promise<void>;
+      resetToCommit: (repoPath: string, hash: string, mode: 'soft' | 'mixed' | 'hard') => Promise<void>;
+      revertCommit: (repoPath: string, hash: string) => Promise<void>;
+      getTags: (repoPath: string) => Promise<{ name: string; hash: string; date: string; message: string }[]>;
+      createTag: (repoPath: string, name: string, hash: string, message?: string) => Promise<void>;
+      deleteTag: (repoPath: string, name: string) => Promise<void>;
+      pushTag: (repoPath: string, name: string) => Promise<void>;
+      deleteRemoteTag: (repoPath: string, name: string) => Promise<void>;
+      merge: (repoPath: string, branch: string) => Promise<void>;
+      getConflicts: (repoPath: string) => Promise<{ path: string; status: string }[]>;
+      getConflictContent: (repoPath: string, filePath: string) => Promise<{ ours: string; base: string; theirs: string; raw: string }>;
+      resolveConflict: (repoPath: string, filePath: string, content: string) => Promise<void>;
       createBranch: (repoPath: string, branchName: string) => Promise<void>;
       checkout: (repoPath: string, branch: string) => Promise<void>;
       checkoutRemote: (repoPath: string, remoteBranch: string) => Promise<string>;
@@ -72,6 +92,17 @@ declare global {
       rebase: (repoPath: string, branch: string) => Promise<void>;
       cherryPick: (repoPath: string, hash: string) => Promise<void>;
       cherryPickToBranch: (repoPath: string, hash: string, branchName: string) => Promise<void>;
+      getCommitFiles: (repoPath: string, hash: string) => Promise<{ path: string; status: string }[]>;
+      getCommitFileDiff: (repoPath: string, hash: string, filePath: string) => Promise<string>;
+      getRemotes: (repoPath: string) => Promise<{ name: string; fetchUrl: string; pushUrl: string }[]>;
+      addRemote: (repoPath: string, name: string, url: string) => Promise<void>;
+      removeRemote: (repoPath: string, name: string) => Promise<void>;
+      renameRemote: (repoPath: string, oldName: string, newName: string) => Promise<void>;
+      setRemoteUrl: (repoPath: string, name: string, url: string) => Promise<void>;
+      getBranchDiffFiles: (repoPath: string, base: string, compare: string) => Promise<{ path: string; status: string }[]>;
+      getBranchDiffFileDiff: (repoPath: string, base: string, compare: string, filePath: string) => Promise<string>;
+      cloneRepo: (url: string, destPath: string) => Promise<string>;
+      pickCloneDir: () => Promise<string | null>;
     };
   }
 }

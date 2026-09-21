@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import type { RepoStatus, FileStatus } from '../types/git';
 import { StashPanel } from './StashPanel';
 
@@ -14,13 +14,34 @@ type OpState = 'idle' | 'loading' | 'error';
 
 export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selectedFile }: ActionPanelProps) {
   const [commitMsg, setCommitMsg] = useState('');
+  const [amend, setAmend] = useState(false);
+  const [lastCommitMsg, setLastCommitMsg] = useState('');
   const [opState, setOpState] = useState<OpState>('idle');
   const [errorMsg, setErrorMsg] = useState('');
-  const [pushPullOp, setPushPullOp] = useState<'push' | 'pull' | null>(null);
+  const [pushPullOp, setPushPullOp] = useState<'push' | 'force-push' | 'pull' | 'pull-rebase' | 'fetch' | null>(null);
+  const [pullMenuOpen, setPullMenuOpen] = useState(false);
+  const pullMenuRef = useRef<HTMLDivElement>(null);
+  const [pushMenuOpen, setPushMenuOpen] = useState(false);
+  const pushMenuRef = useRef<HTMLDivElement>(null);
+  const [confirmForcePush, setConfirmForcePush] = useState(false);
   const [splitPct, setSplitPct] = useState(50);
   const [changesCollapsed, setChangesCollapsed] = useState(false);
   const [stagedCollapsed, setStagedCollapsed] = useState(false);
   const splitRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    window.gitRose.runCommand(repoPath, ['log', '-1', '--format=%s'])
+      .then((msg) => setLastCommitMsg(msg.trim()))
+      .catch(() => {});
+  }, [repoPath, status]);
+
+  useEffect(() => {
+    if (amend) {
+      setCommitMsg(lastCommitMsg);
+    } else {
+      setCommitMsg('');
+    }
+  }, [amend]);
 
   const onSplitMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -86,54 +107,144 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
     onRefresh();
   }
 
-  async function handleCommit() {
-    if (!commitMsg.trim()) return;
-    const ok = await run(() => window.gitRose.commit(repoPath, commitMsg.trim()));
-    if (ok !== null) {
-      setCommitMsg('');
-      onRefresh();
-    }
-  }
-
   async function handlePush() {
+    setPushMenuOpen(false);
     setPushPullOp('push');
     await run(() => window.gitRose.push(repoPath));
     setPushPullOp(null);
     onRefresh();
   }
 
+  async function handleForcePush() {
+    setConfirmForcePush(false);
+    setPushPullOp('force-push');
+    await run(() => window.gitRose.forcePush(repoPath));
+    setPushPullOp(null);
+    onRefresh();
+  }
+
+  useEffect(() => {
+    if (!pushMenuOpen) return;
+    function close(e: MouseEvent) {
+      if (pushMenuRef.current && !pushMenuRef.current.contains(e.target as Node)) {
+        setPushMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [pushMenuOpen]);
+
   async function handlePull() {
+    setPullMenuOpen(false);
     setPushPullOp('pull');
     await run(() => window.gitRose.pull(repoPath));
     setPushPullOp(null);
     onRefresh();
   }
 
-  const canCommit = (status?.staged?.length ?? 0) > 0 && commitMsg.trim().length > 0;
+  async function handlePullRebase() {
+    setPullMenuOpen(false);
+    setPushPullOp('pull-rebase');
+    await run(() => window.gitRose.pullRebase(repoPath));
+    setPushPullOp(null);
+    onRefresh();
+  }
+
+  useEffect(() => {
+    if (!pullMenuOpen) return;
+    function close(e: MouseEvent) {
+      if (pullMenuRef.current && !pullMenuRef.current.contains(e.target as Node)) {
+        setPullMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [pullMenuOpen]);
+
+  async function handleFetch() {
+    setPushPullOp('fetch');
+    await run(() => window.gitRose.fetch(repoPath));
+    setPushPullOp(null);
+    onRefresh();
+  }
+
+  async function handleCommit() {
+    if (!commitMsg.trim()) return;
+    const ok = await run(() =>
+      amend
+        ? window.gitRose.commitAmend(repoPath, commitMsg.trim())
+        : window.gitRose.commit(repoPath, commitMsg.trim())
+    );
+    if (ok !== null) {
+      setCommitMsg('');
+      setAmend(false);
+      onRefresh();
+    }
+  }
+
+  const canCommit = ((status?.staged?.length ?? 0) > 0 || amend) && commitMsg.trim().length > 0;
   const isLoading = opState === 'loading';
 
   return (
     <div className="action-panel">
 
-      {/* Push / Pull */}
+      {/* Fetch / Pull / Push */}
       <div className="action-sync-bar">
         <button
-          className={`action-sync-btn pull ${pushPullOp === 'pull' ? 'loading' : ''}`}
-          onClick={handlePull}
+          className={`action-sync-btn fetch ${pushPullOp === 'fetch' ? 'loading' : ''}`}
+          onClick={handleFetch}
           disabled={isLoading}
+          title="Fetch (download refs, no merge)"
         >
-          {pushPullOp === 'pull' ? <span className="btn-spinner" /> : '↓'}
-          Pull
+          {pushPullOp === 'fetch' ? <span className="btn-spinner" /> : '⟳'}
+          Fetch
         </button>
-        <button
-          className={`action-sync-btn push ${pushPullOp === 'push' ? 'loading' : ''}`}
-          onClick={handlePush}
-          disabled={isLoading}
-        >
-          {pushPullOp === 'push' ? <span className="btn-spinner" /> : '↑'}
-          Push
-        </button>
+        <div className="pull-split-wrap" ref={pullMenuRef}>
+          <button
+            className={`action-sync-btn pull ${(pushPullOp === 'pull' || pushPullOp === 'pull-rebase') ? 'loading' : ''}`}
+            onClick={() => setPullMenuOpen((o) => !o)}
+            disabled={isLoading}
+          >
+            {(pushPullOp === 'pull' || pushPullOp === 'pull-rebase') ? <span className="btn-spinner" /> : '↓'}
+            {pushPullOp === 'pull-rebase' ? 'Pull --rebase' : 'Pull'}
+            <span className="pull-chevron">▾</span>
+          </button>
+          {pullMenuOpen && (
+            <div className="pull-dropdown">
+              <button className="pull-dropdown-item" onClick={handlePull}>↓ Pull (merge)</button>
+              <button className="pull-dropdown-item" onClick={handlePullRebase}>↕ Pull --rebase</button>
+            </div>
+          )}
+        </div>
+        <div className="pull-split-wrap" ref={pushMenuRef}>
+          <button
+            className={`action-sync-btn push ${(pushPullOp === 'push' || pushPullOp === 'force-push') ? 'loading' : ''}`}
+            onClick={() => setPushMenuOpen((o) => !o)}
+            disabled={isLoading}
+          >
+            {(pushPullOp === 'push' || pushPullOp === 'force-push') ? <span className="btn-spinner" /> : '↑'}
+            {pushPullOp === 'force-push' ? 'Force push' : 'Push'}
+            <span className="pull-chevron">▾</span>
+          </button>
+          {pushMenuOpen && (
+            <div className="pull-dropdown align-right">
+              <button className="pull-dropdown-item" onClick={handlePush}>↑ Push</button>
+              <button className="pull-dropdown-item danger" onClick={() => { setPushMenuOpen(false); setConfirmForcePush(true); }}>
+                ⚠ Force push
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {confirmForcePush && (
+        <div className="force-push-confirm">
+          <span className="force-push-warn">⚠</span>
+          <span className="force-push-text">Force push va écraser l'historique distant. Confirmer ?</span>
+          <button className="force-push-btn danger" onClick={handleForcePush}>Force push</button>
+          <button className="force-push-btn ghost" onClick={() => setConfirmForcePush(false)}>Annuler</button>
+        </div>
+      )}
 
       {opState === 'error' && (
         <div className="action-error">
@@ -229,9 +340,23 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
 
       {/* Commit zone */}
       <div className="action-commit-zone">
+        <label className="action-amend-row">
+          <input
+            type="checkbox"
+            className="action-amend-check"
+            checked={amend}
+            onChange={(e) => setAmend(e.target.checked)}
+          />
+          <span className="action-amend-label">Amend last commit</span>
+          {amend && lastCommitMsg && (
+            <span className="action-amend-prev" title={lastCommitMsg}>
+              {lastCommitMsg.length > 30 ? lastCommitMsg.slice(0, 30) + '…' : lastCommitMsg}
+            </span>
+          )}
+        </label>
         <textarea
           className="action-commit-msg"
-          placeholder="Commit message…"
+          placeholder={amend ? 'New commit message…' : 'Commit message…'}
           value={commitMsg}
           onChange={(e) => setCommitMsg(e.target.value)}
           onKeyDown={(e) => {
@@ -245,7 +370,7 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
           disabled={!canCommit || isLoading}
         >
           {isLoading ? <span className="btn-spinner" /> : null}
-          Commit
+          {amend ? 'Amend commit' : 'Commit'}
         </button>
         <div className="action-commit-hint">Ctrl+Enter to commit</div>
       </div>

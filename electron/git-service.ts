@@ -35,6 +35,7 @@ export interface RepoStatus {
   staged: FileStatus[];
   unstaged: FileStatus[];
   untracked: string[];
+  conflicted: string[];
   ahead: number;
   behind: number;
   current: string | null;
@@ -80,8 +81,17 @@ export class GitService {
   }
 
   static async getGraphCommits(repoPath: string, maxCount = 200, ref?: string): Promise<GraphCommit[]> {
-    const commits = await this.getCommits(repoPath, maxCount, ref);
-    return buildGraph(commits);
+    try {
+      const commits = await this.getCommits(repoPath, maxCount, ref);
+      return buildGraph(commits);
+    } catch {
+      // ref may no longer exist (e.g. deleted branch); fall back to all branches
+      if (ref) {
+        const commits = await this.getCommits(repoPath, maxCount, undefined);
+        return buildGraph(commits);
+      }
+      return [];
+    }
   }
 
   static async getBranches(repoPath: string): Promise<Branch[]> {
@@ -120,6 +130,7 @@ export class GitService {
       staged,
       unstaged,
       untracked: status.not_added,
+      conflicted: status.conflicted,
       ahead: status.ahead,
       behind: status.behind,
       current: status.current,
@@ -185,19 +196,117 @@ export class GitService {
     const status = await git.status();
     const branch = status.current;
     if (!branch) throw new Error('Not on a branch');
-
-    const tracking = await git.revparse(['--abbrev-ref', '--symbolic-full-name', '@{u}'])
-      .catch(() => null);
-
-    if (tracking) {
-      await git.push();
-    } else {
-      await git.push(['--set-upstream', 'origin', branch]);
-    }
+    await git.push(['--set-upstream', 'origin', branch]);
   }
 
   static async pull(repoPath: string): Promise<void> {
     await this.getGit(repoPath).pull();
+  }
+
+  static async forcePush(repoPath: string): Promise<void> {
+    const git = this.getGit(repoPath);
+    const status = await git.status();
+    const branch = status.current;
+    if (!branch) throw new Error('Not on a branch');
+    await git.push(['--force-with-lease', '--set-upstream', 'origin', branch]);
+  }
+
+  static async pullRebase(repoPath: string): Promise<void> {
+    await this.getGit(repoPath).pull(['--rebase']);
+  }
+
+  static async fetch(repoPath: string): Promise<void> {
+    await this.getGit(repoPath).fetch();
+  }
+
+  static async commitAmend(repoPath: string, message: string): Promise<void> {
+    await this.getGit(repoPath).raw(['commit', '--amend', '-m', message]);
+  }
+
+  static async deleteBranch(repoPath: string, name: string, force: boolean): Promise<void> {
+    await this.getGit(repoPath).raw(['branch', force ? '-D' : '-d', name]);
+  }
+
+  static async renameBranch(repoPath: string, oldName: string, newName: string): Promise<void> {
+    await this.getGit(repoPath).raw(['branch', '-m', oldName, newName]);
+  }
+
+  static async resetToCommit(repoPath: string, hash: string, mode: 'soft' | 'mixed' | 'hard'): Promise<void> {
+    await this.getGit(repoPath).raw(['reset', `--${mode}`, hash]);
+  }
+
+  static async revertCommit(repoPath: string, hash: string): Promise<void> {
+    await this.getGit(repoPath).raw(['revert', '--no-edit', hash]);
+  }
+
+  static async getTags(repoPath: string): Promise<{ name: string; hash: string; date: string; message: string }[]> {
+    const out = await this.getGit(repoPath)
+      .raw(['tag', '-l', '--sort=-version:refname', '--format=%(refname:short)|%(objectname:short)|%(creatordate:short)|%(subject)'])
+      .catch(() => '');
+    return out.trim().split('\n').filter(Boolean).map((line) => {
+      const [name, hash, date, ...rest] = line.split('|');
+      return { name: name.trim(), hash: hash.trim(), date: date.trim(), message: rest.join('|').trim() };
+    });
+  }
+
+  static async createTag(repoPath: string, name: string, hash: string, message?: string): Promise<void> {
+    if (message) {
+      await this.getGit(repoPath).raw(['tag', '-a', name, hash, '-m', message]);
+    } else {
+      await this.getGit(repoPath).raw(['tag', name, hash]);
+    }
+  }
+
+  static async deleteTag(repoPath: string, name: string): Promise<void> {
+    await this.getGit(repoPath).raw(['tag', '-d', name]);
+  }
+
+  static async pushTag(repoPath: string, name: string): Promise<void> {
+    await this.getGit(repoPath).raw(['push', 'origin', name]);
+  }
+
+  static async deleteRemoteTag(repoPath: string, name: string): Promise<void> {
+    await this.getGit(repoPath).raw(['push', 'origin', '--delete', name]);
+  }
+
+  static async merge(repoPath: string, branch: string): Promise<void> {
+    await this.getGit(repoPath).merge([branch]);
+  }
+
+  static async getConflicts(repoPath: string): Promise<{ path: string; status: string }[]> {
+    const git = this.getGit(repoPath);
+    const status = await git.status();
+    return status.conflicted.map((path) => ({ path, status: 'conflict' }));
+  }
+
+  static async getConflictContent(repoPath: string, filePath: string): Promise<{ ours: string; base: string; theirs: string; raw: string }> {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const raw = await fs.readFile(path.join(repoPath, filePath), 'utf-8');
+
+    const oursLines: string[] = [];
+    const baseLines: string[] = [];
+    const theirsLines: string[] = [];
+    let section: 'ours' | 'base' | 'theirs' | 'none' = 'none';
+
+    for (const line of raw.split('\n')) {
+      if (line.startsWith('<<<<<<<')) { section = 'ours'; continue; }
+      if (line.startsWith('=======')) { section = 'theirs'; continue; }
+      if (line.startsWith('>>>>>>>')) { section = 'none'; continue; }
+      if (line.startsWith('|||||||')) { section = 'base'; continue; }
+      if (section === 'ours') oursLines.push(line);
+      else if (section === 'base') baseLines.push(line);
+      else if (section === 'theirs') theirsLines.push(line);
+      else { oursLines.push(line); theirsLines.push(line); baseLines.push(line); }
+    }
+    return { ours: oursLines.join('\n'), base: baseLines.join('\n'), theirs: theirsLines.join('\n'), raw };
+  }
+
+  static async resolveConflict(repoPath: string, filePath: string, content: string): Promise<void> {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    await fs.writeFile(path.join(repoPath, filePath), content, 'utf-8');
+    await this.getGit(repoPath).add(filePath);
   }
 
   static async checkout(repoPath: string, branch: string): Promise<void> {
@@ -264,6 +373,18 @@ export class GitService {
     return this.getGit(repoPath).raw(filtered);
   }
 
+  static async getCommitFiles(repoPath: string, hash: string): Promise<{ path: string; status: string }[]> {
+    const out = await this.getGit(repoPath).raw(['diff-tree', '--no-commit-id', '-r', '--name-status', hash]);
+    return out.trim().split('\n').filter(Boolean).map((line) => {
+      const [status, ...rest] = line.split('\t');
+      return { status: status.trim()[0], path: rest.join('\t').trim() };
+    });
+  }
+
+  static async getCommitFileDiff(repoPath: string, hash: string, filePath: string): Promise<string> {
+    return this.getGit(repoPath).raw(['show', `${hash}`, '--', filePath]);
+  }
+
   static async squashToCommit(repoPath: string, hash: string, message: string): Promise<void> {
     const git = this.getGit(repoPath);
     // Reset soft to the parent of the target commit — keeps all changes staged
@@ -290,6 +411,54 @@ export class GitService {
     const name = await git.raw(['config', 'user.name']).then((s) => s.trim()).catch(() => '');
     const email = await git.raw(['config', 'user.email']).then((s) => s.trim()).catch(() => '');
     return { name, email };
+  }
+
+  static async cloneRepo(url: string, destPath: string): Promise<string> {
+    const git = simpleGit();
+    await git.clone(url, destPath);
+    return destPath;
+  }
+
+  static async getRemotes(repoPath: string): Promise<{ name: string; fetchUrl: string; pushUrl: string }[]> {
+    const out = await this.getGit(repoPath).raw(['remote', '-v']).catch(() => '');
+    const map = new Map<string, { fetchUrl: string; pushUrl: string }>();
+    for (const line of out.trim().split('\n').filter(Boolean)) {
+      const m = line.match(/^(\S+)\s+(\S+)\s+\((fetch|push)\)$/);
+      if (!m) continue;
+      const [, name, url, type] = m;
+      const entry = map.get(name) ?? { fetchUrl: '', pushUrl: '' };
+      if (type === 'fetch') entry.fetchUrl = url; else entry.pushUrl = url;
+      map.set(name, entry);
+    }
+    return Array.from(map.entries()).map(([name, v]) => ({ name, ...v }));
+  }
+
+  static async addRemote(repoPath: string, name: string, url: string): Promise<void> {
+    await this.getGit(repoPath).raw(['remote', 'add', name, url]);
+  }
+
+  static async removeRemote(repoPath: string, name: string): Promise<void> {
+    await this.getGit(repoPath).raw(['remote', 'remove', name]);
+  }
+
+  static async renameRemote(repoPath: string, oldName: string, newName: string): Promise<void> {
+    await this.getGit(repoPath).raw(['remote', 'rename', oldName, newName]);
+  }
+
+  static async setRemoteUrl(repoPath: string, name: string, url: string): Promise<void> {
+    await this.getGit(repoPath).raw(['remote', 'set-url', name, url]);
+  }
+
+  static async getBranchDiffFiles(repoPath: string, base: string, compare: string): Promise<{ path: string; status: string }[]> {
+    const out = await this.getGit(repoPath).raw(['diff', '--name-status', `${base}...${compare}`]).catch(() => '');
+    return out.trim().split('\n').filter(Boolean).map((line) => {
+      const [status, ...rest] = line.split('\t');
+      return { status: status.trim(), path: rest.join('\t').trim() };
+    });
+  }
+
+  static async getBranchDiffFileDiff(repoPath: string, base: string, compare: string, filePath: string): Promise<string> {
+    return this.getGit(repoPath).raw(['diff', `${base}...${compare}`, '--', filePath]).catch(() => '');
   }
 }
 

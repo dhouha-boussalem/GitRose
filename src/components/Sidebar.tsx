@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import type { Branch } from '../types/git';
 
 interface SidebarProps {
@@ -11,6 +11,7 @@ interface SidebarProps {
   onCreateBranch: (name: string) => Promise<void>;
   onFocus: (branch: string | null) => void;
   onRefresh: () => void;
+  currentBranch: string | null;
 }
 
 function GirlAvatar() {
@@ -38,13 +39,39 @@ function getInitials(name: string): string {
   return name.split(/\s+/).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 }
 
-export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckout, onCheckoutRemote, onCreateBranch, onFocus, onRefresh }: SidebarProps) {
+export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckout, onCheckoutRemote, onCreateBranch, onFocus, onRefresh, currentBranch }: SidebarProps) {
   const [switching, setSwitching] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [newBranchName, setNewBranchName] = useState('');
   const [search, setSearch] = useState('');
   const [blockedCheckout, setBlockedCheckout] = useState<{ branch: string; error: string } | null>(null);
+  const [mergeTarget, setMergeTarget] = useState<string | null>(null);
+  const [hoveredBranch, setHoveredBranch] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ name: string; force: boolean } | null>(null);
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [sidebarWidth, setSidebarWidth] = useState(220);
+
+  const onResizeMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = sidebarWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    const onMove = (ev: MouseEvent) => {
+      const next = Math.min(400, Math.max(160, startW + ev.clientX - startX));
+      setSidebarWidth(next);
+    };
+    const onUp = () => {
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }, [sidebarWidth]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const q = search.trim().toLowerCase();
@@ -121,6 +148,67 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
     onFocus(focusedBranch === name ? null : name);
   }
 
+  function handleDelete(name: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    setDeleteConfirm({ name, force: false });
+  }
+
+  function handleRename(name: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    setRenaming(name);
+    setRenameValue(name);
+  }
+
+  async function confirmRename() {
+    const newName = renameValue.trim();
+    const oldName = renaming!;
+    setRenaming(null);
+    if (!newName || newName === oldName) return;
+    try {
+      await window.gitRose.renameBranch(repoPath, oldName, newName);
+      if (focusedBranch === oldName) onFocus(null);
+      onRefresh();
+      showToast(`Renamed ${oldName} → ${newName}`);
+    } catch (e: any) {
+      showToast(`Error: ${e?.message ?? 'rename failed'}`);
+    }
+  }
+
+  async function confirmDelete(name: string, force: boolean) {
+    setDeleteConfirm(null);
+    try {
+      await window.gitRose.deleteBranch(repoPath, name, force);
+      if (focusedBranch === name) onFocus(null);
+      onRefresh();
+      showToast(force ? `Force deleted ${name}` : `Deleted ${name}`);
+    } catch (err: any) {
+      const msg: string = String(err?.message ?? err ?? '');
+      const isUnmerged = msg.includes('not fully merged') || msg.includes('fully merged') || msg.includes('-D');
+      if (isUnmerged && !force) {
+        setDeleteConfirm({ name, force: true });
+      } else {
+        showToast(`Error: ${msg || 'delete failed'}`);
+      }
+    }
+  }
+
+  async function handleMerge(branch: string) {
+    setMergeTarget(null);
+    try {
+      await window.gitRose.merge(repoPath, branch);
+      onRefresh();
+      showToast(`Merged ${branch} → ${currentBranch}`);
+    } catch (e: any) {
+      const msg: string = e?.message ?? '';
+      if (msg.includes('CONFLICT') || msg.includes('conflict')) {
+        onRefresh();
+        showToast(`Conflicts detected — resolve them in the Changes panel`);
+      } else {
+        showToast(`Error: ${msg || 'merge failed'}`);
+      }
+    }
+  }
+
   function startCreating() {
     setCreating(true);
     setNewBranchName('');
@@ -141,26 +229,29 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
   }
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-section">
+    <aside className="sidebar" style={{ width: sidebarWidth }}>
+      {/* Fixed header */}
+      <div className="sidebar-header">
         <div className="sidebar-logo">
           <span className="logo-icon">🌹</span>
           <span className="logo-text">GitRose</span>
         </div>
+        <div className="sidebar-search-row">
+          <span className="sidebar-search-icon">⌕</span>
+          <input
+            className="sidebar-search-input"
+            placeholder="Rechercher une branche…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && (
+            <button className="sidebar-search-clear" onClick={() => setSearch('')}>✕</button>
+          )}
+        </div>
       </div>
 
-      <div className="sidebar-search-row">
-        <span className="sidebar-search-icon">⌕</span>
-        <input
-          className="sidebar-search-input"
-          placeholder="Rechercher une branche…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        {search && (
-          <button className="sidebar-search-clear" onClick={() => setSearch('')}>✕</button>
-        )}
-      </div>
+      {/* Scrollable branch list */}
+      <div className="sidebar-scroll">
 
       <div className="sidebar-section">
         <div className="sidebar-label local-label">
@@ -183,24 +274,68 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
           </div>
         )}
         {local.map((branch) => (
-          <button
+          <div
             key={branch.name}
-            className={`branch-item ${branch.current ? 'active' : ''} ${switching === branch.name ? 'switching' : ''} ${focusedBranch === branch.name ? 'focused' : ''}`}
-            onClick={() => handleFocus(branch.name)}
-            onDoubleClick={() => handleCheckout(branch.name, branch.current)}
-            disabled={!!switching}
-            title={branch.name}
+            className={`branch-item-wrap ${hoveredBranch === branch.name ? 'hovered' : ''}`}
+            onMouseEnter={() => setHoveredBranch(branch.name)}
+            onMouseLeave={() => setHoveredBranch(null)}
           >
-            <span className="branch-icon">
-              {switching === branch.name ? <span className="branch-spinner" /> : branch.current ? '◆' : '◇'}
-            </span>
-            <span className="branch-name">{branch.name}</span>
-            {branch.current && (
-              <span className="branch-you" title={userName || 'You'}>
-                {userName ? getInitials(userName) : <GirlAvatar />}
-              </span>
+            {renaming === branch.name ? (
+              <div className="sidebar-rename-row">
+                <input
+                  className="sidebar-rename-input"
+                  autoFocus
+                  value={renameValue}
+                  onChange={(e) => setRenameValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') confirmRename();
+                    if (e.key === 'Escape') setRenaming(null);
+                  }}
+                  onBlur={confirmRename}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+            ) : (
+              <>
+                <button
+                  className={`branch-item ${branch.current ? 'active' : ''} ${switching === branch.name ? 'switching' : ''} ${focusedBranch === branch.name ? 'focused' : ''}`}
+                  onClick={() => handleFocus(branch.name)}
+                  onDoubleClick={() => handleCheckout(branch.name, branch.current)}
+                  disabled={!!switching}
+                  title={branch.name}
+                >
+                  <span className="branch-icon">
+                    {switching === branch.name ? <span className="branch-spinner" /> : branch.current ? '◆' : '◇'}
+                  </span>
+                  <span className="branch-name">{branch.name}</span>
+                  {branch.current && (
+                    <span className="branch-you" title={userName || 'You'}>
+                      {userName ? getInitials(userName) : <GirlAvatar />}
+                    </span>
+                  )}
+                </button>
+                {hoveredBranch === branch.name && !branch.current && (
+                  <div className="branch-actions">
+                    <button
+                      className="branch-action-btn rename"
+                      title={`Rename ${branch.name}`}
+                      onClick={(e) => handleRename(branch.name, e)}
+                    >✎</button>
+                    <button
+                      className="branch-action-btn merge"
+                      title={`Merge ${branch.name} into ${currentBranch}`}
+                      onClick={(e) => { e.stopPropagation(); setMergeTarget(branch.name); }}
+                    >⇒</button>
+                    <button
+                      className="branch-action-btn delete"
+                      title={`Delete ${branch.name}`}
+                      onClick={(e) => handleDelete(branch.name, e)}
+                    >✕</button>
+                  </div>
+                )}
+              </>
             )}
-          </button>
+          </div>
         ))}
       </div>
 
@@ -224,6 +359,8 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
           ))}
         </div>
       )}
+
+      </div>{/* end sidebar-scroll */}
 
       {toast && (
         <div className="sidebar-toast">{toast}</div>
@@ -258,6 +395,57 @@ export function Sidebar({ branches, userName, focusedBranch, repoPath, onCheckou
           </div>
         </div>
       )}
+
+      {mergeTarget && (
+        <div className="checkout-blocked-overlay" onClick={() => setMergeTarget(null)}>
+          <div className="checkout-blocked-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="checkout-blocked-title">Merge branch</div>
+            <div className="checkout-blocked-desc">
+              Merge <strong>{mergeTarget}</strong> into <strong>{currentBranch}</strong>?
+            </div>
+            <div className="checkout-blocked-actions">
+              <button className="checkout-blocked-btn stash" onClick={() => handleMerge(mergeTarget)}>
+                <span className="checkout-blocked-btn-icon">⇒</span>
+                Merge
+              </button>
+              <button className="checkout-blocked-btn cancel" onClick={() => setMergeTarget(null)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirm && (
+        <div className="checkout-blocked-overlay" onClick={() => setDeleteConfirm(null)}>
+          <div className="checkout-blocked-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="checkout-blocked-title">
+              {deleteConfirm.force ? 'Force delete branch' : 'Delete branch'}
+            </div>
+            <div className="checkout-blocked-desc">
+              {deleteConfirm.force ? (
+                <><strong>{deleteConfirm.name}</strong> has unmerged commits. Force delete anyway? This cannot be undone.</>
+              ) : (
+                <>Delete <strong>{deleteConfirm.name}</strong>? This cannot be undone.</>
+              )}
+            </div>
+            <div className="checkout-blocked-actions">
+              <button
+                className="checkout-blocked-btn discard"
+                onClick={() => confirmDelete(deleteConfirm.name, deleteConfirm.force)}
+              >
+                <span className="checkout-blocked-btn-icon">{deleteConfirm.force ? '⚠' : '✕'}</span>
+                {deleteConfirm.force ? 'Force delete' : 'Delete'}
+              </button>
+              <button className="checkout-blocked-btn cancel" onClick={() => setDeleteConfirm(null)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="sidebar-resize-handle" onMouseDown={onResizeMouseDown} title="Drag to resize" />
     </aside>
   );
 }

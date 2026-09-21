@@ -8,8 +8,14 @@ import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ResizablePanels } from './components/ResizablePanels';
 import { CherryPickPanel } from './components/CherryPickPanel';
+import { CloneDialog } from './components/CloneDialog';
+import { BranchDiffPanel } from './components/BranchDiffPanel';
+import { RemotesPanel } from './components/RemotesPanel';
+import { CommitDetail } from './components/CommitDetail';
+import { TagsPanel } from './components/TagsPanel';
 import { RebaseBar } from './components/RebaseBar';
 import { GitConsole } from './components/GitConsole';
+import { ConflictPanel } from './components/ConflictPanel';
 import './styles/theme.css';
 import './App.css';
 
@@ -35,10 +41,11 @@ interface RepoTab {
   userName: string;
   activeView: 'commits' | 'status';
   selectedFile: { path: string; staged: boolean } | null;
-  showGraph: boolean;
   showRebase: boolean;
   showConsole: boolean;
   loading: boolean;
+  commitSearch: string;
+  showTags: boolean;
 }
 
 function repoName(path: string): string {
@@ -59,16 +66,20 @@ function newTab(path: string, index: number): RepoTab {
     userName: '',
     activeView: 'status',
     selectedFile: null,
-    showGraph: false,
     showRebase: false,
     showConsole: false,
     loading: true,
+    commitSearch: '',
+    showTags: false,
   };
 }
 
 export default function App() {
   const [tabs, setTabs] = useState<RepoTab[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [showClone, setShowClone] = useState(false);
+  const [showBranchDiff, setShowBranchDiff] = useState(false);
+  const [showRemotes, setShowRemotes] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const tab = tabs.find((t) => t.id === activeId) ?? null;
@@ -113,6 +124,17 @@ export default function App() {
     loadRepo(path, t.id);
   }, [tabs, loadRepo]);
 
+  const handleCloned = useCallback((path: string) => {
+    setShowClone(false);
+    window.gitRose.addRecentRepo(path).catch(() => {});
+    const existing = tabs.find((t) => t.path === path);
+    if (existing) { setActiveId(existing.id); return; }
+    const t = newTab(path, tabs.length);
+    setTabs((prev) => [...prev, t]);
+    setActiveId(t.id);
+    loadRepo(path, t.id);
+  }, [tabs, loadRepo]);
+
   const handleCloseTab = useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setTabs((prev) => {
@@ -121,6 +143,18 @@ export default function App() {
       return next;
     });
   }, [activeId]);
+
+  // Restore last opened repo on startup
+  useEffect(() => {
+    window.gitRose.getRecentRepos().then((paths) => {
+      if (paths.length === 0) return;
+      const path = paths[0];
+      const t = newTab(path, 0);
+      setTabs([t]);
+      setActiveId(t.id);
+      loadRepo(path, t.id);
+    }).catch(() => {});
+  }, []);
 
   // Poll status for active tab
   useEffect(() => {
@@ -133,7 +167,12 @@ export default function App() {
   }, [activeId]);
 
   if (tabs.length === 0 || !tab) {
-    return <WelcomeScreen onOpenRepo={handleOpenRepo} />;
+    return (
+      <>
+        <WelcomeScreen onOpenRepo={handleOpenRepo} onClone={() => setShowClone(true)} />
+        {showClone && <CloneDialog onClose={() => setShowClone(false)} onCloned={handleCloned} />}
+      </>
+    );
   }
 
   async function handleFocusBranch(branch: string | null) {
@@ -164,6 +203,7 @@ export default function App() {
           </button>
         ))}
         <button className="tab-add" onClick={handleOpenRepo} title="Open another repository">+</button>
+        <button className="tab-add" onClick={() => setShowClone(true)} title="Cloner un dépôt">⬇</button>
       </div>
 
       <Toolbar
@@ -197,6 +237,7 @@ export default function App() {
             return localName;
           }}
           onFocus={handleFocusBranch}
+          currentBranch={tab.status?.current ?? null}
         />
 
         <main className="main-content">
@@ -219,6 +260,18 @@ export default function App() {
                 ) : (
                   <span className="history-toolbar-hint">Click a branch to filter</span>
                 )}
+                <div className="history-search-wrap">
+                  <span className="history-search-icon">⌕</span>
+                  <input
+                    className="history-search-input"
+                    placeholder="Rechercher…"
+                    value={tab.commitSearch}
+                    onChange={(e) => updateTab(tab.id, { commitSearch: e.target.value })}
+                  />
+                  {tab.commitSearch && (
+                    <button className="history-search-clear" onClick={() => updateTab(tab.id, { commitSearch: '' })}>✕</button>
+                  )}
+                </div>
                 <button
                   className={`graph-toggle-btn rebase-btn ${tab.showRebase ? 'active' : ''}`}
                   onClick={() => updateTab(tab.id, { showRebase: !tab.showRebase })}
@@ -226,10 +279,22 @@ export default function App() {
                   ↥ Rebase
                 </button>
                 <button
-                  className={`graph-toggle-btn ${tab.showGraph ? 'active' : ''}`}
-                  onClick={() => updateTab(tab.id, { showGraph: !tab.showGraph })}
+                  className={`graph-toggle-btn ${tab.showTags ? 'active' : ''}`}
+                  onClick={() => updateTab(tab.id, { showTags: !tab.showTags })}
                 >
-                  {tab.showGraph ? '⬡ Hide graph' : '⬡ Show graph'}
+                  🏷 Tags
+                </button>
+                <button
+                  className="graph-toggle-btn"
+                  onClick={() => setShowBranchDiff(true)}
+                >
+                  ⇄ Diff branches
+                </button>
+                <button
+                  className="graph-toggle-btn"
+                  onClick={() => setShowRemotes(true)}
+                >
+                  ⚡ Remotes
                 </button>
               </div>
               {tab.showRebase && (
@@ -240,34 +305,44 @@ export default function App() {
                   onCancel={() => updateTab(tab.id, { showRebase: false })}
                 />
               )}
-              <CommitGraph
-                commits={tab.commits}
-                selectedHash={tab.selectedCommit?.hash ?? null}
-                showGraph={tab.showGraph}
-                onSelect={(c) => updateTab(tab.id, { selectedCommit: c })}
-              />
-              {tab.selectedCommit && (
-                <CherryPickPanel
-                  commit={tab.selectedCommit}
-                  repoPath={tab.path}
-                  onDone={async () => {
-                    await refreshTab(tab);
-                    updateTab(tab.id, { selectedCommit: null });
-                  }}
-                  onDismiss={() => updateTab(tab.id, { selectedCommit: null })}
-                />
-              )}
+              <div className="commits-layout">
+                <div className={`commits-list-pane${tab.selectedCommit ? ' collapsed' : ''}`}>
+                  <CommitGraph
+                    commits={tab.commitSearch
+                      ? tab.commits.filter(c => {
+                          const q = tab.commitSearch.toLowerCase();
+                          return c.message.toLowerCase().includes(q) || c.author.toLowerCase().includes(q) || c.shortHash.toLowerCase().includes(q);
+                        })
+                      : tab.commits}
+                    selectedHash={tab.selectedCommit?.hash ?? null}
+                    onSelect={(c) => updateTab(tab.id, { selectedCommit: c })}
+                  />
+                </div>
+                {tab.selectedCommit && (
+                  <CommitDetail
+                    commit={tab.selectedCommit}
+                    repoPath={tab.path}
+                    onRefresh={() => refreshTab(tab)}
+                    onClose={() => updateTab(tab.id, { selectedCommit: null })}
+                  />
+                )}
+              </div>
             </>
           ) : (
             <ResizablePanels
               left={
-                <ActionPanel
-                  repoPath={tab.path}
-                  status={tab.status}
-                  onRefresh={() => { refreshTab(tab); updateTab(tab.id, { selectedFile: null }); }}
-                  onFileSelect={(path, staged) => updateTab(tab.id, { selectedFile: { path, staged } })}
-                  selectedFile={tab.selectedFile?.path ?? null}
-                />
+                <>
+                  {(tab.status?.conflicted?.length ?? 0) > 0 && (
+                    <ConflictPanel repoPath={tab.path} onRefresh={() => refreshTab(tab)} />
+                  )}
+                  <ActionPanel
+                    repoPath={tab.path}
+                    status={tab.status}
+                    onRefresh={() => { refreshTab(tab); updateTab(tab.id, { selectedFile: null }); }}
+                    onFileSelect={(path, staged) => updateTab(tab.id, { selectedFile: { path, staged } })}
+                    selectedFile={tab.selectedFile?.path ?? null}
+                  />
+                </>
               }
               right={
                 <DiffViewer
@@ -286,6 +361,25 @@ export default function App() {
           repoPath={tab.path}
           onClose={() => updateTab(tab.id, { showConsole: false })}
           onRefresh={() => refreshTab(tab)}
+        />
+      )}
+
+      {tab.showTags && (
+        <TagsPanel repoPath={tab.path} onClose={() => updateTab(tab.id, { showTags: false })} />
+      )}
+
+      {showClone && <CloneDialog onClose={() => setShowClone(false)} onCloned={handleCloned} />}
+
+      {showRemotes && (
+        <RemotesPanel repoPath={tab.path} onClose={() => setShowRemotes(false)} />
+      )}
+
+      {showBranchDiff && (
+        <BranchDiffPanel
+          repoPath={tab.path}
+          branches={tab.branches}
+          currentBranch={tab.status?.current ?? null}
+          onClose={() => setShowBranchDiff(false)}
         />
       )}
     </div>
