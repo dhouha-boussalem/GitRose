@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Tag {
   name: string;
@@ -80,7 +81,7 @@ export function TagsPanel({ repoPath, onClose }: TagsPanelProps) {
     }
   }
 
-  return (
+  return createPortal(
     <div className="tags-overlay" onClick={onClose}>
       <div className="tags-panel" onClick={(e) => e.stopPropagation()}>
         <div className="tags-header">
@@ -154,6 +155,7 @@ export function TagsPanel({ repoPath, onClose }: TagsPanelProps) {
 
         {toast && <div className="tags-toast">{toast}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
