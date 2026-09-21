@@ -1,3 +1,21 @@
+/* === CSS variable shims (vars used in components but not in theme.css) === */
+:root {
+  --accent-rose: #f03060;
+  --border-color: var(--border-subtle, #dcdce6);
+  --bg-secondary: var(--bg-deep, #ededf2);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --border-color: #2c2b3e;
+    --bg-secondary: #232233;
+    --bg-hover: #2a2940;
+    --text-primary: #e0e0f0;
+    --text-secondary: #9090b0;
+    --text-muted: #60607a;
+    --bg-deepest: #13121f;
+  }
+}
+
 /* === Layout === */
 
 .app-layout {
@@ -2456,7 +2474,7 @@
   max-height: calc(100vh - 120px);
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
+  background: var(--bg-deepest);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: 0 16px 48px rgba(0,0,0,0.28);
