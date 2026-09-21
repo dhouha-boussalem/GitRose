@@ -7,7 +7,6 @@ import { ActionPanel } from './components/ActionPanel';
 import { DiffViewer } from './components/DiffViewer';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { ResizablePanels } from './components/ResizablePanels';
-import { CherryPickPanel } from './components/CherryPickPanel';
 import { CloneDialog } from './components/CloneDialog';
 import { BranchDiffPanel } from './components/BranchDiffPanel';
 import { RemotesPanel } from './components/RemotesPanel';
