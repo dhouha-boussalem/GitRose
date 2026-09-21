@@ -119,6 +119,10 @@ function registerGitHandlers() {
     return GitService.renameBranch(repoPath, oldName, newName);
   });
 
+  ipcMain.handle('git:reset-to-commit', async (_event, repoPath: string, hash: string, mode: 'soft' | 'mixed' | 'hard') => {
+    return GitService.resetToCommit(repoPath, hash, mode);
+  });
+
   ipcMain.handle('git:merge', async (_event, repoPath: string, branch: string) => {
     return GitService.merge(repoPath, branch);
   });

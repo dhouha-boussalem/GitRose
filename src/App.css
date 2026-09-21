@@ -2331,3 +2331,67 @@
 .cd-diff-del  { background: rgba(220,50,50,0.1); }
 .cd-diff-del .cd-diff-gutter  { color: var(--color-deleted); }
 .cd-diff-ctx  { background: transparent; }
+
+/* === Reset panel inside CommitDetail === */
+.cd-reset-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.cd-reset-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.cd-reset-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cd-reset-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s;
+  width: 100%;
+}
+.cd-reset-btn:hover:not(:disabled) {
+  border-color: var(--accent-rose);
+  background: rgba(240,48,96,0.06);
+}
+.cd-reset-btn.danger {
+  border-color: rgba(220,50,50,0.3);
+}
+.cd-reset-btn.danger:hover:not(:disabled) {
+  border-color: #e05555;
+  background: rgba(220,50,50,0.1);
+}
+.cd-reset-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.cd-reset-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 48px;
+  flex-shrink: 0;
+}
+.cd-reset-btn.danger .cd-reset-label { color: #e05555; }
+
+.cd-reset-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+}

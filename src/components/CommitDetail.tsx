@@ -8,7 +8,7 @@ interface CommitDetailProps {
   onRefresh: () => void;
 }
 
-type Mode = 'detail' | 'cherry-new-branch' | 'squash';
+type Mode = 'detail' | 'cherry-new-branch' | 'squash' | 'reset';
 
 const STATUS_ICON: Record<string, string> = { M: '✎', A: '+', D: '−', R: '→', C: '©' };
 const STATUS_CLASS: Record<string, string> = { M: 'modified', A: 'added', D: 'deleted', R: 'renamed' };
@@ -129,7 +129,30 @@ export function CommitDetail({ commit, repoPath, onClose, onRefresh }: CommitDet
             <button className="cd-action-btn" disabled={busy} onClick={() => { setMode('squash'); setSquashMsg(''); }}>
               ⊙ Squash
             </button>
+            <button className="cd-action-btn" disabled={busy} onClick={() => setMode('reset')}>
+              ↺ Reset
+            </button>
           </>
+        )}
+        {mode === 'reset' && (
+          <div className="cd-reset-panel">
+            <div className="cd-reset-title">Réinitialiser HEAD vers ce commit</div>
+            <div className="cd-reset-options">
+              <button className="cd-reset-btn" disabled={busy} onClick={() => run(() => window.gitRose.resetToCommit(repoPath, commit.hash, 'soft'))}>
+                <span className="cd-reset-label">Soft</span>
+                <span className="cd-reset-desc">Garde les fichiers stagés</span>
+              </button>
+              <button className="cd-reset-btn" disabled={busy} onClick={() => run(() => window.gitRose.resetToCommit(repoPath, commit.hash, 'mixed'))}>
+                <span className="cd-reset-label">Mixed</span>
+                <span className="cd-reset-desc">Désgage les fichiers, garde les modifications</span>
+              </button>
+              <button className="cd-reset-btn danger" disabled={busy} onClick={() => run(() => window.gitRose.resetToCommit(repoPath, commit.hash, 'hard'))}>
+                <span className="cd-reset-label">Hard ⚠</span>
+                <span className="cd-reset-desc">Supprime toutes les modifications locales</span>
+              </button>
+            </div>
+            <button className="cd-action-btn ghost" onClick={() => setMode('detail')}>Annuler</button>
+          </div>
         )}
         {mode === 'cherry-new-branch' && (
           <>

@@ -219,6 +219,10 @@ export class GitService {
     await this.getGit(repoPath).raw(['branch', '-m', oldName, newName]);
   }
 
+  static async resetToCommit(repoPath: string, hash: string, mode: 'soft' | 'mixed' | 'hard'): Promise<void> {
+    await this.getGit(repoPath).raw(['reset', `--${mode}`, hash]);
+  }
+
   static async merge(repoPath: string, branch: string): Promise<void> {
     await this.getGit(repoPath).merge([branch]);
   }
