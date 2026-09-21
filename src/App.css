@@ -2445,17 +2445,15 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(10,8,20,0.4);
+  background: rgba(10,8,20,0.6);
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding-top: 84px;
-  padding-right: 16px;
+  align-items: center;
+  justify-content: center;
 }
 
 .tags-panel {
-  width: 440px;
-  max-height: calc(100vh - 100px);
+  width: 680px;
+  max-height: calc(100vh - 120px);
   display: flex;
   flex-direction: column;
   background: var(--bg-primary);
