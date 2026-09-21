@@ -1393,8 +1393,8 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background: #111020;
+  border: 1px solid #3a3858;
   border-radius: var(--radius-sm);
   padding: 0 8px;
   height: 26px;
@@ -1404,7 +1404,7 @@
 .history-search-wrap:focus-within { border-color: var(--accent-rose); }
 
 .history-search-icon {
-  color: var(--text-secondary);
+  color: #9090b0;
   font-size: 13px;
   flex-shrink: 0;
 }
@@ -1415,10 +1415,10 @@
   border: none;
   outline: none;
   font-size: 12px;
-  color: var(--text-primary);
+  color: #e0e0f0;
   min-width: 0;
 }
-.history-search-input::placeholder { color: var(--text-muted); }
+.history-search-input::placeholder { color: #606080; }
 
 .history-search-clear {
   background: none;
