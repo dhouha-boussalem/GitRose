@@ -2815,3 +2815,31 @@
   gap: 8px;
   margin-top: 4px;
 }
+
+/* === Force Push confirm bar === */
+.force-push-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(220,50,50,0.08);
+  border-bottom: 1px solid rgba(220,50,50,0.2);
+  flex-shrink: 0;
+}
+.force-push-warn { font-size: 14px; flex-shrink: 0; }
+.force-push-text { font-size: 11px; color: #e05555; flex: 1; }
+.force-push-btn {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.12s;
+  white-space: nowrap;
+}
+.force-push-btn.danger { background: #c03030; border: 1px solid #a02020; color: #fff; }
+.force-push-btn.danger:hover { background: #a02020; }
+.force-push-btn.ghost { background: none; border: 1px solid var(--border-color); color: var(--text-secondary, #9090b0); }
+.force-push-btn.ghost:hover { background: var(--bg-hover, #2a2940); }
+.pull-dropdown-item.danger { color: #e05555; }
+.pull-dropdown-item.danger:hover { background: rgba(220,50,50,0.1); }

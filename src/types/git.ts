@@ -55,6 +55,7 @@ declare global {
       stageAll: (repoPath: string) => Promise<void>;
       commit: (repoPath: string, message: string) => Promise<void>;
       push: (repoPath: string) => Promise<void>;
+      forcePush: (repoPath: string) => Promise<void>;
       pull: (repoPath: string) => Promise<void>;
       pullRebase: (repoPath: string) => Promise<void>;
       fetch: (repoPath: string) => Promise<void>;

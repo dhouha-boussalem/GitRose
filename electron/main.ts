@@ -99,6 +99,10 @@ function registerGitHandlers() {
     return GitService.push(repoPath);
   });
 
+  ipcMain.handle('git:force-push', async (_event, repoPath: string) => {
+    return GitService.forcePush(repoPath);
+  });
+
   ipcMain.handle('git:pull', async (_event, repoPath: string) => {
     return GitService.pull(repoPath);
   });

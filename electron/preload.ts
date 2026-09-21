@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('gitRose', {
   stageAll: (repoPath: string) => ipcRenderer.invoke('git:stage-all', repoPath),
   commit: (repoPath: string, message: string) => ipcRenderer.invoke('git:commit', repoPath, message),
   push: (repoPath: string) => ipcRenderer.invoke('git:push', repoPath),
+  forcePush: (repoPath: string) => ipcRenderer.invoke('git:force-push', repoPath),
   pull: (repoPath: string) => ipcRenderer.invoke('git:pull', repoPath),
   pullRebase: (repoPath: string) => ipcRenderer.invoke('git:pull-rebase', repoPath),
   fetch: (repoPath: string) => ipcRenderer.invoke('git:fetch', repoPath),

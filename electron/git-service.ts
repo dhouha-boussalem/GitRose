@@ -203,6 +203,14 @@ export class GitService {
     await this.getGit(repoPath).pull();
   }
 
+  static async forcePush(repoPath: string): Promise<void> {
+    const git = this.getGit(repoPath);
+    const status = await git.status();
+    const branch = status.current;
+    if (!branch) throw new Error('Not on a branch');
+    await git.push(['--force-with-lease', '--set-upstream', 'origin', branch]);
+  }
+
   static async pullRebase(repoPath: string): Promise<void> {
     await this.getGit(repoPath).pull(['--rebase']);
   }

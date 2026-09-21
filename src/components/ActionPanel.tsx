@@ -18,9 +18,12 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
   const [lastCommitMsg, setLastCommitMsg] = useState('');
   const [opState, setOpState] = useState<OpState>('idle');
   const [errorMsg, setErrorMsg] = useState('');
-  const [pushPullOp, setPushPullOp] = useState<'push' | 'pull' | 'pull-rebase' | 'fetch' | null>(null);
+  const [pushPullOp, setPushPullOp] = useState<'push' | 'force-push' | 'pull' | 'pull-rebase' | 'fetch' | null>(null);
   const [pullMenuOpen, setPullMenuOpen] = useState(false);
   const pullMenuRef = useRef<HTMLDivElement>(null);
+  const [pushMenuOpen, setPushMenuOpen] = useState(false);
+  const pushMenuRef = useRef<HTMLDivElement>(null);
+  const [confirmForcePush, setConfirmForcePush] = useState(false);
   const [splitPct, setSplitPct] = useState(50);
   const [changesCollapsed, setChangesCollapsed] = useState(false);
   const [stagedCollapsed, setStagedCollapsed] = useState(false);
@@ -105,11 +108,31 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
   }
 
   async function handlePush() {
+    setPushMenuOpen(false);
     setPushPullOp('push');
     await run(() => window.gitRose.push(repoPath));
     setPushPullOp(null);
     onRefresh();
   }
+
+  async function handleForcePush() {
+    setConfirmForcePush(false);
+    setPushPullOp('force-push');
+    await run(() => window.gitRose.forcePush(repoPath));
+    setPushPullOp(null);
+    onRefresh();
+  }
+
+  useEffect(() => {
+    if (!pushMenuOpen) return;
+    function close(e: MouseEvent) {
+      if (pushMenuRef.current && !pushMenuRef.current.contains(e.target as Node)) {
+        setPushMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [pushMenuOpen]);
 
   async function handlePull() {
     setPullMenuOpen(false);
@@ -193,15 +216,35 @@ export function ActionPanel({ repoPath, status, onRefresh, onFileSelect, selecte
             </div>
           )}
         </div>
-        <button
-          className={`action-sync-btn push ${pushPullOp === 'push' ? 'loading' : ''}`}
-          onClick={handlePush}
-          disabled={isLoading}
-        >
-          {pushPullOp === 'push' ? <span className="btn-spinner" /> : '↑'}
-          Push
-        </button>
+        <div className="pull-split-wrap" ref={pushMenuRef}>
+          <button
+            className={`action-sync-btn push ${(pushPullOp === 'push' || pushPullOp === 'force-push') ? 'loading' : ''}`}
+            onClick={() => setPushMenuOpen((o) => !o)}
+            disabled={isLoading}
+          >
+            {(pushPullOp === 'push' || pushPullOp === 'force-push') ? <span className="btn-spinner" /> : '↑'}
+            {pushPullOp === 'force-push' ? 'Force push' : 'Push'}
+            <span className="pull-chevron">▾</span>
+          </button>
+          {pushMenuOpen && (
+            <div className="pull-dropdown">
+              <button className="pull-dropdown-item" onClick={handlePush}>↑ Push</button>
+              <button className="pull-dropdown-item danger" onClick={() => { setPushMenuOpen(false); setConfirmForcePush(true); }}>
+                ⚠ Force push
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {confirmForcePush && (
+        <div className="force-push-confirm">
+          <span className="force-push-warn">⚠</span>
+          <span className="force-push-text">Force push va écraser l'historique distant. Confirmer ?</span>
+          <button className="force-push-btn danger" onClick={handleForcePush}>Force push</button>
+          <button className="force-push-btn ghost" onClick={() => setConfirmForcePush(false)}>Annuler</button>
+        </div>
+      )}
 
       {opState === 'error' && (
         <div className="action-error">
