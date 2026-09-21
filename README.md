@@ -2,7 +2,15 @@
 
 A modern, elegant desktop Git client built with Electron, React and TypeScript.
 
-![GitRose — dark theme](https://raw.githubusercontent.com/dhouha-boussalem/GitRose/main/public/icon.png)
+## Screenshots
+
+| Welcome | Changes |
+|---|---|
+| ![Welcome screen](screenshots/01-welcome.png) | ![Changes view](screenshots/02-main.png) |
+
+| Commit history | Commit detail |
+|---|---|
+| ![History view](screenshots/03-history.png) | ![Commit detail](screenshots/04-commit-detail.png) |
 
 ---
 
